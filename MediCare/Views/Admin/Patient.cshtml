@@ -1,0 +1,193 @@
+﻿@{
+    ViewData["Title"] = "Patients";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .topbar {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+
+        .topbar input {
+            width: 50%;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+        }
+
+    .profile {
+        background: #17b978;
+        color: white;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .btn-add {
+        background: #17b978;
+        color: white;
+        padding: 8px 15px;
+        border-radius: 6px;
+        border: none;
+    }
+
+    .card-box {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .table-search {
+        width: 250px;
+        padding: 6px;
+        border-radius: 6px;
+        border: 1px solid #ddd;
+        margin-bottom: 15px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        table th, table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+    .badge {
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+    }
+
+    .active-badge {
+        background: #d1f5e0;
+        color: #0f9b6d;
+    }
+
+    .inactive-badge {
+        background: #eee;
+        color: #777;
+    }
+
+    .actions span {
+        cursor: pointer;
+        margin-right: 8px;
+    }
+
+    .pagination {
+        text-align: right;
+        margin-top: 15px;
+    }
+
+        .pagination button {
+            padding: 5px 10px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            background: white;
+        }
+</style>
+
+<!-- TOPBAR -->
+<div class="topbar">
+    <input type="text" placeholder="Search patients, doctors, appointments..." />
+    <div class="profile">AD</div>
+</div>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+    <div>
+        <h2>Patients</h2>
+        <small class="text-muted">Manage patient records</small>
+    </div>
+    <button class="btn-add">+ Add Patient</button>
+</div>
+
+<!-- TABLE CARD -->
+<div class="card-box">
+
+    <input class="table-search" type="text" placeholder="Search patients..." />
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Patient Name</th>
+                <th>Age</th>
+                <th>Gender</th>
+                <th>Phone</th>
+                <th>Last Visit</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>John Smith</td>
+                <td>45</td>
+                <td>Male</td>
+                <td>+1234-567-8900</td>
+                <td>2024-02-10</td>
+                <td><span class="badge active-badge">Active</span></td>
+                <td class="actions">
+                    <span>👁</span>
+                    <span>✏</span>
+                    <span>🗑</span>
+                </td>
+            </tr>
+
+            <tr>
+                <td>2</td>
+                <td>Sarah Johnson</td>
+                <td>32</td>
+                <td>Female</td>
+                <td>+1234-567-8901</td>
+                <td>2024-02-09</td>
+                <td><span class="badge active-badge">Active</span></td>
+                <td class="actions">
+                    <span>👁</span>
+                    <span>✏</span>
+                    <span>🗑</span>
+                </td>
+            </tr>
+
+            <tr>
+                <td>3</td>
+                <td>Michael Chen</td>
+                <td>58</td>
+                <td>Male</td>
+                <td>+1234-567-8902</td>
+                <td>2024-01-28</td>
+                <td><span class="badge inactive-badge">Inactive</span></td>
+                <td class="actions">
+                    <span>👁</span>
+                    <span>✏</span>
+                    <span>🗑</span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="pagination">
+        <button>Previous</button>
+        <button>Next</button>
+    </div>
+
+</div>

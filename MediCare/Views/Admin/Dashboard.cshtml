@@ -1,0 +1,162 @@
+﻿@{
+    ViewData["Title"] = "Admin Dashboard";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<!-- HEADER -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold">Admin Dashboard</h2>
+        <p class="text-muted">Overview of your clinic operations</p>
+    </div>
+</div>
+
+<!-- STATS CARDS -->
+<div class="row g-4 mb-4">
+
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 rounded-4 p-3">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <small class="text-muted">Total Patients</small>
+                    <h3 class="fw-bold">2,847</h3>
+                    <small class="text-success">↑ 12.5%</small>
+                </div>
+                <div class="bg-success bg-opacity-25 p-3 rounded-3">
+                    <i class="fa-solid fa-users text-success"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 rounded-4 p-3">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <small class="text-muted">Appointments Today</small>
+                    <h3 class="fw-bold">64</h3>
+                    <small class="text-success">↑ 5.2%</small>
+                </div>
+                <div class="bg-primary bg-opacity-25 p-3 rounded-3">
+                    <i class="fa-solid fa-calendar-check text-primary"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 rounded-4 p-3">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <small class="text-muted">Active Doctors</small>
+                    <h3 class="fw-bold">18</h3>
+                </div>
+                <div class="bg-purple bg-opacity-25 p-3 rounded-3">
+                    <i class="fa-solid fa-user-doctor text-warning"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 rounded-4 p-3">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <small class="text-muted">Revenue</small>
+                    <h3 class="fw-bold">$12,543</h3>
+                    <small class="text-success">↑ 8.1%</small>
+                </div>
+                <div class="bg-warning bg-opacity-25 p-3 rounded-3">
+                    <i class="fa-solid fa-dollar-sign text-warning"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- CHARTS -->
+<div class="row g-4 mb-4">
+
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0 rounded-4 p-4">
+            <h5>Weekly Patients</h5>
+            <canvas id="barChart"></canvas>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0 rounded-4 p-4">
+            <h5>Appointment Trends</h5>
+            <canvas id="lineChart"></canvas>
+        </div>
+    </div>
+
+</div>
+
+<!-- RECENT ACTIVITIES -->
+<div class="card shadow-sm border-0 rounded-4 p-4">
+    <h5 class="mb-4">Recent Activities</h5>
+
+    <div class="mb-3">
+        <strong>New patient registered</strong><br />
+        <small class="text-muted">John Smith • 2 minutes ago</small>
+    </div>
+
+    <div class="mb-3">
+        <strong>Appointment booked</strong><br />
+        <small class="text-muted">Dr. Sarah Johnson • 15 minutes ago</small>
+    </div>
+
+    <div class="mb-3">
+        <strong>Prescription created</strong><br />
+        <small class="text-muted">Dr. Michael Chen • 30 minutes ago</small>
+    </div>
+
+    <div class="mb-3">
+        <strong>Lab report updated</strong><br />
+        <small class="text-muted">Patient: Maria Garcia • 1 hour ago</small>
+    </div>
+
+    <div>
+        <strong>Payment received</strong><br />
+        <small class="text-muted">Invoice #INV-2024-001 • 2 hours ago</small>
+    </div>
+</div>
+
+<!-- CHART JS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // BAR CHART
+    new Chart(document.getElementById('barChart'), {
+        type: 'bar',
+        data: {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+            datasets: [{
+                data: [45, 52, 38, 60, 48, 35],
+                backgroundColor: '#16a34a'
+            }]
+        },
+        options: {
+            plugins: { legend: { display: false } }
+        }
+    });
+
+    // LINE CHART
+    new Chart(document.getElementById('lineChart'), {
+        type: 'line',
+        data: {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+            datasets: [{
+                data: [35, 42, 28, 48, 38, 25],
+                borderColor: '#0d6efd',
+                fill: false,
+                tension: 0.4
+            }]
+        },
+        options: {
+            plugins: { legend: { display: false } }
+        }
+    });
+</script>

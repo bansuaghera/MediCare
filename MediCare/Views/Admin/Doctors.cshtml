@@ -1,0 +1,224 @@
+﻿@{
+    ViewData["Title"] = "Doctors";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .topbar {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+
+        .topbar input {
+            width: 50%;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+        }
+
+    .profile {
+        background: #17b978;
+        color: white;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .btn-add {
+        background: #17b978;
+        color: white;
+        padding: 8px 15px;
+        border-radius: 6px;
+        border: none;
+    }
+
+    .card-box {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .table-search {
+        width: 250px;
+        padding: 6px;
+        border-radius: 6px;
+        border: 1px solid #ddd;
+        margin-bottom: 15px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        table th, table td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+        }
+
+    .doctor-name {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .avatar {
+        width: 35px;
+        height: 35px;
+        border-radius: 8px;
+        background: #e8d8ff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: purple;
+        font-weight: bold;
+    }
+
+    .badge {
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+    }
+
+    .active-badge {
+        background: #d1f5e0;
+        color: #0f9b6d;
+    }
+
+    .leave-badge {
+        background: #fff4cc;
+        color: #b38f00;
+    }
+
+    .actions span {
+        cursor: pointer;
+        margin-right: 8px;
+    }
+
+    .pagination {
+        text-align: right;
+        margin-top: 15px;
+    }
+
+        .pagination button {
+            padding: 5px 10px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            background: white;
+        }
+</style>
+
+<!-- TOPBAR -->
+<div class="topbar">
+    <input type="text" placeholder="Search patients, doctors, appointments..." />
+    <div class="profile">AD</div>
+</div>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+    <div>
+        <h2>Doctors</h2>
+        <small class="text-muted">Manage doctor profiles</small>
+    </div>
+    <button class="btn-add">+ Add Doctor</button>
+</div>
+
+<!-- TABLE CARD -->
+<div class="card-box">
+
+    <input class="table-search" type="text" placeholder="Search doctors..." />
+
+    <table>
+        <thead>
+            <tr>
+                <th>Doctor Name</th>
+                <th>Specialty</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>Patients</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            <tr>
+                <td>
+                    <div class="doctor-name">
+                        <div class="avatar">👩‍⚕</div>
+                        Dr. Sarah Johnson
+                    </div>
+                </td>
+                <td>Cardiology</td>
+                <td>+1234-567-8900</td>
+                <td>sarah.j@hospital.com</td>
+                <td>145</td>
+                <td><span class="badge active-badge">Active</span></td>
+                <td class="actions">
+                    <span>👁</span>
+                    <span>✏</span>
+                    <span>🗑</span>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <div class="doctor-name">
+                        <div class="avatar">👨‍⚕</div>
+                        Dr. Michael Chen
+                    </div>
+                </td>
+                <td>Pediatrics</td>
+                <td>+1234-567-8901</td>
+                <td>michael.c@hospital.com</td>
+                <td>132</td>
+                <td><span class="badge active-badge">Active</span></td>
+                <td class="actions">
+                    <span>👁</span>
+                    <span>✏</span>
+                    <span>🗑</span>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <div class="doctor-name">
+                        <div class="avatar">👩‍⚕</div>
+                        Dr. Emily Davis
+                    </div>
+                </td>
+                <td>Dermatology</td>
+                <td>+1234-567-8902</td>
+                <td>emily.d@hospital.com</td>
+                <td>98</td>
+                <td><span class="badge leave-badge">On Leave</span></td>
+                <td class="actions">
+                    <span>👁</span>
+                    <span>✏</span>
+                    <span>🗑</span>
+                </td>
+            </tr>
+
+        </tbody>
+    </table>
+
+    <div class="pagination">
+        <button>Previous</button>
+        <button>Next</button>
+    </div>
+
+</div>

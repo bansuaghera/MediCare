@@ -1,0 +1,139 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+/* LEFT SIDE */
+.left-section {
+  flex: 1;
+  background: linear-gradient(135deg, #0bb783, #0a9e74);
+  color: white;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.logo-icon {
+  background: white;
+  color: #0bb783;
+  padding: 5px 8px;
+  border-radius: 5px;
+}
+
+.left-content {
+  max-width: 400px;
+}
+
+.left-content h1 {
+  font-size: 28px;
+  margin-bottom: 15px;
+}
+
+.left-content p {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+/* RIGHT SIDE */
+.right-section {
+  flex: 1;
+  background: #f4f6f9;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-card {
+  background: white;
+  padding: 40px;
+  border-radius: 15px;
+  width: 350px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+  width: 120px;
+  display: block;
+  margin: 0 auto 20px;
+}
+
+.login-card h2 {
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.subtitle {
+  text-align: center;
+  font-size: 13px;
+  margin-bottom: 20px;
+  color: gray;
+}
+
+form label {
+  font-size: 13px;
+  margin-top: 10px;
+  display: block;
+}
+
+form input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  margin-bottom: 10px;
+}
+
+.options {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-bottom: 15px;
+}
+
+.options a {
+  color: #0bb783;
+  text-decoration: none;
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  background: #0bb783;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+button:hover {
+  background: #09996f;
+}
+
+.signup {
+  text-align: center;
+  font-size: 12px;
+  margin-top: 15px;
+}
+
+.signup a {
+  color: #0bb783;
+  text-decoration: none;
+}

@@ -1,0 +1,190 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Login - MediCare+</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- FontAwesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .login-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* LEFT SIDE */
+        .left-panel {
+            flex: 1;
+            background: linear-gradient(135deg, #16a34a, #14b8a6);
+            color: white;
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+            .left-panel h1 {
+                font-weight: 700;
+                font-size: 42px;
+            }
+
+            .left-panel p {
+                font-size: 18px;
+                margin-top: 20px;
+                opacity: 0.9;
+            }
+
+        /* RIGHT SIDE */
+        .right-panel {
+            flex: 1;
+            background: #f4f6f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            width: 420px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+        }
+
+            .login-card h3 {
+                font-weight: 700;
+            }
+
+        .form-control {
+            height: 45px;
+            border-radius: 10px;
+        }
+
+        .btn-login {
+            background: linear-gradient(135deg, #16a34a, #14b8a6);
+            border: none;
+            height: 45px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+            .btn-login:hover {
+                opacity: 0.9;
+            }
+
+        .support-text {
+            position: absolute;
+            bottom: 20px;
+            right: 40px;
+            font-size: 14px;
+            color: gray;
+        }
+
+            .support-text span {
+                color: #16a34a;
+            }
+
+        @@media (max-width: 992px) {
+            .left-panel {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="login-container">
+
+        <!-- LEFT SIDE -->
+        <div class="left-panel">
+            <h2>MediCare <small>Smart OPD</small></h2>
+
+            <h1 class="mt-5">
+                Streamline Your<br />
+                Healthcare Operations
+            </h1>
+
+            <p>
+                Manage appointments, patients, and OPD queues
+                efficiently with our intelligent healthcare platform.
+            </p>
+        </div>
+
+        <!-- RIGHT SIDE -->
+        <div class="right-panel">
+
+            <div class="login-card">
+
+                <div class="text-center mb-4">
+                    <h3>Welcome Back 👋</h3>
+                    <p class="text-muted">Please login to your account</p>
+                </div>
+
+                <form asp-controller="Admin" asp-action="Dashboard" method="post">
+
+                    <div class="mb-3">
+                        <label>Email Address</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white">
+                                <i class="fa-regular fa-envelope"></i>
+                            </span>
+                            <input type="email" name="Email" class="form-control" placeholder="Enter your email" required />
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white">
+                                <i class="fa-solid fa-lock"></i>
+                            </span>
+                            <input type="password" name="Password" class="form-control" placeholder="Enter your password" required />
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-3">
+                        <div>
+                            <input type="checkbox" /> Remember me
+                            <a asp-controller="Login" asp-action="ForgotPassword" class="text-success">
+                                Forgot password?
+                            </a>
+
+                    <button type="submit" class="btn btn-login w-100 text-white">
+                        Login
+                    </button>
+
+                    <div class="text-center mt-4">
+                        Don't have an account?
+                        <a asp-controller="Login" asp-action="Register" class="text-success">Sign up</a>
+                    </div>
+
+                </form>
+
+            </div>
+
+            <div class="support-text">
+                Need help? <br />
+                <span>support@medicare.com</span>
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+</html>
