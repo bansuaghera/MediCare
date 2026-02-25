@@ -1,0 +1,168 @@
+﻿@{
+    ViewData["Title"] = "Prescription Templates";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+
+        .page-header h2 {
+            font-weight: 700;
+        }
+
+    .add-btn {
+        background: #16a34a;
+        color: white;
+        padding: 10px 18px;
+        border-radius: 10px;
+        border: none;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(22,163,74,0.3);
+    }
+
+    .template-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 25px;
+    }
+
+    .template-card {
+        background: white;
+        padding: 20px;
+        border-radius: 16px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        position: relative;
+        transition: 0.2s;
+    }
+
+        .template-card:hover {
+            transform: translateY(-3px);
+        }
+
+    .template-title {
+        font-weight: 600;
+        font-size: 18px;
+        margin-bottom: 8px;
+    }
+
+    .template-info {
+        font-size: 14px;
+        color: #6b7280;
+        margin-bottom: 5px;
+    }
+
+    .template-date {
+        position: absolute;
+        bottom: 15px;
+        right: 20px;
+        font-size: 13px;
+        color: #9ca3af;
+    }
+
+    .template-actions {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+    }
+
+        .template-actions i {
+            margin-left: 10px;
+            cursor: pointer;
+            color: #6b7280;
+            transition: 0.2s;
+        }
+
+            .template-actions i:hover {
+                color: #16a34a;
+            }
+
+        .template-actions .delete:hover {
+            color: red;
+        }
+
+    @@media (max-width: 768px) {
+        .save-btn {
+            width: 100%;
+            float: none;
+            margin-top: 20px;
+        }
+    }
+</style>
+
+<!-- HEADER -->
+<div class="page-header">
+    <div>
+        <h2>Prescription Templates</h2>
+        <p class="text-muted mb-0">Manage prescription templates</p>
+    </div>
+
+    <button class="add-btn">
+        <i class="fa fa-plus me-2"></i> New Template
+    </button>
+</div>
+
+<!-- TEMPLATE GRID -->
+<div class="template-grid">
+
+    <!-- Card 1 -->
+    <div class="template-card">
+        <div class="template-actions">
+            <i class="fa-regular fa-copy"></i>
+            <i class="fa-regular fa-pen-to-square"></i>
+            <i class="fa-solid fa-trash delete"></i>
+        </div>
+
+        <div class="template-title">Hypertension Follow-up</div>
+        <div class="template-info">3 medicines</div>
+        <div class="template-info">Used 45 times</div>
+        <div class="template-date">2024-02-10</div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="template-card">
+        <div class="template-actions">
+            <i class="fa-regular fa-copy"></i>
+            <i class="fa-regular fa-pen-to-square"></i>
+            <i class="fa-solid fa-trash delete"></i>
+        </div>
+
+        <div class="template-title">Diabetes Management</div>
+        <div class="template-info">4 medicines</div>
+        <div class="template-info">Used 38 times</div>
+        <div class="template-date">2024-02-11</div>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="template-card">
+        <div class="template-actions">
+            <i class="fa-regular fa-copy"></i>
+            <i class="fa-regular fa-pen-to-square"></i>
+            <i class="fa-solid fa-trash delete"></i>
+        </div>
+
+        <div class="template-title">Common Cold</div>
+        <div class="template-info">5 medicines</div>
+        <div class="template-info">Used 92 times</div>
+        <div class="template-date">2024-02-12</div>
+    </div>
+
+    <!-- Card 4 -->
+    <div class="template-card">
+        <div class="template-actions">
+            <i class="fa-regular fa-copy"></i>
+            <i class="fa-regular fa-pen-to-square"></i>
+            <i class="fa-solid fa-trash delete"></i>
+        </div>
+
+        <div class="template-title">Post-Surgery Care</div>
+        <div class="template-info">6 medicines</div>
+        <div class="template-info">Used 12 times</div>
+        <div class="template-date">2024-02-09</div>
+    </div>
+
+</div>

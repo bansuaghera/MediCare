@@ -1,0 +1,153 @@
+﻿<h1>Settings</h1>
+@{
+    ViewData["Title"] = "Clinic Settings";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .settings-container {
+        max-width: 1100px;
+    }
+
+    .page-title {
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+
+    .page-subtitle {
+        color: #6b7280;
+        margin-bottom: 30px;
+    }
+
+    .settings-card {
+        background: white;
+        padding: 25px;
+        border-radius: 16px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        margin-bottom: 30px;
+    }
+
+        .settings-card h5 {
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+    .form-control {
+        border-radius: 10px;
+        padding: 10px 14px;
+    }
+
+    .row-gap {
+        margin-bottom: 18px;
+    }
+
+    .save-btn {
+        background: #16a34a;
+        color: white;
+        padding: 12px 22px;
+        border-radius: 12px;
+        border: none;
+        font-weight: 600;
+        box-shadow: 0 6px 15px rgba(22,163,74,0.3);
+        float: right;
+        transition: 0.2s;
+    }
+
+        .save-btn:hover {
+            background: #15803d;
+        }
+
+    .closed-text {
+        color: #6b7280;
+        padding-top: 10px;
+    }
+
+    /* ✅ Razor Safe Media Query */
+    @@media (max-width: 768px) {
+        .save-btn {
+            width: 100%;
+            float: none;
+            margin-top: 20px;
+        }
+    }
+</style>
+
+<div class="settings-container">
+
+    <h2 class="page-title">Clinic Settings</h2>
+    <p class="page-subtitle">Manage clinic configuration</p>
+
+    <!-- Clinic Information -->
+    <div class="settings-card">
+
+        <h5><i class="fa-solid fa-building text-success"></i> Clinic Information</h5>
+
+        <div class="row row-gap">
+            <div class="col-md-6">
+                <label class="form-label">Clinic Name</label>
+                <input type="text" class="form-control" value="MediCare Smart OPD" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Registration Number</label>
+                <input type="text" class="form-control" value="CLINIC-2024-001" />
+            </div>
+        </div>
+
+        <div class="row row-gap">
+            <div class="col-12">
+                <label class="form-label">Address</label>
+                <input type="text" class="form-control" value="123 Medical Center, Healthcare City, HC 12345" />
+            </div>
+        </div>
+
+        <div class="row row-gap">
+            <div class="col-md-6">
+                <label class="form-label">Phone</label>
+                <input type="text" class="form-control" value="+91 00000 00000" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" value="contact@medicare.com" />
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Operating Hours -->
+    <div class="settings-card">
+
+        <h5><i class="fa-solid fa-clock text-success"></i> Operating Hours</h5>
+
+        @foreach (var day in new[] { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" })
+        {
+            <div class="row row-gap align-items-center">
+                <div class="col-md-3 fw-semibold">@day</div>
+
+                <div class="col-md-4">
+                    <input type="time" class="form-control" value="09:00" />
+                </div>
+
+                <div class="col-md-4">
+                    <input type="time" class="form-control" value="18:00" />
+                </div>
+            </div>
+        }
+
+        <!-- Sunday -->
+        <div class="row align-items-center">
+            <div class="col-md-3 fw-semibold">Sunday</div>
+            <div class="col-md-9 closed-text">Closed</div>
+        </div>
+
+    </div>
+
+    <button class="save-btn">
+        <i class="fa-solid fa-floppy-disk me-2"></i> Save Settings
+    </button>
+
+</div>

@@ -1,0 +1,116 @@
+﻿@{
+    ViewData["Title"] = "Add New Staff";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .page-header h2 {
+        font-weight: 600;
+    }
+
+    .card-box {
+        background: #ffffff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        margin-top: 20px;
+    }
+
+    .form-label {
+        font-weight: 500;
+    }
+
+    .btn-save {
+        background: #16a34a;
+        color: white;
+        padding: 8px 20px;
+        border-radius: 25px;
+        border: none;
+    }
+
+        .btn-save:hover {
+            background: #15803d;
+        }
+
+    .btn-cancel {
+        border-radius: 25px;
+        padding: 8px 20px;
+    }
+</style>
+
+<!-- PAGE HEADER -->
+<div class="page-header mb-4">
+    <h2>
+        <i class="fa fa-plus-circle text-success"></i>
+        Add New Staff
+    </h2>
+    <small class="text-muted">Register a new staff member</small>
+</div>
+
+<!-- FORM CARD -->
+<div class="card-box">
+
+    <form asp-action="AddStaff" method="post">
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label">First Name *</label>
+                <input type="text" name="FirstName" class="form-control" placeholder="Enter first name" required />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Last Name *</label>
+                <input type="text" name="LastName" class="form-control" placeholder="Enter last name" required />
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Role *</label>
+                <select name="Role" class="form-select" required>
+                    <option value="">Select role</option>
+                    <option>Receptionist</option>
+                    <option>Nurse</option>
+                    <option>Lab Technician</option>
+                    <option>Pharmacist</option>
+                    <option>Admin Assistant</option>
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Shift *</label>
+                <select name="Shift" class="form-select" required>
+                    <option value="">Select shift</option>
+                    <option>Morning</option>
+                    <option>Afternoon</option>
+                    <option>Evening</option>
+                    <option>Night</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <label class="form-label">Phone Number *</label>
+                <input type="tel" name="Phone" class="form-control" placeholder="+1 234-567-8900" required />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Email *</label>
+                <input type="email" name="Email" class="form-control" placeholder="staff@example.com" required />
+            </div>
+        </div>
+
+        <div>
+            <button type="submit" class="btn btn-save">
+                <i class="fa fa-save"></i> Save Staff
+            </button>
+
+            <a asp-action="Staff" class="btn btn-outline-secondary btn-cancel">
+                Cancel
+            </a>
+        </div>
+
+    </form>
+
+</div>
