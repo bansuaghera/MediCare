@@ -1,0 +1,143 @@
+﻿@{
+    ViewData["Title"] = "Call Token";
+    Layout = "~/Views/Shared/_StaffLayout.cshtml";
+}
+
+<style>
+    .page-header h3 {
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+
+    .card-custom {
+        background: #ffffff;
+        border-radius: 22px;
+        padding: 30px;
+        box-shadow: 0 4px 25px rgba(0,0,0,0.05);
+        margin-bottom: 25px;
+    }
+
+    .token-display {
+        background: #d1fae5;
+        border: 2px solid #86efac;
+        border-radius: 18px;
+        padding: 25px;
+        font-size: 48px;
+        font-weight: 800;
+        color: #047857;
+        text-align: center;
+        margin: 20px 0;
+    }
+
+    .btn-call {
+        background: #10b981;
+        color: white;
+        border-radius: 12px;
+        padding: 12px;
+        font-weight: 600;
+    }
+
+        .btn-call:hover {
+            background: #059669;
+            color: white;
+        }
+
+    .btn-outline-custom {
+        border-radius: 12px;
+        padding: 10px;
+        font-weight: 500;
+    }
+
+    .queue-item {
+        background: #f9fafb;
+        border-radius: 16px;
+        padding: 15px 18px;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+    }
+
+    .queue-token {
+        background: #e0e7ff;
+        color: #4338ca;
+        font-weight: 700;
+        padding: 8px 14px;
+        border-radius: 10px;
+        margin-right: 15px;
+    }
+</style>
+
+<div class="page-header">
+    <h3>Call Token</h3>
+    <p class="text-muted">Call next patient</p>
+</div>
+
+<div class="row justify-content-center mt-4">
+
+    <div class="col-md-6">
+
+        <!-- Current Token Card -->
+        <div class="card-custom text-center">
+
+            <small class="text-muted">Current Token</small>
+
+            <div class="token-display">
+                A-045
+            </div>
+
+            <h5 class="fw-bold">John Smith</h5>
+            <p class="text-muted">Dr. Sarah Johnson – Room 101</p>
+
+            <button class="btn btn-call w-100 mt-3">
+                <i class="fa fa-phone me-2"></i> Call Next Token
+            </button>
+
+            <div class="row mt-3">
+                <div class="col-6">
+                    <button class="btn btn-outline-secondary btn-outline-custom w-100">
+                        Repeat Call
+                    </button>
+                </div>
+                <div class="col-6">
+                    <button class="btn btn-outline-secondary btn-outline-custom w-100">
+                        Skip Token
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Next in Queue -->
+        <div class="card-custom">
+
+            <h5 class="fw-bold mb-3">Next in Queue</h5>
+
+            <div class="queue-item">
+                <div class="queue-token">A-046</div>
+                <div>
+                    <strong>Sarah Johnson</strong><br />
+                    <small class="text-muted">Dr. Michael Chen</small>
+                </div>
+            </div>
+
+            <div class="queue-item">
+                <div class="queue-token">A-047</div>
+                <div>
+                    <strong>Michael Chen</strong><br />
+                    <small class="text-muted">Dr. Emily Davis</small>
+                </div>
+            </div>
+
+            <div class="queue-item">
+                <div class="queue-token">A-048</div>
+                <div>
+                    <strong>Emily Davis</strong><br />
+                    <small class="text-muted">Dr. Robert Wilson</small>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

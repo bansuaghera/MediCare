@@ -1,0 +1,214 @@
+﻿@{
+    ViewData["Title"] = "PrintPrescription";
+    Layout = "~/Views/Shared/_StaffLayout.cshtml";
+}
+
+<style>
+    .prescription-container {
+        max-width: 850px;
+        margin: 30px auto;
+    }
+
+    .prescription-card {
+        background: #ffffff;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 4px 25px rgba(0,0,0,0.05);
+    }
+
+    .clinic-header {
+        text-align: center;
+        margin-bottom: 25px;
+        border-bottom: 2px solid #16a34a;
+        padding-bottom: 15px;
+    }
+
+        .clinic-header h2 {
+            margin: 0;
+            color: #16a34a;
+        }
+
+    .token-box {
+        text-align: center;
+        margin-top: 15px;
+        padding: 10px;
+        background: #16a34a;
+        color: white;
+        font-weight: 600;
+        border-radius: 8px;
+    }
+
+    .info-section {
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+    }
+
+    .info-label {
+        font-weight: 600;
+    }
+
+    .medicine-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+        .medicine-table th,
+        .medicine-table td {
+            border: 1px solid #e5e7eb;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .medicine-table th {
+            background: #f3f4f6;
+        }
+
+    .signature-section {
+        margin-top: 50px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .signature-box {
+        text-align: center;
+        width: 220px;
+    }
+
+    .print-btn {
+        margin-top: 25px;
+        text-align: center;
+    }
+
+        .print-btn button {
+            background: #16a34a;
+            color: white;
+            padding: 10px 25px;
+            border: none;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+    /* Razor-safe print */
+    @@media print {
+        body * {
+            visibility: hidden;
+        }
+
+        .prescription-card, .prescription-card * {
+            visibility: visible;
+        }
+
+        .prescription-card {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            box-shadow: none;
+        }
+
+        .print-btn {
+            display: none;
+        }
+    }
+</style>
+
+<div class="prescription-container">
+
+    <div class="prescription-card">
+
+        <!-- Clinic Header -->
+        <div class="clinic-header">
+            <h2>MediCare Smart OPD</h2>
+            <small>Official Prescription</small>
+
+            <div class="token-box">
+                Token No: A-045
+            </div>
+        </div>
+
+        <!-- Patient & Doctor Info -->
+        <div class="info-section">
+
+            <div class="info-row">
+                <span><span class="info-label">Patient Name:</span> John Smith</span>
+                <span><span class="info-label">Patient ID:</span> PT-1023</span>
+            </div>
+
+            <div class="info-row">
+                <span><span class="info-label">Doctor Name:</span> Dr. Sarah Johnson</span>
+                <span><span class="info-label">Doctor ID:</span> DR-204</span>
+            </div>
+
+            <div class="info-row">
+                <span><span class="info-label">Age:</span> 45</span>
+                <span><span class="info-label">Date:</span> 20 July 2026</span>
+            </div>
+
+            <div class="info-row">
+                <span><span class="info-label">Gender:</span> Male</span>
+                <span><span class="info-label">Contact:</span> +91 9876543210</span>
+            </div>
+
+        </div>
+
+        <!-- Medicines -->
+        <table class="medicine-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Medicine</th>
+                    <th>Dosage</th>
+                    <th>Duration</th>
+                    <th>Instructions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>Paracetamol 500mg</td>
+                    <td>1 Tablet</td>
+                    <td>5 Days</td>
+                    <td>After Food</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Amoxicillin 500mg</td>
+                    <td>1 Capsule</td>
+                    <td>7 Days</td>
+                    <td>Before Food</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Notes & Signature -->
+        <div class="signature-section">
+            <div>
+                <strong>Notes:</strong>
+                <p>Take medicines regularly. Avoid oily food.</p>
+            </div>
+
+            <div class="signature-box">
+                <br /><br />
+                ___________________________
+                <br />
+                Doctor Signature
+            </div>
+        </div>
+
+        <div class="print-btn">
+            <button onclick="window.print()">
+                🖨 Print Prescription
+            </button>
+        </div>
+
+    </div>
+
+</div>

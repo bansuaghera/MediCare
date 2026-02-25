@@ -1,0 +1,234 @@
+﻿@{
+    ViewData["Title"] = "Today's Appointments";
+    Layout = "~/Views/Shared/_StaffLayout.cshtml";
+}
+
+<style>
+    body {
+        background: #f4f6f9;
+    }
+
+    .page-title {
+        font-size: 26px;
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+
+    .page-subtitle {
+        color: #6b7280;
+        font-size: 14px;
+        margin-bottom: 30px;
+    }
+
+    .main-card {
+        background: #ffffff;
+        border-radius: 24px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+
+    .search-box {
+        max-width: 350px;
+        margin-bottom: 25px;
+    }
+
+        .search-box input {
+            border-radius: 14px;
+            padding-left: 40px;
+            height: 45px;
+        }
+
+    .search-icon {
+        position: absolute;
+        top: 12px;
+        left: 15px;
+        color: #9ca3af;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 10px;
+    }
+
+    thead th {
+        font-size: 12px;
+        text-transform: uppercase;
+        color: #9ca3af;
+        font-weight: 600;
+        padding-bottom: 10px;
+    }
+
+    tbody tr {
+        background: #f9fafb;
+        border-radius: 16px;
+    }
+
+    tbody td {
+        padding: 15px;
+        vertical-align: middle;
+    }
+
+    tbody tr td:first-child {
+        border-top-left-radius: 16px;
+        border-bottom-left-radius: 16px;
+    }
+
+    tbody tr td:last-child {
+        border-top-right-radius: 16px;
+        border-bottom-right-radius: 16px;
+    }
+
+    .badge-status {
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .in-progress {
+        background: #dbeafe;
+        color: #2563eb;
+    }
+
+    .waiting {
+        background: #fef3c7;
+        color: #d97706;
+    }
+
+    .action-btn {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+
+    .pagination-box {
+        margin-top: 25px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 13px;
+        color: #6b7280;
+    }
+
+    .pagination-buttons button {
+        border-radius: 12px;
+        padding: 6px 15px;
+        border: 1px solid #e5e7eb;
+        background: #ffffff;
+        margin-left: 8px;
+    }
+</style>
+
+<div class="page-title">Today's Appointments</div>
+<div class="page-subtitle">View your appointments</div>
+
+<div class="main-card">
+
+    <!-- Search -->
+    <div class="position-relative search-box">
+        <i class="fa fa-search search-icon"></i>
+        <input type="text" class="form-control" placeholder="Search appointments..." />
+    </div>
+
+    <!-- Table -->
+    <table>
+        <thead>
+            <tr>
+                <th>Time</th>
+                <th>Patient</th>
+                <th>Type</th>
+                <th>Token</th>
+                <th>Status</th>
+                <th class="text-end">Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr>
+                <td>09:00 AM</td>
+                <td><strong>John Smith</strong></td>
+                <td>Checkup</td>
+                <td>A-045</td>
+                <td>
+                    <span class="badge-status in-progress">
+                        In Progress
+                    </span>
+                </td>
+                <td class="text-end">
+                    <div class="action-btn">
+                        <i class="fa fa-eye text-muted"></i>
+                    </div>
+                </td>
+            </tr>
+
+            <tr>
+                <td>09:30 AM</td>
+                <td><strong>Sarah Johnson</strong></td>
+                <td>Consultation</td>
+                <td>A-046</td>
+                <td>
+                    <span class="badge-status waiting">
+                        Waiting
+                    </span>
+                </td>
+                <td class="text-end">
+                    <div class="action-btn">
+                        <i class="fa fa-eye text-muted"></i>
+                    </div>
+                </td>
+            </tr>
+
+            <tr>
+                <td>10:00 AM</td>
+                <td><strong>Michael Chen</strong></td>
+                <td>Follow-up</td>
+                <td>A-047</td>
+                <td>
+                    <span class="badge-status waiting">
+                        Waiting
+                    </span>
+                </td>
+                <td class="text-end">
+                    <div class="action-btn">
+                        <i class="fa fa-eye text-muted"></i>
+                    </div>
+                </td>
+            </tr>
+
+            <tr>
+                <td>10:30 AM</td>
+                <td><strong>Emily Davis</strong></td>
+                <td>Checkup</td>
+                <td>A-048</td>
+                <td>
+                    <span class="badge-status waiting">
+                        Waiting
+                    </span>
+                </td>
+                <td class="text-end">
+                    <div class="action-btn">
+                        <i class="fa fa-eye text-muted"></i>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <div class="pagination-box">
+        <div>Showing 4 results</div>
+
+        <div class="pagination-buttons">
+            <button>Previous</button>
+            <button>Next</button>
+        </div>
+    </div>
+
+</div>

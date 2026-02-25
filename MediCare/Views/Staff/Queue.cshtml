@@ -1,0 +1,182 @@
+﻿@{
+    ViewData["Title"] = "Queue Monitor";
+    Layout = "~/Views/Shared/_StaffLayout.cshtml";
+}
+
+<style>
+    .page-header h3 {
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+
+    .stat-card {
+        background: #ffffff;
+        border-radius: 18px;
+        padding: 20px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+    }
+
+        .stat-card h4 {
+            font-weight: 700;
+            margin-top: 8px;
+        }
+
+    .card-custom {
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 25px;
+        margin-top: 25px;
+        box-shadow: 0 4px 25px rgba(0,0,0,0.05);
+    }
+
+    .queue-item {
+        background: #f9fafb;
+        border-radius: 16px;
+        padding: 18px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        border: 1px solid #f0f0f0;
+    }
+
+    .token-badge {
+        background: #bbf7d0;
+        color: #047857;
+        font-weight: 700;
+        padding: 14px 18px;
+        border-radius: 14px;
+        margin-right: 15px;
+        min-width: 85px;
+        text-align: center;
+    }
+
+    .patient-info h6 {
+        margin-bottom: 3px;
+        font-weight: 600;
+    }
+
+    .wait-info {
+        text-align: right;
+    }
+
+    .status-waiting {
+        color: #d97706;
+        font-weight: 600;
+    }
+
+    .status-progress {
+        color: #6366f1;
+        font-weight: 600;
+    }
+</style>
+
+<div class="page-header">
+    <h3>Queue Monitor</h3>
+    <p class="text-muted">Live queue status</p>
+</div>
+
+<!-- Stats -->
+<div class="row g-4 mt-3">
+
+    <div class="col-md-3">
+        <div class="stat-card">
+            <small class="text-muted">Waiting</small>
+            <h4>12</h4>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stat-card">
+            <small class="text-muted">In Progress</small>
+            <h4>4</h4>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stat-card">
+            <small class="text-muted">Completed</small>
+            <h4>31</h4>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stat-card">
+            <small class="text-muted">Total</small>
+            <h4>47</h4>
+        </div>
+    </div>
+
+</div>
+
+<!-- Live Queue -->
+<div class="card-custom">
+
+    <h5 class="fw-bold mb-4">Live Queue</h5>
+
+    <!-- Queue Item -->
+    <div class="queue-item">
+        <div class="d-flex align-items-center">
+            <div class="token-badge">A-045</div>
+            <div class="patient-info">
+                <h6>John Smith</h6>
+                <small class="text-muted">Dr. Sarah Johnson</small>
+            </div>
+        </div>
+
+        <div class="wait-info">
+            <small class="text-muted">Wait Time</small><br />
+            <strong>5 min</strong><br />
+            <span class="status-progress">In Progress</span>
+        </div>
+    </div>
+
+    <div class="queue-item">
+        <div class="d-flex align-items-center">
+            <div class="token-badge">A-046</div>
+            <div class="patient-info">
+                <h6>Sarah Johnson</h6>
+                <small class="text-muted">Dr. Michael Chen</small>
+            </div>
+        </div>
+
+        <div class="wait-info">
+            <small class="text-muted">Wait Time</small><br />
+            <strong>15 min</strong><br />
+            <span class="status-waiting">Waiting</span>
+        </div>
+    </div>
+
+    <div class="queue-item">
+        <div class="d-flex align-items-center">
+            <div class="token-badge">A-047</div>
+            <div class="patient-info">
+                <h6>Michael Chen</h6>
+                <small class="text-muted">Dr. Emily Davis</small>
+            </div>
+        </div>
+
+        <div class="wait-info">
+            <small class="text-muted">Wait Time</small><br />
+            <strong>22 min</strong><br />
+            <span class="status-waiting">Waiting</span>
+        </div>
+    </div>
+
+    <div class="queue-item">
+        <div class="d-flex align-items-center">
+            <div class="token-badge">A-048</div>
+            <div class="patient-info">
+                <h6>Emily Davis</h6>
+                <small class="text-muted">Dr. Robert Wilson</small>
+            </div>
+        </div>
+
+        <div class="wait-info">
+            <small class="text-muted">Wait Time</small><br />
+            <strong>30 min</strong><br />
+            <span class="status-waiting">Waiting</span>
+        </div>
+    </div>
+
+</div>
