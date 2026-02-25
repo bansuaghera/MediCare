@@ -4,17 +4,9 @@ namespace MediCare.Controllers
 {
     public class DoctorController : Controller
     {
-        public IActionResult Index()
+        public IActionResult Dashboard()
         {
-            return RedirectToAction("Dashboard");
+            return View();
         }
-
-        public IActionResult Dashboard() => View();
-        public IActionResult Appointments() => View();
-        public IActionResult Patients() => View();
-        public IActionResult Examination() => View();
-        public IActionResult Prescriptions() => View();
-        public IActionResult Schedule() => View();
-        public IActionResult Followups() => View();
     }
 }
