@@ -1,0 +1,111 @@
+﻿@{
+    ViewData["Title"] = "Generate Token";
+    Layout = "~/Views/Shared/_StaffLayout.cshtml";
+}
+
+<style>
+    .page-title h3 {
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+
+    .card-custom {
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 4px 25px rgba(0,0,0,0.05);
+        max-width: 500px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 6px;
+    }
+
+    .form-select {
+        border-radius: 12px;
+        padding: 10px 14px;
+        border: 1px solid #e5e7eb;
+    }
+
+    .btn-generate {
+        width: 100%;
+        background: linear-gradient(90deg, #16a34a, #059669);
+        border: none;
+        padding: 12px;
+        border-radius: 30px;
+        font-weight: 600;
+        margin-top: 15px;
+    }
+
+        .btn-generate:hover {
+            background: linear-gradient(90deg, #15803d, #047857);
+        }
+
+    .token-box {
+        margin-top: 30px;
+        background: #d1fae5;
+        border: 2px solid #34d399;
+        border-radius: 18px;
+        padding: 25px;
+        text-align: center;
+        max-width: 500px;
+    }
+
+        .token-box small {
+            color: #065f46;
+            font-weight: 600;
+        }
+
+    .token-number {
+        font-size: 36px;
+        font-weight: 800;
+        color: #047857;
+        margin-top: 8px;
+    }
+</style>
+
+<!-- Page Header -->
+<div class="page-title mb-4">
+    <h3>Generate Token</h3>
+    <p class="text-muted">Issue token for walk-in patients</p>
+</div>
+
+<!-- Form Card -->
+<div class="card-custom">
+
+    <form>
+
+        <div class="mb-3">
+            <label class="form-label">Patient <span class="text-danger">*</span></label>
+            <select class="form-select">
+                <option>Select patient</option>
+                <option>John Smith</option>
+                <option>Sarah Johnson</option>
+                <option>Michael Chen</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Doctor <span class="text-danger">*</span></label>
+            <select class="form-select">
+                <option>Select doctor</option>
+                <option>Dr. Sarah Johnson</option>
+                <option>Dr. Michael Chen</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-success btn-generate">
+            <i class="fa fa-plus me-2"></i> Generate Token
+        </button>
+
+    </form>
+
+</div>
+
+<!-- Latest Token Display -->
+<div class="token-box">
+    <small>Latest Token</small>
+    <div class="token-number">A-049</div>
+</div>
