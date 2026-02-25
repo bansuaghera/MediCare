@@ -25,6 +25,35 @@ namespace MediCare.Controllers
             return View();
         }
 
+        public IActionResult Appointments()
+        {
+            return View();
+        }
+
+        public IActionResult Prescriptions()
+        {
+            return View();
+        }
+
+        public IActionResult TokenQueue() 
+        { 
+            return View();
+        }
+
+      //public IActionResult Settings()
+      //  {
+      //      return View();
+      //  }
+
+    //public IActionResult Medicines()
+    //    {
+    //      return View();
+    //    }
+
+        //public IActionResult Templates()
+        //{
+        //    return View();
+        //}
 
     }
 }

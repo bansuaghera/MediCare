@@ -1,0 +1,174 @@
+﻿@{
+    ViewData["Title"] = "Appointments";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .filter-btn {
+        padding: 6px 12px;
+        border-radius: 6px;
+        border: 1px solid #ddd;
+        background: white;
+        cursor: pointer;
+    }
+
+    .card-box {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .search-box {
+        width: 300px;
+        padding: 6px;
+        border-radius: 6px;
+        border: 1px solid #ddd;
+        margin-bottom: 15px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    table th, table td {
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+        text-align: left;
+    }
+
+    .badge {
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .confirmed {
+        background: #d1f5e0;
+        color: #0f9b6d;
+    }
+
+    .pending {
+        background: #fff4cc;
+        color: #b38f00;
+    }
+
+    .cancelled {
+        background: #ffd6d6;
+        color: #cc0000;
+    }
+
+    .pagination {
+        margin-top: 15px;
+        text-align: right;
+    }
+
+    .pagination button {
+        padding: 5px 10px;
+        border-radius: 6px;
+        border: 1px solid #ddd;
+        background: white;
+        cursor: pointer;
+    }
+</style>
+
+<div class="page-header">
+    <div>
+        <h2>Appointments</h2>
+        <small class="text-muted">Manage all appointments</small>
+    </div>
+    <button class="filter-btn">Filter</button>
+</div>
+
+<div class="card-box">
+
+    <input class="search-box" type="text" placeholder="Search appointments..." />
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Patient</th>
+                <th>Doctor</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            <tr>
+                <td>1</td>
+                <td>John Smith</td>
+                <td>Dr. Sarah Johnson</td>
+                <td>2024-02-12</td>
+                <td>10:00 AM</td>
+                <td>Checkup</td>
+                <td><span class="badge confirmed">Confirmed</span></td>
+                <td><i class="fa fa-eye"></i></td>
+            </tr>
+
+            <tr>
+                <td>2</td>
+                <td>Sarah Johnson</td>
+                <td>Dr. Michael Chen</td>
+                <td>2024-02-12</td>
+                <td>11:00 AM</td>
+                <td>Consultation</td>
+                <td><span class="badge pending">Pending</span></td>
+                <td><i class="fa fa-eye"></i></td>
+            </tr>
+
+            <tr>
+                <td>3</td>
+                <td>Michael Chen</td>
+                <td>Dr. Emily Davis</td>
+                <td>2024-02-12</td>
+                <td>02:00 PM</td>
+                <td>Follow-up</td>
+                <td><span class="badge confirmed">Confirmed</span></td>
+                <td><i class="fa fa-eye"></i></td>
+            </tr>
+
+            <tr>
+                <td>4</td>
+                <td>Emily Davis</td>
+                <td>Dr. Robert Wilson</td>
+                <td>2024-02-13</td>
+                <td>09:00 AM</td>
+                <td>Emergency</td>
+                <td><span class="badge cancelled">Cancelled</span></td>
+                <td><i class="fa fa-eye"></i></td>
+            </tr>
+
+            <tr>
+                <td>5</td>
+                <td>Robert Wilson</td>
+                <td>Dr. Sarah Johnson</td>
+                <td>2024-02-13</td>
+                <td>03:00 PM</td>
+                <td>Checkup</td>
+                <td><span class="badge confirmed">Confirmed</span></td>
+                <td><i class="fa fa-eye"></i></td>
+            </tr>
+
+        </tbody>
+    </table>
+
+    <div class="pagination">
+        <button>Previous</button>
+        <button>Next</button>
+    </div>
+
+</div>
