@@ -153,5 +153,9 @@ Need help? Contact us at <br>
         {
             return View();
         }
+        public IActionResult Register()
+        {
+            return View();
+        }
     }
 }
