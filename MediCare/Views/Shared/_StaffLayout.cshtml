@@ -158,11 +158,11 @@
             <i class="fa fa-users"></i> Patients
         </a>
 
-        <a class="nav-link @(currentAction == "Appointments" ? "active" : "")" asp-controller="Staff" asp-action="Appointments">
+        <a class="nav-link @(currentAction == "Appointments" ? "active" : "")" asp-controller="Staff" asp-action="TodayAppointments">
             <i class="fa fa-calendar-check"></i> Appointments
         </a>
 
-        <a class="nav-link @(currentAction == "Tokens" ? "active" : "")" asp-controller="Staff" asp-action="Tokens">
+        <a class="nav-link @(currentAction == "Tokens" ? "active" : "")" asp-controller="Staff" asp-action="GenerateToken">
             <i class="fa fa-ticket"></i> Tokens
         </a>
 
@@ -178,7 +178,7 @@
             <i class="fa fa-clock"></i> Schedule
         </a>
 
-        <a class="nav-link @(currentAction == "Print" ? "active" : "")" asp-controller="Staff" asp-action="Print">
+        <a class="nav-link @(currentAction == "Print" ? "active" : "")" asp-controller="Staff" asp-action="PrintAppointment">
             <i class="fa fa-print"></i> Print
         </a>
 
