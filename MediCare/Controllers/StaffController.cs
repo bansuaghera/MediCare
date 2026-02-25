@@ -40,6 +40,10 @@ namespace MediCare.Controllers
         {
             return View();
         }
+        public IActionResult PrintAppointment()
+        {
+            return View();
+        }
 
     }
 }
