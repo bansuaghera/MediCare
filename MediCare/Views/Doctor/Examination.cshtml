@@ -1,0 +1,219 @@
+﻿@{
+    ViewData["Title"] = "Examination Notes";
+    Layout = "~/Views/Shared/_DoctorLayout.cshtml";
+}
+
+<style>
+    body {
+        background: #f4f6f9;
+    }
+
+    /* ===== Topbar ===== */
+    .topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+
+    .search-wrapper {
+        position: relative;
+        width: 420px;
+    }
+
+        .search-wrapper input {
+            width: 100%;
+            height: 45px;
+            border-radius: 14px;
+            border: 1px solid #e5e7eb;
+            padding-left: 40px;
+            background: #f9fafb;
+            outline: none;
+        }
+
+        .search-wrapper i {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            color: #9ca3af;
+        }
+
+    .profile-area {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+        .profile-area i {
+            font-size: 18px;
+            color: #6b7280;
+            cursor: pointer;
+        }
+
+    .profile-circle {
+        width: 40px;
+        height: 40px;
+        background: #10b981;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+    }
+
+    /* ===== Page Header ===== */
+    .page-title {
+        font-size: 26px;
+        font-weight: 700;
+    }
+
+    .page-subtitle {
+        color: #6b7280;
+        margin-bottom: 30px;
+    }
+
+    /* ===== Card ===== */
+    .card-custom {
+        background: #ffffff;
+        border-radius: 24px;
+        padding: 35px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+
+    .form-label {
+        font-weight: 500;
+        margin-bottom: 6px;
+    }
+
+    .form-control {
+        border-radius: 14px;
+        border: 1px solid #e5e7eb;
+        background: #f9fafb;
+        height: 48px;
+        outline: none;
+        transition: 0.3s;
+    }
+
+        .form-control:focus {
+            border-color: #10b981;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(16,185,129,0.15);
+        }
+
+    textarea.form-control {
+        height: 110px;
+        resize: none;
+        padding-top: 12px;
+    }
+
+    .large-textarea {
+        height: 140px;
+    }
+
+    /* ===== BIG Treatment Plan ===== */
+    .treatment-textarea {
+        height: 220px; /* Increased Height */
+        width: 100%; /* Full Width */
+        border-radius: 18px;
+        padding: 15px;
+        font-size: 15px;
+    }
+
+    .action-buttons {
+        margin-top: 30px;
+    }
+
+    .btn-success {
+        border-radius: 14px;
+        padding: 10px 25px;
+        font-weight: 500;
+    }
+
+    .btn-outline-secondary {
+        border-radius: 14px;
+        padding: 10px 25px;
+    }
+</style>
+
+
+<!-- ===== Topbar ===== -->
+<div class="topbar">
+
+    <div class="search-wrapper">
+        <i class="fa fa-search"></i>
+        <input type="text" placeholder="Search patients, appointments..." />
+    </div>
+
+    <div class="profile-area">
+        <i class="fa fa-bell"></i>
+        <div class="profile-circle">
+            DR
+        </div>
+    </div>
+
+</div>
+
+
+<!-- ===== Header ===== -->
+<div class="page-title">
+    <i class="fa fa-arrow-left me-2"></i> Examination Notes
+</div>
+<div class="page-subtitle">Patient ID: #1</div>
+
+
+<!-- ===== Examination Card ===== -->
+<div class="card-custom">
+
+    <div class="row g-4">
+
+        <div class="col-md-6">
+            <label class="form-label">Blood Pressure</label>
+            <input type="text" class="form-control" />
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Temperature (°F)</label>
+            <input type="text" class="form-control" />
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Pulse Rate</label>
+            <input type="text" class="form-control" />
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Weight (kg)</label>
+            <input type="text" class="form-control" />
+        </div>
+
+        <div class="col-12">
+            <label class="form-label">Symptoms</label>
+            <textarea class="form-control"></textarea>
+        </div>
+
+        <div class="col-12">
+            <label class="form-label">Diagnosis</label>
+            <textarea class="form-control large-textarea"></textarea>
+        </div>
+
+        <!-- 🔥 BIGGER Treatment Plan -->
+        <div class="col-12">
+            <label class="form-label">Treatment Plan</label>
+            <textarea class="form-control treatment-textarea"></textarea>
+        </div>
+
+    </div>
+
+    <!-- Buttons -->
+    <div class="action-buttons">
+        <button class="btn btn-success me-3">
+            <i class="fa fa-check me-2"></i> Save Notes
+        </button>
+
+        <button class="btn btn-outline-secondary">
+            Create Prescription
+        </button>
+    </div>
+
+</div>
