@@ -1,0 +1,216 @@
+﻿@{
+    ViewData["Title"] = "Staff";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .topbar {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+
+        .topbar input {
+            width: 50%;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+        }
+
+    .profile {
+        background: #17b978;
+        color: white;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .btn-add {
+        background: #17b978;
+        color: white;
+        padding: 8px 15px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+    }
+
+    .card-box {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .table-search {
+        width: 250px;
+        padding: 6px;
+        border-radius: 6px;
+        border: 1px solid #ddd;
+        margin-bottom: 15px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        table th, table td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+        }
+
+    .badge {
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+    }
+
+    .active-badge {
+        background: #d1f5e0;
+        color: #0f9b6d;
+    }
+
+    .leave-badge {
+        background: #fff4cc;
+        color: #b38f00;
+    }
+
+    .actions span {
+        cursor: pointer;
+        margin-right: 8px;
+    }
+
+    .delete {
+        color: red;
+    }
+
+    .pagination {
+        text-align: right;
+        margin-top: 15px;
+    }
+
+        .pagination button {
+            padding: 5px 10px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+        }
+</style>
+
+<!-- TOPBAR -->
+<div class="topbar">
+    <input type="text" placeholder="Search staff..." />
+    <div class="profile">AD</div>
+</div>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+    <div>
+        <h2>Staff</h2>
+        <small class="text-muted">Manage staff members</small>
+    </div>
+    <button class="btn-add">+ Add Staff</button>
+</div>
+
+<!-- TABLE CARD -->
+<div class="card-box">
+
+    <input class="table-search" type="text" placeholder="Search staff..." />
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Shift</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            <tr>
+                <td>1</td>
+                <td>Jennifer Lee</td>
+                <td>Receptionist</td>
+                <td>Morning</td>
+                <td>+1234-567-8900</td>
+                <td>jennifer.l@hospital.com</td>
+                <td><span class="badge active-badge">Active</span></td>
+                <td class="actions">
+                    <span>👁</span>
+                    <span>✏</span>
+                    <span class="delete">🗑</span>
+                </td>
+            </tr>
+
+            <tr>
+                <td>2</td>
+                <td>David Brown</td>
+                <td>Nurse</td>
+                <td>Night</td>
+                <td>+1234-567-8901</td>
+                <td>david.b@hospital.com</td>
+                <td><span class="badge active-badge">Active</span></td>
+                <td class="actions">
+                    <span>👁</span>
+                    <span>✏</span>
+                    <span class="delete">🗑</span>
+                </td>
+            </tr>
+
+            <tr>
+                <td>3</td>
+                <td>Lisa Anderson</td>
+                <td>Lab Technician</td>
+                <td>Morning</td>
+                <td>+1234-567-8902</td>
+                <td>lisa.a@hospital.com</td>
+                <td><span class="badge active-badge">Active</span></td>
+                <td class="actions">
+                    <span>👁</span>
+                    <span>✏</span>
+                    <span class="delete">🗑</span>
+                </td>
+            </tr>
+
+            <tr>
+                <td>4</td>
+                <td>James Taylor</td>
+                <td>Pharmacist</td>
+                <td>Evening</td>
+                <td>+1234-567-8903</td>
+                <td>james.t@hospital.com</td>
+                <td><span class="badge leave-badge">On Leave</span></td>
+                <td class="actions">
+                    <span>👁</span>
+                    <span>✏</span>
+                    <span class="delete">🗑</span>
+                </td>
+            </tr>
+
+        </tbody>
+    </table>
+
+    <div class="pagination">
+        <button>Previous</button>
+        <button>Next</button>
+    </div>
+
+</div>

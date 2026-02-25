@@ -16,11 +16,15 @@
     <!-- FontAwesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
 
+    <!-- FullCalendar -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet" />
+
     <style>
         body {
             margin: 0;
             background-color: #f4f6f9;
             overflow-x: hidden;
+            font-family: 'Segoe UI', sans-serif;
         }
 
         /* SIDEBAR */
@@ -79,13 +83,11 @@
                 width: 22px;
             }
 
-            /* Hover */
             .nav-link:hover {
                 background: #e8f7ed;
                 color: #16a34a;
             }
 
-            /* Active */
             .nav-link.active {
                 background: #d1fae5;
                 color: #16a34a !important;
@@ -109,27 +111,25 @@
             justify-content: space-between;
         }
 
-        /* RESPONSIVE */
-        @media (max-width: 992px) {
-            .sidebar
+        /* RESPONSIVE FIX */
+        @@media (max-width: 992px) {
 
-        {
-            left: -260px;
-        }
+            .sidebar {
+                left: -260px;
+            }
 
-        .sidebar.show {
-            left: 0;
-        }
+                .sidebar.show {
+                    left: 0;
+                }
 
-        .content {
-            margin-left: 0;
-            padding: 20px;
-        }
+            .content {
+                margin-left: 0;
+                padding: 20px;
+            }
 
-        .mobile-topbar {
-            display: flex;
-        }
-
+            .mobile-topbar {
+                display: flex;
+            }
         }
     </style>
 </head>
@@ -227,6 +227,9 @@
     <div class="content">
         @RenderBody()
     </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
 
     <script>
         const toggleBtn = document.getElementById("menuToggle");

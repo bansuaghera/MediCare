@@ -12,6 +12,19 @@ namespace MediCare.Controllers
         {
             return View();
         }
-       
+        public IActionResult Doctors()
+        {
+            return View();
+        }
+        public IActionResult Staff()
+        {
+            return View();
+        }
+        public IActionResult OPDSchedule()
+        {
+            return View();
+        }
+
+
     }
 }
