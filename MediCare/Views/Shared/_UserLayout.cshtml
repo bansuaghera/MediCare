@@ -1,12 +1,260 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+}
+
+<!DOCTYPE html>
 <html>
 <head>
-    <title>User Panel</title>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"] - MediCare</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- FontAwesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+
+    <style>
+        body {
+            margin: 0;
+            background: #f4f6f9;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        /* ===== Layout Wrapper ===== */
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ===== Sidebar ===== */
+        .sidebar {
+            width: 240px;
+            background: #ffffff;
+            border-right: 1px solid #eee;
+            padding: 20px 15px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 35px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: #10b981;
+            color: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+        }
+
+        .logo h5 {
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .logo small {
+            color: #888;
+        }
+
+        .menu a {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            border-radius: 12px;
+            color: #555;
+            text-decoration: none;
+            margin-bottom: 8px;
+            transition: 0.2s;
+            font-weight: 500;
+        }
+
+            .menu a i {
+                width: 20px;
+                margin-right: 10px;
+            }
+
+            .menu a:hover {
+                background: #e6f9f1;
+                color: #10b981;
+            }
+
+            .menu a.active {
+                background: #d1fae5;
+                color: #059669;
+                font-weight: 600;
+            }
+
+        .logout {
+            position: absolute;
+            bottom: 20px;
+            color: #666;
+            text-decoration: none;
+        }
+
+        /* ===== Main Content ===== */
+        .main {
+            flex: 1;
+            padding: 25px 35px;
+        }
+
+        /* ===== Topbar ===== */
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .search-box {
+            position: relative;
+            width: 420px;
+        }
+
+            .search-box input {
+                width: 100%;
+                height: 42px;
+                border-radius: 14px;
+                border: 1px solid #e5e7eb;
+                padding-left: 40px;
+                background: #f9fafb;
+            }
+
+            .search-box i {
+                position: absolute;
+                top: 13px;
+                left: 14px;
+                color: #9ca3af;
+            }
+
+        .profile-area {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .profile-circle {
+            width: 38px;
+            height: 38px;
+            background: #10b981;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        @@media (max-width: 992px) {
+            .sidebar {
+                display: none;
+            }
+
+            .search-box {
+                width: 250px;
+            }
+        }
+    </style>
 </head>
+
 <body>
-    <h2>User Navbar</h2>
-    <div>
-        @RenderBody()
+
+    <div class="layout">
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-heart-pulse"></i>
+                </div>
+                <div>
+                    <h5>MediCare</h5>
+                    <small>Patient Panel</small>
+                </div>
+            </div>
+
+            <div class="menu">
+
+                <a asp-controller="User" asp-action="Home"
+                   class="@(currentAction == "Home" ? "active" : "")">
+                    <i class="fa fa-home"></i> Home
+                </a>
+
+                <a asp-controller="User" asp-action="Doctors"
+                   class="@(currentAction == "Doctors" ? "active" : "")">
+                    <i class="fa fa-user-md"></i> Doctors
+                </a>
+
+                <a asp-controller="User" asp-action="BookAppointment"
+                   class="@(currentAction == "BookAppointment" ? "active" : "")">
+                    <i class="fa fa-calendar-plus"></i> Book Appointment
+                </a>
+
+                <a asp-controller="User" asp-action="MyAppointments"
+                   class="@(currentAction == "MyAppointments" ? "active" : "")">
+                    <i class="fa fa-calendar-check"></i> My Appointments
+                </a>
+
+                <a asp-controller="User" asp-action="TokenStatus"
+                   class="@(currentAction == "TokenStatus" ? "active" : "")">
+                    <i class="fa fa-ticket"></i> Token Status
+                </a>
+
+                <a asp-controller="User" asp-action="Prescriptions"
+                   class="@(currentAction == "Prescriptions" ? "active" : "")">
+                    <i class="fa fa-file-medical"></i> Prescriptions
+                </a>
+
+                <a asp-controller="User" asp-action="History"
+                   class="@(currentAction == "History" ? "active" : "")">
+                    <i class="fa fa-history"></i> History
+                </a>
+
+                <a asp-controller="User" asp-action="Profile"
+                   class="@(currentAction == "Profile" ? "active" : "")">
+                    <i class="fa fa-user"></i> Profile
+                </a>
+
+            </div>
+
+            <a href="#" class="logout">
+                <i class="fa fa-sign-out-alt me-1"></i> Logout
+            </a>
+
+        </div>
+
+        <!-- Main Content -->
+        <div class="main">
+
+            <!-- Topbar -->
+            <div class="topbar">
+
+                <div class="search-box">
+                    <i class="fa fa-search"></i>
+                    <input type="text" placeholder="Search doctors, appointments..." />
+                </div>
+
+                <div class="profile-area">
+                    <i class="fa fa-bell"></i>
+                    <div class="profile-circle">PT</div>
+                </div>
+
+            </div>
+
+            <!-- Page Content -->
+            @RenderBody()
+
+        </div>
+
     </div>
+
 </body>
 </html>

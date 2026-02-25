@@ -1,6 +1,210 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿
 @{
+    ViewData["Title"] = "Home";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
 }
-<h1>User Dashboard</h1>
+
+<style>
+    .page-title h3 {
+        font-weight: 700;
+    }
+
+    .card-custom {
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 20px;
+        box-shadow: 0 4px 25px rgba(0,0,0,0.05);
+    }
+
+    .stat-card {
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    }
+
+    .stat-icon {
+        width: 45px;
+        height: 45px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+    }
+
+    .icon-green {
+        background: #d1fae5;
+        color: #10b981;
+    }
+
+    .icon-blue {
+        background: #dbeafe;
+        color: #3b82f6;
+    }
+
+    .icon-purple {
+        background: #ede9fe;
+        color: #8b5cf6;
+    }
+
+    .icon-orange {
+        background: #fde68a;
+        color: #f59e0b;
+    }
+
+    .quick-btn {
+        width: 100%;
+        padding: 12px;
+        border-radius: 12px;
+        margin-bottom: 10px;
+        font-weight: 500;
+    }
+
+    .appointment-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #f9fafb;
+        padding: 15px;
+        border-radius: 15px;
+        margin-bottom: 10px;
+    }
+
+    .doctor-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #ede9fe;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #8b5cf6;
+        margin-right: 10px;
+    }
+</style>
+
+<div class="page-title mb-4">
+    <h3>Welcome Back, Hardik!</h3>
+    <p class="text-muted">Here's your health dashboard</p>
+</div>
+
+<!-- Stats Row -->
+<div class="row g-4">
+
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div>
+                <small class="text-muted">Upcoming Appointments</small>
+                <h4 class="fw-bold">2</h4>
+            </div>
+            <div class="stat-icon icon-green">
+                <i class="fa fa-calendar"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div>
+                <small class="text-muted">Total Visits</small>
+                <h4 class="fw-bold">12</h4>
+            </div>
+            <div class="stat-icon icon-blue">
+                <i class="fa fa-user"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div>
+                <small class="text-muted">Prescriptions</small>
+                <h4 class="fw-bold">8</h4>
+            </div>
+            <div class="stat-icon icon-purple">
+                <i class="fa fa-file-medical"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div>
+                <small class="text-muted">Last Visit</small>
+                <h4 class="fw-bold">Feb 10</h4>
+            </div>
+            <div class="stat-icon icon-orange">
+                <i class="fa fa-clock"></i>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Bottom Section -->
+<div class="row mt-4 g-4">
+
+    <!-- Quick Actions -->
+    <div class="col-md-5">
+        <div class="card-custom">
+            <h5 class="fw-bold mb-3">Quick Actions</h5>
+
+            <button class="btn btn-success quick-btn">
+                <i class="fa fa-calendar-plus me-2"></i> Book Appointment
+            </button>
+
+            <button class="btn btn-outline-secondary quick-btn">
+                <i class="fa fa-user-md me-2"></i> Find Doctor
+            </button>
+
+            <button class="btn btn-outline-secondary quick-btn">
+                <i class="fa fa-ticket me-2"></i> Token Status
+            </button>
+        </div>
+    </div>
+
+    <!-- Upcoming Appointments -->
+    <div class="col-md-7">
+        <div class="card-custom">
+            <h5 class="fw-bold mb-3">Upcoming Appointments</h5>
+
+            <div class="appointment-item">
+                <div class="d-flex align-items-center">
+                    <div class="doctor-avatar">
+                        <i class="fa fa-user-md"></i>
+                    </div>
+                    <div>
+                        <strong>Dr. Sarah Johnson</strong><br />
+                        <small class="text-muted">Cardiology</small>
+                    </div>
+                </div>
+                <div class="text-end">
+                    <strong>2024-02-15</strong><br />
+                    <small class="text-muted">10:00 AM</small>
+                </div>
+            </div>
+
+            <div class="appointment-item">
+                <div class="d-flex align-items-center">
+                    <div class="doctor-avatar" style="background:#dbeafe;color:#3b82f6;">
+                        <i class="fa fa-user-md"></i>
+                    </div>
+                    <div>
+                        <strong>Dr. Michael Chen</strong><br />
+                        <small class="text-muted">Pediatrics</small>
+                    </div>
+                </div>
+                <div class="text-end">
+                    <strong>2024-02-20</strong><br />
+                    <small class="text-muted">02:00 PM</small>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
