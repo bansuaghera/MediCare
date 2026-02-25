@@ -40,20 +40,28 @@ namespace MediCare.Controllers
             return View();
         }
 
-      //public IActionResult Settings()
-      //  {
-      //      return View();
-      //  }
+        public IActionResult Settings()
+        {
+            return View();
+        }
 
-    //public IActionResult Medicines()
-    //    {
-    //      return View();
-    //    }
+        public IActionResult Medicines()
+        {
+            return View();
+        }
 
-        //public IActionResult Templates()
-        //{
-        //    return View();
-        //}
+        public IActionResult Templates()
+        {
+            return View();
+        }
+        public IActionResult AddPatient()
+        {
+            return View();
+        }
+        public IActionResult AddStaff()
+        {
+            return View();
+        }
 
     }
 }

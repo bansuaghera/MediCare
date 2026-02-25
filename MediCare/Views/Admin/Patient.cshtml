@@ -116,7 +116,11 @@
         <h2>Patients</h2>
         <small class="text-muted">Manage patient records</small>
     </div>
-    <button class="btn-add">+ Add Patient</button>
+    <a asp-controller="Admin"
+       asp-action="AddPatient"
+       class="btn-add">
+        + Add Patient
+    </a>
 </div>
 
 <!-- TABLE CARD -->
