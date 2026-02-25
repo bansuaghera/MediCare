@@ -1,0 +1,176 @@
+﻿@{
+    ViewData["Title"] = "OPD Schedule";
+    Layout = "~/Views/Shared/_StaffLayout.cshtml";
+}
+
+<style>
+    .page-header h3 {
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+
+    .card-custom {
+        background: #ffffff;
+        border-radius: 22px;
+        padding: 25px;
+        box-shadow: 0 4px 25px rgba(0,0,0,0.05);
+        margin-bottom: 25px;
+    }
+
+    .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+
+    .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 10px;
+        text-align: center;
+        font-size: 14px;
+    }
+
+        .calendar-grid div {
+            padding: 8px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .calendar-grid .selected {
+            background: #111827;
+            color: white;
+        }
+
+    .doctor-card {
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 20px 25px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+        margin-bottom: 18px;
+    }
+
+    .slots {
+        text-align: right;
+        font-weight: 700;
+        font-size: 22px;
+        color: #10b981;
+    }
+
+        .slots small {
+            display: block;
+            font-size: 12px;
+            color: #6b7280;
+            font-weight: 500;
+        }
+</style>
+
+<div class="page-header">
+    <h3>OPD Schedule</h3>
+    <p class="text-muted">View doctor schedules</p>
+</div>
+
+<div class="row mt-4">
+
+    <!-- Calendar -->
+    <div class="col-md-4">
+        <div class="card-custom">
+
+            <h5 class="fw-bold mb-3">Select Date</h5>
+
+            <div class="calendar-header">
+                <i class="fa fa-chevron-left"></i>
+                <span>February 2026</span>
+                <i class="fa fa-chevron-right"></i>
+            </div>
+
+            <div class="calendar-grid text-muted fw-semibold">
+                <div>Su</div><div>Mo</div><div>Tu</div>
+                <div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
+
+                <div>26</div><div>27</div><div>28</div>
+                <div>29</div><div>30</div><div>31</div><div>1</div>
+
+                <div>2</div><div>3</div><div>4</div>
+                <div>5</div><div>6</div><div>7</div><div>8</div>
+
+                <div>9</div><div>10</div><div>11</div>
+                <div>12</div><div class="selected">13</div>
+                <div>14</div><div>15</div>
+
+                <div>16</div><div>17</div><div>18</div>
+                <div>19</div><div>20</div><div>21</div><div>22</div>
+
+                <div>23</div><div>24</div><div>25</div>
+                <div>26</div><div>27</div><div>28</div><div>1</div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Doctor Schedules -->
+    <div class="col-md-8">
+
+        <div class="doctor-card">
+            <div>
+                <strong>Dr. Sarah Johnson</strong><br />
+                <small class="text-muted">09:00 AM – 12:00 PM • Room 101</small>
+            </div>
+            <div class="slots">
+                12
+                <small>Available Slots</small>
+            </div>
+        </div>
+
+        <div class="doctor-card">
+            <div>
+                <strong>Dr. Michael Chen</strong><br />
+                <small class="text-muted">10:00 AM – 01:00 PM • Room 102</small>
+            </div>
+            <div class="slots">
+                15
+                <small>Available Slots</small>
+            </div>
+        </div>
+
+        <div class="doctor-card">
+            <div>
+                <strong>Dr. Emily Davis</strong><br />
+                <small class="text-muted">02:00 PM – 05:00 PM • Room 103</small>
+            </div>
+            <div class="slots">
+                10
+                <small>Available Slots</small>
+            </div>
+        </div>
+
+        <div class="doctor-card">
+            <div>
+                <strong>Dr. James Wilson</strong><br />
+                <small class="text-muted">03:00 PM – 06:00 PM • Room 104</small>
+            </div>
+            <div class="slots">
+                8
+                <small>Available Slots</small>
+            </div>
+        </div>
+
+        <div class="doctor-card">
+            <div>
+                <strong>Dr. Lisa Thompson</strong><br />
+                <small class="text-muted">11:00 AM – 02:00 PM • Room 105</small>
+            </div>
+            <div class="slots">
+                6
+                <small>Available Slots</small>
+            </div>
+        </div>
+
+    </div>
+
+</div>
