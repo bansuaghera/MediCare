@@ -16,10 +16,6 @@ namespace MediCare.Controllers
         {
             return View();
         }
-        public IActionResult BookAppointment()
-        {
-            return View();
-        }
         public IActionResult GenerateToken()
         {
             return View();
@@ -36,5 +32,14 @@ namespace MediCare.Controllers
         {
             return View();
         }
+        public IActionResult TodayAppointments()
+        {
+            return View();
+        }
+        public IActionResult BookAppointment()
+        {
+            return View();
+        }
+
     }
 }
