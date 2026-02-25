@@ -134,7 +134,11 @@
         <h2>Doctors</h2>
         <small class="text-muted">Manage doctor profiles</small>
     </div>
-    <button class="btn-add">+ Add Doctor</button>
+    <a asp-controller="Admin"
+       asp-action="AddDoctor"
+       class="btn-add">
+        + Add Doctor
+    </a>
 </div>
 
 <!-- TABLE CARD -->
