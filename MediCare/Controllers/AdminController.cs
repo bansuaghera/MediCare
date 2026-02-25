@@ -35,8 +35,8 @@ namespace MediCare.Controllers
             return View();
         }
 
-        public IActionResult TokenQueue() 
-        { 
+        public IActionResult TokenQueue()
+        {
             return View();
         }
 
@@ -62,6 +62,23 @@ namespace MediCare.Controllers
         {
             return View();
         }
+        public IActionResult AddOPDSchedule()
+        {
+            return View();
+        }
+        public IActionResult AddMedicine()
+        {
+            return View();
+        }
+        public IActionResult AddTemplate()
+            {
+                return View();
+        }
+        public IActionResult AddDoctor()
+        {
+            return View();
+        }
+
 
     }
 }

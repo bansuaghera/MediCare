@@ -8,74 +8,195 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 20px;
+        margin-bottom: 25px;
     }
 
-    .btn-add {
-        background: #17b978;
-        color: white;
-        padding: 8px 15px;
-        border-radius: 6px;
-        border: none;
-    }
-
-    .card {
-        background: white;
+    .card-box {
+        background: #ffffff;
+        border-radius: 16px;
         padding: 20px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    }
+
+    .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        font-weight: 600;
+    }
+
+    .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 8px;
+        text-align: center;
+    }
+
+        .calendar-grid div {
+            padding: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+            .calendar-grid div:hover {
+                background: #f3f4f6;
+            }
+
+    .selected-date {
+        background: #111827;
+        color: white;
+        border-radius: 50%;
+    }
+
+    .schedule-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px;
+        border-radius: 12px;
+        border: 1px solid #f0f0f0;
+        margin-bottom: 12px;
+    }
+
+    .schedule-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .schedule-icon {
+        background: #ede9fe;
+        color: #7c3aed;
+        padding: 10px;
         border-radius: 10px;
     }
 
-    #calendar {
-        margin-top: 10px;
+    .slots {
+        text-align: right;
+        font-weight: 600;
     }
+
+    .btn-add {
+        background: #16a34a;
+        color: white;
+        border-radius: 10px;
+        padding: 8px 18px;
+        border: none;
+    }
+
+        .btn-add:hover {
+            background: #15803d;
+        }
 </style>
 
+<!-- HEADER -->
 <div class="page-header">
     <div>
-        <h2>OPD Schedule</h2>
-        <small>Manage OPD schedules and slots</small>
+        <h3 class="fw-bold">OPD Schedule</h3>
+        <small class="text-muted">Manage OPD schedules and slots</small>
     </div>
-    <button class="btn-add">+ Add Schedule</button>
+    <a asp-controller="Admin" asp-action="AddOPDSchedule" class="btn btn-add">
+        <i class="fa fa-plus me-1"></i> Add Schedule
+    </a>
 </div>
 
-<div class="card">
-    <div id="calendar"></div>
+<div class="row g-4">
+
+    <!-- Calendar -->
+    <div class="col-md-4">
+        <div class="card-box">
+            <h5 class="mb-3">Select Date</h5>
+
+            <div class="calendar-header">
+                <span><i class="fa fa-chevron-left"></i></span>
+                <span>February 2026</span>
+                <span><i class="fa fa-chevron-right"></i></span>
+            </div>
+
+            <div class="calendar-grid">
+                <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
+
+                <div>23</div><div>24</div><div>25</div><div>26</div><div>27</div><div>28</div><div>1</div>
+                <div>2</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div><div>8</div>
+                <div>9</div><div>10</div><div>11</div><div>12</div><div>13</div>
+                <div class="selected-date">14</div>
+                <div>15</div><div>16</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Today's Schedule -->
+    <div class="col-md-8">
+        <div class="card-box">
+            <h5 class="mb-4">Today's Schedule</h5>
+
+            <div class="schedule-item">
+                <div class="schedule-left">
+                    <div class="schedule-icon">
+                        <i class="fa fa-calendar"></i>
+                    </div>
+                    <div>
+                        <strong>Dr. Sarah Johnson</strong><br />
+                        <small class="text-muted">09:00 AM - 12:00 PM · Room 101</small>
+                    </div>
+                </div>
+                <div class="slots">
+                    12
+                    <div class="text-muted small">Available Slots</div>
+                </div>
+            </div>
+
+            <div class="schedule-item">
+                <div class="schedule-left">
+                    <div class="schedule-icon">
+                        <i class="fa fa-calendar"></i>
+                    </div>
+                    <div>
+                        <strong>Dr. Michael Chen</strong><br />
+                        <small class="text-muted">10:00 AM - 01:00 PM · Room 102</small>
+                    </div>
+                </div>
+                <div class="slots">
+                    15
+                    <div class="text-muted small">Available Slots</div>
+                </div>
+            </div>
+
+            <div class="schedule-item">
+                <div class="schedule-left">
+                    <div class="schedule-icon">
+                        <i class="fa fa-calendar"></i>
+                    </div>
+                    <div>
+                        <strong>Dr. Emily Davis</strong><br />
+                        <small class="text-muted">02:00 PM - 05:00 PM · Room 103</small>
+                    </div>
+                </div>
+                <div class="slots">
+                    10
+                    <div class="text-muted small">Available Slots</div>
+                </div>
+            </div>
+
+            <div class="schedule-item">
+                <div class="schedule-left">
+                    <div class="schedule-icon">
+                        <i class="fa fa-calendar"></i>
+                    </div>
+                    <div>
+                        <strong>Dr. Robert Wilson</strong><br />
+                        <small class="text-muted">03:00 PM - 06:00 PM · Room 104</small>
+                    </div>
+                </div>
+                <div class="slots">
+                    12
+                    <div class="text-muted small">Available Slots</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
 </div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-
-        var calendarEl = document.getElementById('calendar');
-
-        var calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth',
-            height: 600,
-            selectable: true,
-
-            headerToolbar: {
-                left: 'prev,next today',
-                center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay'
-            },
-
-            dateClick: function (info) {
-                alert("Selected Date: " + info.dateStr);
-            },
-
-            events: [
-                {
-                    title: 'Dr. Sarah Johnson (Room 101)',
-                    start: '2026-02-14T09:00:00',
-                    end: '2026-02-14T12:00:00'
-                },
-                {
-                    title: 'Dr. Michael Chen (Room 102)',
-                    start: '2026-02-15T10:00:00',
-                    end: '2026-02-15T13:00:00'
-                }
-            ]
-        });
-
-        calendar.render();
-    });
-</script>
