@@ -1,8 +1,228 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    Layout = null;
+    ViewData["Title"] = "MediCare - Smart OPD Management";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <meta name="description" content="Transforming Healthcare through Innovation. Experience a seamless and efficient OPD management system.">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="~/css/landingPage.css" asp-append-version="true">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="landing-container">
+        <!-- Navbar -->
+        <nav class="navbar">
+            <a href="/" class="nav-brand">
+                <div class="brand-logo">
+                    <i data-lucide="activity"></i>
+                </div>
+                <h2 class="brand-name">Medi<span>Care</span></h2>
+            </a>
+
+            <div class="nav-links">
+                <a href="#home" class="nav-link active">Home</a>
+                <a href="#features" class="nav-link">Features</a>
+                <a href="/Home/About" class="nav-link">About</a>
+                <a href="/Home/Contact" class="nav-link">Contact</a>
+            </div>
+
+            <div class="nav-auth">
+                <a href="/Login/Login" class="btn btn-outline">Login</a>
+                <a href="/Login/Register" class="btn btn-primary">Join Now</a>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <section id="home" class="hero">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <i data-lucide="heart-pulse" style="width: 16px; height: 16px;"></i>
+                    Next-Gen Patient Management
+                </div>
+                <h1>Transforming <span>Healthcare</span> through Innovation</h1>
+                <p>
+                    Experience a seamless, efficient, and patient-centric OPD management system.
+                    Designed for modern clinics and hospitals to streamline appointments,
+                    prescriptions, and advanced patient care.
+                </p>
+                <div class="hero-btns">
+                    <a href="/Login/Login" class="btn btn-primary">
+                        Get Started <i data-lucide="arrow-up-right" style="width: 18px; height: 18px;"></i>
+                    </a>
+                    <a href="#features" class="btn btn-outline">Learn More</a>
+                </div>
+            </div>
+
+            <div class="hero-image">
+                <div class="image-container">
+                    <img src="~/images/hero.png" alt="Healthcare Professional" class="main-img" />
+                    <div class="floating-stats stat-1">
+                        <div class="stat-icon blue-icon">
+                            <i data-lucide="calendar" style="width: 20px; height: 20px;"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h5>Easy Booking</h5>
+                            <p>250+ Today</p>
+                        </div>
+                    </div>
+                    <div class="floating-stats stat-2">
+                        <div class="stat-icon green-icon">
+                            <i data-lucide="users" style="width: 20px; height: 20px;"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h5>Success Rate</h5>
+                            <p>98.5% Satisfaction</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Bar -->
+        <section class="stats-bar">
+            <div class="stat-item">
+                <h3>20k+</h3>
+                <p>Active Users</p>
+            </div>
+            <div class="stat-item">
+                <h3>500+</h3>
+                <p>Hospitals</p>
+            </div>
+            <div class="stat-item">
+                <h3>1M+</h3>
+                <p>Digital Records</p>
+            </div>
+            <div class="stat-item">
+                <h3>24/7</h3>
+                <p>Global Support</p>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="features">
+            <div class="section-head">
+                <span class="tag">Features</span>
+                <h2>All-in-one Clinical Solution</h2>
+                <p>Everything you need to manage your medical practice efficiently in one powerful, secure, and intuitive platform.</p>
+            </div>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon-box">
+                        <i data-lucide="calendar" style="width: 28px; height: 28px;"></i>
+                    </div>
+                    <h4>Smart Scheduling</h4>
+                    <p>Manage appointments with an intuitive calendar, automated reminders, and real-time availability sync.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon-box">
+                        <i data-lucide="clipboard-list" style="width: 28px; height: 28px;"></i>
+                    </div>
+                    <h4>Advanced Records</h4>
+                    <p>Access secure and centralized patient history, lab reports, and vitals from anywhere, anytime.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon-box">
+                        <i data-lucide="shield" style="width: 28px; height: 28px;"></i>
+                    </div>
+                    <h4>Enterprise Security</h4>
+                    <p>Military-grade data encryption and HIPAA compliance ensuring patient confidentiality at all levels.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon-box">
+                        <i data-lucide="smartphone" style="width: 28px; height: 28px;"></i>
+                    </div>
+                    <h4>Patient Portal</h4>
+                    <p>A dedicated mobile interface for patients to book appointments, view reports, and manage health.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon-box">
+                        <i data-lucide="clock" style="width: 28px; height: 28px;"></i>
+                    </div>
+                    <h4>Queue Analytics</h4>
+                    <p>Optimize OPD flow with real-time tracking and automated queue management for waiting patients.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon-box">
+                        <i data-lucide="check-circle-2" style="width: 28px; height: 28px;"></i>
+                    </div>
+                    <h4>e-Prescriptions</h4>
+                    <p>Generate precise digital prescriptions instantly, reducing human error and improving patient outcomes.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-top">
+                <div class="f-brand">
+                    <div class="nav-brand" style="justify-content: flex-start; margin-bottom: 20px; color: white;">
+                        <div class="brand-logo" style="box-shadow: none;">
+                            <i data-lucide="activity"></i>
+                        </div>
+                        <h2 class="brand-name" style="margin-bottom: 0;">Medi<span>Care</span></h2>
+                    </div>
+                    <p>Empowering healthcare providers with state-of-the-art technology to deliver exceptional care.</p>
+                    <div class="social-links">
+                        <a href="#" class="social-btn"><i data-lucide="instagram"></i></a>
+                        <a href="#" class="social-btn"><i data-lucide="twitter"></i></a>
+                        <a href="#" class="social-btn"><i data-lucide="linkedin"></i></a>
+                        <a href="#" class="social-btn"><i data-lucide="facebook"></i></a>
+                    </div>
+                </div>
+
+                <div class="f-links">
+                    <h5>Company</h5>
+                    <ul>
+                        <li><a href="/Home/About">About Us</a></li>
+                        <li><a href="/Home/Contact">Contact</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+
+                <div class="f-newsletter">
+                    <h5>Stay Updated</h5>
+                    <p>Get the latest analytics and healthcare news delivered to your inbox weekly.</p>
+                    <div class="input-group">
+                        <input type="email" placeholder="Email address" />
+                        <button class="btn btn-primary">Subscribe</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; @DateTime.Now.Year MediCare Smart OPD. Created with Excellence.</p>
+                <div class="footer-legal">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="~/js/landingPage.js" asp-append-version="true"></script>
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+    </script>
+</body>
+</html>
