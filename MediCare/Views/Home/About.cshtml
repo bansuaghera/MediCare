@@ -1,0 +1,185 @@
+@{
+    Layout = null;
+    ViewData["Title"] = "About Us - MediCare";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="~/css/landingPage.css" asp-append-version="true">
+    <link rel="stylesheet" href="~/css/about.css" asp-append-version="true">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="about-container">
+        <!-- Navbar -->
+        <nav class="navbar">
+            <a href="/" class="nav-brand">
+                <div class="brand-logo">
+                    <i data-lucide="activity"></i>
+                </div>
+                <h2 class="brand-name">Medi<span>Care</span></h2>
+            </a>
+
+            <div class="nav-links">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/Home/About" class="nav-link active">About</a>
+                <a href="/Home/Contact" class="nav-link">Contact</a>
+            </div>
+
+            <div class="nav-auth">
+                <a href="/Login/Login" class="btn btn-outline">Login</a>
+                <a href="/Login/Register" class="btn btn-primary">Join Now</a>
+            </div>
+        </nav>
+
+        <!-- Header -->
+        <header class="about-header">
+            <div class="hero-badge" style="margin: 0 auto 2rem">About MediCare</div>
+            <h1>Empowering Healthcare through <span>Innovation</span></h1>
+            <p>
+                We are on a global mission to revolutionize outpatient department management
+                by integrating state-of-the-art technology with deeply human care.
+                Our platform bridges the critical gap between providers and patients.
+            </p>
+        </header>
+
+        <!-- Mission/Vision -->
+        <section class="mission-vision">
+            <div class="mission-grid">
+                <div class="mission-card">
+                    <div class="icon-box primary-icon">
+                        <i data-lucide="target" style="width: 36px; height: 36px;"></i>
+                    </div>
+                    <h3>Our Mission</h3>
+                    <p>To provide clinics and hospitals with the tools they need to deliver exceptional care through seamless appointment scheduling, digital records, and intelligent workflow management.</p>
+                </div>
+                <div class="mission-card">
+                    <div class="icon-box blue-icon">
+                        <i data-lucide="trending-up" style="width: 36px; height: 36px;"></i>
+                    </div>
+                    <h3>Our Vision</h3>
+                    <p>A world where healthcare is truly accessible, efficient, and transparent for everyone. We envision a future where technology eliminates waiting times and prevents documentation errors.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Values -->
+        <section class="values-sec">
+            <div class="section-head">
+                <span class="tag">Our values</span>
+                <h2>Driven by Clinical Excellence</h2>
+                <p>Built by healthcare experts and technology enthusiasts to solve real-world clinical challenges.</p>
+            </div>
+
+            <div class="values-grid">
+                <div class="val-item">
+                    <div class="val-icon"><i data-lucide="shield" style="width: 24px; height: 24px;"></i></div>
+                    <h5>Data Integrity</h5>
+                    <p>We prioritize patient confidentiality with advanced encryption and clinical data security.</p>
+                </div>
+                <div class="val-item">
+                    <div class="val-icon"><i data-lucide="activity" style="width: 24px; height: 24px;"></i></div>
+                    <h5>Real-time Care</h5>
+                    <p>Instant access to vital reports and history for immediate medical decision-making.</p>
+                </div>
+                <div class="val-item">
+                    <div class="val-icon"><i data-lucide="users" style="width: 24px; height: 24px;"></i></div>
+                    <h5>Human First</h5>
+                    <p>Every feature is designed to simplify the journey of patients through the health system.</p>
+                </div>
+                <div class="val-item">
+                    <div class="val-icon"><i data-lucide="award" style="width: 24px; height: 24px;"></i></div>
+                    <h5>Excellence</h5>
+                    <p>Committed to continuous improvement, ensuring our platform stays ahead of industry standards.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="cta-sec">
+            <div class="cta-box">
+                <h2>Ready to Transform Your Practice?</h2>
+                <p>Join over 500+ healthcare providers who trust MediCare for their daily operations and patient care.</p>
+                <div class="hero-btns" style="justify-content: center">
+                    <a href="/Login/Login" class="btn btn-outline" style="border-color: white; color: white">Watch Live Demo</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-top">
+                <div class="f-brand">
+                    <div class="nav-brand" style="justify-content: flex-start; margin-bottom: 20px; color: white;">
+                        <div class="brand-logo" style="box-shadow: none;">
+                            <i data-lucide="activity"></i>
+                        </div>
+                        <h2 class="brand-name" style="margin-bottom: 0;">Medi<span>Care</span></h2>
+                    </div>
+                    <p>Empowering healthcare providers with state-of-the-art technology to deliver exceptional care.</p>
+                    <div class="social-links">
+                        <a href="#" class="social-btn"><i data-lucide="instagram"></i></a>
+                        <a href="#" class="social-btn"><i data-lucide="twitter"></i></a>
+                        <a href="#" class="social-btn"><i data-lucide="linkedin"></i></a>
+                        <a href="#" class="social-btn"><i data-lucide="facebook"></i></a>
+                    </div>
+                </div>
+
+                <div class="f-links">
+                    <h5>Platform</h5>
+                    <ul>
+                        <li><a href="#">Pricing Models</a></li>
+                        <li><a href="#">Global Reach</a></li>
+                        <li><a href="#">Security Audit</a></li>
+                        <li><a href="#">Case Studies</a></li>
+                    </ul>
+                </div>
+
+                <div class="f-links">
+                    <h5>Company</h5>
+                    <ul>
+                        <li><a href="/Home/About">About Us</a></li>
+                        <li><a href="/Home/Contact">Contact</a></li>
+                        <li><a href="#">Our Vision</a></li>
+                        <li><a href="#">Partnerships</a></li>
+                    </ul>
+                </div>
+
+                <div class="f-newsletter">
+                    <h5>Stay Updated</h5>
+                    <p>Get the latest analytics and healthcare news delivered to your inbox weekly.</p>
+                    <div class="input-group">
+                        <input type="email" placeholder="Email address" />
+                        <button class="btn btn-primary">Subscribe</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; @DateTime.Now.Year MediCare Smart OPD. Created with Excellence.</p>
+                <div class="footer-legal">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="~/js/landingPage.js" asp-append-version="true"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
