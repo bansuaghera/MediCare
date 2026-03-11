@@ -1,0 +1,188 @@
+﻿@{
+    ViewData["Title"] = "History";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+}
+
+<style>
+    .page-header h2 {
+        font-weight: 700;
+    }
+
+    .history-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 25px;
+        margin-top: 30px;
+    }
+
+    .history-card {
+        background: #ffffff;
+        padding: 25px;
+        border-radius: 18px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        transition: 0.3s;
+    }
+
+        .history-card:hover {
+            transform: translateY(-5px);
+        }
+
+    .history-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .icon-box {
+        width: 55px;
+        height: 55px;
+        background: #ede9fe;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+    }
+
+    .status-badge {
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .completed {
+        background: #d1fae5;
+        color: #059669;
+    }
+
+    .cancelled {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    .pending {
+        background: #fef3c7;
+        color: #d97706;
+    }
+
+    .visit-title {
+        font-weight: 700;
+        font-size: 18px;
+        margin-top: 15px;
+    }
+
+    .doctor-name {
+        color: #6b7280;
+        margin-bottom: 10px;
+    }
+
+    .visit-info {
+        font-size: 14px;
+        margin-bottom: 15px;
+    }
+
+    .date-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 15px;
+        font-size: 14px;
+        color: #6b7280;
+    }
+
+    @@media (max-width: 768px) {
+        .history-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="page-header">
+    <h2>Visit History</h2>
+    <p class="text-muted">Your complete medical visit history</p>
+</div>
+
+<div class="history-grid">
+
+    <!-- Visit 1 -->
+    <div class="history-card">
+        <div class="history-top">
+            <div class="icon-box">🩺</div>
+            <span class="status-badge completed">Completed</span>
+        </div>
+
+        <div class="visit-title">Routine Checkup</div>
+        <div class="doctor-name">Dr. Sarah Johnson</div>
+
+        <div class="visit-info">
+            General health examination and consultation.
+        </div>
+
+        <div class="date-row">
+            <div>📅 10 Feb 2024</div>
+            <div>💰 $50</div>
+        </div>
+    </div>
+
+    <!-- Visit 2 -->
+    <div class="history-card">
+        <div class="history-top">
+            <div class="icon-box">🌡️</div>
+            <span class="status-badge completed">Completed</span>
+        </div>
+
+        <div class="visit-title">Fever Treatment</div>
+        <div class="doctor-name">Dr. Michael Chen</div>
+
+        <div class="visit-info">
+            Diagnosis and medication for viral fever.
+        </div>
+
+        <div class="date-row">
+            <div>📅 25 Jan 2024</div>
+            <div>💰 $45</div>
+        </div>
+    </div>
+
+    <!-- Visit 3 -->
+    <div class="history-card">
+        <div class="history-top">
+            <div class="icon-box">🩸</div>
+            <span class="status-badge completed">Completed</span>
+        </div>
+
+        <div class="visit-title">Blood Pressure Check</div>
+        <div class="doctor-name">Dr. Emily Davis</div>
+
+        <div class="visit-info">
+            Routine blood pressure monitoring and advice.
+        </div>
+
+        <div class="date-row">
+            <div>📅 10 Dec 2023</div>
+            <div>💰 $55</div>
+        </div>
+    </div>
+
+    <!-- Visit 4 -->
+    <div class="history-card">
+        <div class="history-top">
+            <div class="icon-box">🦴</div>
+            <span class="status-badge cancelled">Cancelled</span>
+        </div>
+
+        <div class="visit-title">Orthopedic Consultation</div>
+        <div class="doctor-name">Dr. Robert Wilson</div>
+
+        <div class="visit-info">
+            Consultation for joint pain treatment.
+        </div>
+
+        <div class="date-row">
+            <div>📅 15 Nov 2023</div>
+            <div>💰 $60</div>
+        </div>
+    </div>
+
+</div>
