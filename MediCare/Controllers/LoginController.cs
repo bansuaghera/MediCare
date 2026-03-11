@@ -33,12 +33,12 @@ namespace MediCare.Controllers
             else if (Email.ToLower() == "doctor@medicare" && Password == "123")
             {
                 // Specifically requested to redirect to Admin/Dashboard
-                return RedirectToAction("Dashboard", "Admin");
+                return RedirectToAction("Dashboard", "Doctor");
             }
             else if (Email.ToLower() == "staff@medicare" && Password == "123")
             {
                 // Specifically requested to redirect to Admin/Dashboard
-                return RedirectToAction("Dashboard", "Admin");
+                return RedirectToAction("Dashboard", "Staff");
             }
             else if (Email.ToLower() == "user@medicare" && Password == "123")
             {
@@ -191,6 +191,11 @@ Need help? Contact us at <br>
         public IActionResult Register()
         {
             return View();
+        }
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear();
+            return RedirectToAction("Index", "Home");
         }
     }
 }
