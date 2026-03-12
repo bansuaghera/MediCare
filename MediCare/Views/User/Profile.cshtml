@@ -1,0 +1,158 @@
+﻿@{
+    ViewData["Title"] = "Profile";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+}
+
+<style>
+    .profile-card {
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 4px 25px rgba(0,0,0,0.05);
+    }
+
+    .profile-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+
+    .profile-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 20px;
+        background: #10b981;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 28px;
+        margin-right: 20px;
+    }
+
+    .profile-title h4 {
+        font-weight: 700;
+        margin-bottom: 3px;
+    }
+
+    .form-control,
+    .form-select {
+        border-radius: 12px;
+        padding: 10px 14px;
+        height: 45px;
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+    }
+
+    .form-label {
+        font-weight: 500;
+        margin-bottom: 6px;
+    }
+
+    .btn-save {
+        background: #10b981;
+        color: white;
+        border-radius: 12px;
+        padding: 10px 20px;
+        font-weight: 500;
+        border: none;
+    }
+
+        .btn-save:hover {
+            background: #059669;
+        }
+
+    .btn-cancel {
+        border-radius: 12px;
+        padding: 10px 20px;
+    }
+
+    .page-title h3 {
+        font-weight: 700;
+    }
+</style>
+
+<div class="page-title mb-4">
+    <h3>Profile Settings</h3>
+    <p class="text-muted">Manage your personal information</p>
+</div>
+
+<div class="profile-card">
+
+    <!-- Profile Header -->
+    <div class="profile-header">
+        <div class="profile-avatar">
+            <i class="fa fa-user"></i>
+        </div>
+        <div class="profile-title">
+            <h4>John Smith</h4>
+            <small class="text-muted">Patient ID: 12345</small>
+        </div>
+    </div>
+
+    <!-- Profile Form -->
+    <form method="post" asp-action="UpdateProfile">
+
+        <div class="row g-4">
+
+            <div class="col-md-6">
+                <label class="form-label">First Name</label>
+                <input type="text" name="FirstName" class="form-control" value="John" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Last Name</label>
+                <input type="text" name="LastName" class="form-control" value="Smith" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Email</label>
+                <input type="email" name="Email" class="form-control" value="john.smith@example.com" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Phone</label>
+                <input type="text" name="Phone" class="form-control" value="+1 234-567-8900" />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Date of Birth</label>
+                <input type="date" name="DateOfBirth" class="form-control" value="1979-01-15" />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Gender</label>
+                <select name="Gender" class="form-select">
+                    <option selected>Male</option>
+                    <option>Female</option>
+                    <option>Other</option>
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Blood Group</label>
+                <select name="BloodGroup" class="form-select">
+                    <option>O+</option>
+                    <option>A+</option>
+                    <option>B+</option>
+                    <option>AB+</option>
+                    <option>O-</option>
+                </select>
+            </div>
+
+        </div>
+
+        <!-- Buttons -->
+        <div class="mt-4">
+            <button type="submit" class="btn btn-save me-2">
+                <i class="fa fa-save me-2"></i> Save Changes
+            </button>
+
+            <a href="@Url.Action("Dashboard", "User")" class="btn btn-outline-secondary btn-cancel">
+                Cancel
+            </a>
+        </div>
+
+    </form>
+
+</div>
