@@ -1,12 +1,355 @@
-﻿<!DOCTYPE html>
+@{
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+}
+
+<!DOCTYPE html>
 <html>
 <head>
-    <title>Doctor Panel</title>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"] - MediCare Doctor Panel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+
+    <style>
+        :root {
+            --primary: #10b981;
+            --primary-light: #d1fae5;
+            --bg-color: #f4f6f9;
+            --sidebar-bg: #f8fafc;
+            --text-dark: #1a1a1a;
+            --text-muted: #6b7280;
+            --border-color: #e5e5e5;
+        }
+
+        body {
+            margin: 0;
+            background-color: var(--bg-color);
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dark);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 260px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            transition: 0.3s ease;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 30px 24px 20px 24px;
+        }
+
+        .logo-box {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--primary);
+            color: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 16px;
+        }
+
+        .brand-title {
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--text-dark);
+            line-height: 1.2;
+        }
+
+        .brand-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .sidebar-content {
+            flex-grow: 1;
+            padding: 10px 16px;
+            overflow-y: auto;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 10px;
+            margin-bottom: 4px;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .nav-link i {
+            width: 24px;
+            font-size: 16px;
+            margin-right: 8px;
+            text-align: center;
+        }
+
+        .nav-link:hover {
+            color: var(--text-dark);
+            background: rgba(0,0,0,0.03);
+        }
+
+        .nav-link.active {
+            background: var(--primary-light);
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .logout-container {
+            padding: 24px;
+            margin-top: auto;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .logout-link {
+            font-size: 16px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+        .logout-link:hover {
+            color: var(--text-dark);
+        }
+
+        /* MAIN CONTENT AREA */
+        .main-wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: white;
+        }
+
+        /* TOPBAR */
+        .topbar {
+            height: 80px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            background: white;
+        }
+
+        .search-wrapper {
+            display: flex;
+            align-items: center;
+            background: var(--bg-color);
+            border-radius: 20px;
+            padding: 10px 16px;
+            width: 400px;
+            border: 1px solid transparent;
+        }
+
+        .search-wrapper i {
+            color: var(--text-muted);
+            margin-right: 12px;
+        }
+
+        .search-wrapper input {
+            border: none;
+            background: transparent;
+            outline: none;
+            width: 100%;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .notification-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 20px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        /* PAGE CONTENT */
+        .page-content {
+            padding: 40px;
+            overflow-y: auto;
+            flex-grow: 1;
+            background: white;
+        }
+
+        /* MOBILE MENU TOGGLE */
+        .mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--text-dark);
+            cursor: pointer;
+            margin-right: 20px;
+        }
+
+        .sidebar-backdrop {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+
+        @@media (max-width: 992px) {
+            .sidebar {
+                position: fixed;
+                left: -260px;
+                height: 100vh;
+            }
+            .sidebar.show {
+                left: 0;
+            }
+            .sidebar-backdrop.show {
+                display: block;
+            }
+            .mobile-toggle {
+                display: block;
+            }
+            .search-wrapper {
+                width: 250px;
+            }
+        }
+    </style>
 </head>
+
 <body>
-    <h2>Doctor Navbar</h2>
-    <div>
-        @RenderBody()
+
+    <!-- OVERLAY FOR MOBILE -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-box">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-heart-pulse"></i>
+                </div>
+                <div>
+                    <div class="brand-title">MediCare</div>
+                    <div class="brand-sub">Doctor Panel</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar-content">
+            <nav>
+                <a class="nav-link @(currentAction == "Dashboard" ? "active" : "")" asp-controller="Doctor" asp-action="Dashboard">
+                    <i class="fa-solid fa-table-cells-large"></i> Dashboard
+                </a>
+                <a class="nav-link @(currentAction == "Appointments" ? "active" : "")" asp-controller="Doctor" asp-action="Appointments">
+                    <i class="fa-regular fa-calendar-check"></i> Appointments
+                </a>
+                <a class="nav-link @(currentAction == "Patients" ? "active" : "")" asp-controller="Doctor" asp-action="Patients">
+                    <i class="fa-regular fa-user"></i> Patients
+                </a>
+                <a class="nav-link @(currentAction == "Examination" ? "active" : "")" asp-controller="Doctor" asp-action="Examination">
+                    <i class="fa-regular fa-clock"></i> Examination
+                </a>
+                <a class="nav-link @(currentAction == "Prescriptions" ? "active" : "")" asp-controller="Doctor" asp-action="Prescriptions">
+                    <i class="fa-solid fa-file-prescription"></i> Prescriptions
+                </a>
+                <a class="nav-link @(currentAction == "Schedule" ? "active" : "")" asp-controller="Doctor" asp-action="Schedule">
+                    <i class="fa-regular fa-calendar-days"></i> Schedule
+                </a>
+                <a class="nav-link @(currentAction == "FollowUps" ? "active" : "")" asp-controller="Doctor" asp-action="FollowUps">
+                    <i class="fa-regular fa-circle-check"></i> Follow-ups
+                </a>
+            </nav>
+        </div>
+
+        <div class="logout-container">
+            <a class="nav-link logout-link" asp-controller="Login" asp-action="Logout">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+            </a>
+        </div>
     </div>
+
+    <!-- MAIN APP AREA -->
+    <div class="main-wrapper">
+        
+        <!-- TOP NAVBAR -->
+        <header class="topbar">
+            <div style="display: flex; align-items: center;">
+                <button class="mobile-toggle" id="menuToggle">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <div class="search-wrapper">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" placeholder="Search patients, appointments..." />
+                </div>
+            </div>
+            
+            <div class="topbar-right">
+                <button class="notification-btn">
+                    <i class="fa-regular fa-bell"></i>
+                </button>
+                <div class="user-avatar">DR</div>
+            </div>
+        </header>
+
+        <!-- PAGE CONTENT -->
+        <main class="page-content">
+            @RenderBody()
+        </main>
+    </div>
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+    <script>
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const backdrop = document.getElementById('sidebarBackdrop');
+
+        function toggleMenu() {
+            sidebar.classList.toggle('show');
+            backdrop.classList.toggle('show');
+        }
+
+        menuToggle?.addEventListener('click', toggleMenu);
+        backdrop?.addEventListener('click', toggleMenu);
+    </script>
 </body>
 </html>

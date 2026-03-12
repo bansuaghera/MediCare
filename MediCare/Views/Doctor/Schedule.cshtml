@@ -1,0 +1,278 @@
+@{
+    ViewData["Title"] = "Schedule";
+    Layout = "~/Views/Shared/_DoctorLayout.cshtml";
+}
+
+<style>
+    .page-header {
+        margin-bottom: 30px;
+    }
+    .page-header h3 {
+        font-weight: 700;
+        margin-bottom: 8px;
+        color: #1a1a1a;
+        font-size: 28px;
+    }
+    .page-header p {
+        color: #6b7280;
+        font-size: 14px;
+        margin: 0;
+    }
+
+    .layout-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+    }
+
+    .card-container {
+        background: white;
+        border-radius: 16px;
+        padding: 32px;
+        border: 1px solid #f1f5f9;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.01);
+        height: 100%;
+    }
+
+    .card-header {
+        font-weight: 700;
+        color: #1a1a1a;
+        font-size: 18px;
+        margin-bottom: 24px;
+    }
+
+    /* Calendar Styling */
+    .calendar-wrapper {
+        background: #f8fafc;
+        border-radius: 16px;
+        padding: 24px;
+    }
+    
+    .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+    .calendar-header h5 {
+        font-weight: 600;
+        font-size: 15px;
+        color: #1a1a1a;
+        margin: 0;
+    }
+    .calendar-nav {
+        background: none;
+        border: none;
+        color: #1a1a1a;
+        cursor: pointer;
+        font-size: 15px;
+    }
+
+    .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 16px;
+        text-align: center;
+    }
+    
+    .calendar-day-header {
+        font-size: 11px;
+        color: #6b7280;
+        font-weight: 600;
+        margin-bottom: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .calendar-day {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        font-size: 13px;
+        color: #1a1a1a;
+        cursor: pointer;
+        margin: auto;
+        transition: all 0.2s;
+    }
+    .calendar-day.active {
+        background: #10b981;
+        color: white;
+        font-weight: 600;
+        box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+    }
+    .calendar-day:hover:not(.active) {
+        background: #e2e8f0;
+    }
+
+    /* Sessions Styling */
+    .session-card {
+        border-radius: 16px;
+        padding: 24px;
+        margin-bottom: 20px;
+        position: relative;
+    }
+    .session-card:last-child {
+        margin-bottom: 0;
+    }
+    
+    .session-morning {
+        background: #d1fae5;
+    }
+    .session-afternoon {
+        background: #dbeafe;
+    }
+
+    .session-title {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 12px;
+    }
+    .session-morning .session-title { color: #047857; }
+    .session-afternoon .session-title { color: #1d4ed8; }
+
+    .session-detail {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        margin-bottom: 10px;
+        font-weight: 500;
+    }
+    .session-detail:last-child {
+        margin-bottom: 0;
+    }
+    .session-morning .session-detail { color: #059669; }
+    .session-afternoon .session-detail { color: #2563eb; }
+    
+    .session-detail i { font-size: 14px; width: 14px; text-align: center; }
+
+    .session-icon {
+        position: absolute;
+        top: 24px;
+        right: 24px;
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+    }
+    .session-morning .session-icon { background: #10b981; color: white; }
+    .session-afternoon .session-icon { background: #3b82f6; color: white; }
+    
+    @@media (max-width: 992px) {
+        .layout-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="page-header">
+    <h3>My Schedule</h3>
+    <p>View your OPD schedule</p>
+</div>
+
+<div class="layout-grid">
+    <!-- Select Date Card -->
+    <div class="card-container">
+        <div class="card-header">Select Date</div>
+        
+        <div class="calendar-wrapper">
+            <div class="calendar-header">
+                <button class="calendar-nav"><i class="fa-solid fa-chevron-left"></i></button>
+                <h5>February 2026</h5>
+                <button class="calendar-nav"><i class="fa-solid fa-chevron-right"></i></button>
+            </div>
+            
+            <div class="calendar-grid mb-2">
+                <div class="calendar-day-header">SU</div>
+                <div class="calendar-day-header">MO</div>
+                <div class="calendar-day-header">TU</div>
+                <div class="calendar-day-header">WE</div>
+                <div class="calendar-day-header">TH</div>
+                <div class="calendar-day-header">FR</div>
+                <div class="calendar-day-header">SA</div>
+            </div>
+            
+            <div class="calendar-grid">
+                <div class="calendar-day">1</div>
+                <div class="calendar-day">2</div>
+                <div class="calendar-day">3</div>
+                <div class="calendar-day">4</div>
+                <div class="calendar-day">5</div>
+                <div class="calendar-day">6</div>
+                <div class="calendar-day">7</div>
+                
+                <div class="calendar-day">8</div>
+                <div class="calendar-day">9</div>
+                <div class="calendar-day">10</div>
+                <div class="calendar-day">11</div>
+                <div class="calendar-day">12</div>
+                <div class="calendar-day active">13</div>
+                <div class="calendar-day">14</div>
+                
+                <div class="calendar-day">15</div>
+                <div class="calendar-day">16</div>
+                <div class="calendar-day">17</div>
+                <div class="calendar-day">18</div>
+                <div class="calendar-day">19</div>
+                <div class="calendar-day">20</div>
+                <div class="calendar-day">21</div>
+                
+                <div class="calendar-day">22</div>
+                <div class="calendar-day">23</div>
+                <div class="calendar-day">24</div>
+                <div class="calendar-day">25</div>
+                <div class="calendar-day">26</div>
+                <div class="calendar-day">27</div>
+                <div class="calendar-day">28</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Today's Schedule Card -->
+    <div class="card-container">
+        <div class="card-header">Today's Schedule</div>
+
+        <!-- Morning Session -->
+        <div class="session-card session-morning">
+            <div class="session-title">Morning Session</div>
+            
+            <div class="session-detail">
+                <i class="fa-regular fa-clock"></i>
+                <span>09:00 AM &ndash; 12:00 PM &bull; Room 101</span>
+            </div>
+            <div class="session-detail">
+                <i class="fa-solid fa-user-group"></i>
+                <span>12 appointments scheduled</span>
+            </div>
+
+            <div class="session-icon">
+                <i class="fa-solid fa-sun"></i>
+            </div>
+        </div>
+
+        <!-- Afternoon Session -->
+        <div class="session-card session-afternoon">
+            <div class="session-title">Afternoon Session</div>
+            
+            <div class="session-detail">
+                <i class="fa-regular fa-clock"></i>
+                <span>02:00 PM &ndash; 05:00 PM &bull; Room 101</span>
+            </div>
+            <div class="session-detail">
+                <i class="fa-solid fa-user-group"></i>
+                <span>8 appointments scheduled</span>
+            </div>
+
+            <div class="session-icon">
+                <i class="fa-solid fa-moon"></i>
+            </div>
+        </div>
+
+    </div>
+</div>
