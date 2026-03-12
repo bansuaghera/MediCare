@@ -1,4 +1,4 @@
-﻿@{
+@{
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
     var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
 }
@@ -35,96 +35,156 @@
             position: fixed;
             top: 0;
             left: 0;
-            padding-top: 20px;
+            display: flex;
+            flex-direction: column;
             border-right: 1px solid #e5e5e5;
-            transition: 0.3s ease;
-            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1050;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: #fff;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 0;
+        }
+
+        /* Custom Scrollbar */
+        .sidebar-content::-webkit-scrollbar {
+            width: 5px;
+        }
+        .sidebar-content::-webkit-scrollbar-thumb {
+            background: #e5e5e5;
+            border-radius: 10px;
         }
 
         .logo-box {
             display: flex;
             align-items: center;
-            padding: 0 20px 20px 20px;
         }
 
         .logo-icon {
             width: 40px;
             height: 40px;
-            background: #22c55e;
+            background: linear-gradient(135deg, #16a34a, #14b8a6);
             color: white;
-            border-radius: 10px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 10px;
+            margin-right: 12px;
             font-size: 18px;
+            box-shadow: 0 4px 12px rgba(22, 163, 74, 0.2);
         }
 
         .brand-title {
-            font-weight: 600;
-            font-size: 18px;
+            font-weight: 700;
+            font-size: 19px;
+            color: #1a1a1a;
+            letter-spacing: -0.5px;
         }
 
         .brand-sub {
-            font-size: 13px;
-            color: gray;
+            font-size: 12px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
         }
 
         .nav-link {
-            color: #555;
+            color: #4b5563;
             padding: 12px 20px;
-            margin: 5px 10px;
-            border-radius: 8px;
+            margin: 4px 15px;
+            border-radius: 10px;
             font-weight: 500;
-            transition: 0.2s;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
         }
 
             .nav-link i {
-                width: 22px;
+                width: 24px;
+                font-size: 18px;
+                margin-right: 12px;
+                transition: transform 0.2s;
             }
 
             .nav-link:hover {
-                background: #e8f7ed;
+                background: #f3f4f6;
                 color: #16a34a;
             }
 
+            .nav-link:hover i {
+                transform: translateX(3px);
+            }
+
             .nav-link.active {
-                background: #d1fae5;
-                color: #16a34a !important;
+                background: #ecfdf5;
+                color: #059669 !important;
                 font-weight: 600;
+                box-shadow: inset 0 0 0 1px rgba(16, 185, 129, 0.1);
             }
 
         /* CONTENT */
         .content {
             margin-left: 260px;
-            padding: 30px;
-            transition: 0.3s ease;
+            padding: 40px;
+            min-height: 100vh;
+            transition: all 0.3s;
         }
 
         /* MOBILE TOPBAR */
         .mobile-topbar {
             display: none;
             background: white;
-            padding: 10px 15px;
+            padding: 12px 20px;
             border-bottom: 1px solid #e5e5e5;
             align-items: center;
-            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1001;
+        }
+
+        .sidebar-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1040;
         }
 
         /* RESPONSIVE FIX */
-        @@media (max-width: 992px) {
-
+        @media (max-width: 992px) {
             .sidebar {
                 left: -260px;
+                box-shadow: none;
             }
 
-                .sidebar.show {
-                    left: 0;
-                }
+            .sidebar.show {
+                left: 0;
+                box-shadow: 20px 0 50px rgba(0,0,0,0.1);
+            }
+
+            .sidebar.show + .sidebar-backdrop {
+                display: block;
+            }
 
             .content {
                 margin-left: 0;
-                padding: 20px;
+                padding: 24px;
             }
 
             .mobile-topbar {
@@ -138,84 +198,97 @@
 
     <!-- MOBILE TOPBAR -->
     <div class="mobile-topbar">
-        <button class="btn btn-light" id="menuToggle">
+        <button class="btn btn-light shadow-sm border" id="menuToggle">
             <i class="fa fa-bars"></i>
         </button>
-        <strong>MediCare Admin</strong>
+        <span class="ms-3 fw-bold">MediCare Admin</span>
     </div>
 
     <!-- SIDEBAR -->
     <div class="sidebar" id="sidebar">
 
-        <div class="logo-box">
-            <div class="logo-icon">
-                <i class="fa-solid fa-heart-pulse"></i>
-            </div>
-            <div>
-                <div class="brand-title">MediCare</div>
-                <div class="brand-sub">Admin Panel</div>
+        <div class="sidebar-header">
+            <div class="logo-box">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-heart-pulse"></i>
+                </div>
+                <div>
+                    <div class="brand-title">MediCare</div>
+                    <div class="brand-sub">Admin Panel</div>
+                </div>
             </div>
         </div>
 
-        <nav class="nav flex-column">
+        <div class="sidebar-content">
+            <nav class="nav flex-column">
 
-            <a class="nav-link @(currentController == "Admin" && currentAction == "Dashboard" ? "active" : "")"
-               asp-controller="Admin" asp-action="Dashboard">
-                <i class="fa-solid fa-chart-line"></i> Dashboard
-            </a>
+                <a class="nav-link @(currentController == "Admin" && currentAction == "Dashboard" ? "active" : "")"
+                   asp-controller="Admin" asp-action="Dashboard">
+                    <i class="fa-solid fa-chart-line"></i> Dashboard
+                </a>
 
-            <a class="nav-link @(currentController == "Admin" && currentAction == "Patient" ? "active" : "")"
-               asp-controller="Admin" asp-action="Patient">
-                <i class="fa-regular fa-user"></i> Patients
-            </a>
+                <a class="nav-link @(currentController == "Admin" && currentAction == "Patient" ? "active" : "")"
+                   asp-controller="Admin" asp-action="Patient">
+                    <i class="fa-regular fa-user"></i> Patients
+                </a>
 
-            <a class="nav-link @(currentController == "Admin" && currentAction == "Doctors" ? "active" : "")"
-               asp-controller="Admin" asp-action="Doctors">
-                <i class="fa-solid fa-user-doctor"></i> Doctors
-            </a>
+                <a class="nav-link @(currentController == "Admin" && currentAction == "Doctors" ? "active" : "")"
+                   asp-controller="Admin" asp-action="Doctors">
+                    <i class="fa-solid fa-user-doctor"></i> Doctors
+                </a>
 
-            <a class="nav-link @(currentController == "Admin" && currentAction == "Staff" ? "active" : "")"
-               asp-controller="Admin" asp-action="Staff">
-                <i class="fa-solid fa-users"></i> Staff
-            </a>
+                <a class="nav-link @(currentController == "Admin" && currentAction == "Staff" ? "active" : "")"
+                   asp-controller="Admin" asp-action="Staff">
+                    <i class="fa-solid fa-users"></i> Staff
+                </a>
 
-            <a class="nav-link @(currentController == "Admin" && currentAction == "OPDSchedule" ? "active" : "")"
-               asp-controller="Admin" asp-action="OPDSchedule">
-                <i class="fa-regular fa-calendar"></i> OPD Schedule
-            </a>
+                <a class="nav-link @(currentController == "Admin" && currentAction == "OPDSchedule" ? "active" : "")"
+                   asp-controller="Admin" asp-action="OPDSchedule">
+                    <i class="fa-regular fa-calendar"></i> OPD Schedule
+                </a>
 
-            <a class="nav-link @(currentController == "Admin" && currentAction == "Appointments" ? "active" : "")"
-               asp-controller="Admin" asp-action="Appointments">
-                <i class="fa-solid fa-calendar-check"></i> Appointments
-            </a>
+                <a class="nav-link @(currentController == "Admin" && currentAction == "Appointments" ? "active" : "")"
+                   asp-controller="Admin" asp-action="Appointments">
+                    <i class="fa-solid fa-calendar-check"></i> Appointments
+                </a>
 
-            <a class="nav-link @(currentController == "Admin" && currentAction == "TokenQueue" ? "active" : "")"
-               asp-controller="Admin" asp-action="TokenQueue">
-                <i class="fa-solid fa-list"></i> Token Queue
-            </a>
+                <a class="nav-link @(currentController == "Admin" && currentAction == "TokenQueue" ? "active" : "")"
+                   asp-controller="Admin" asp-action="TokenQueue">
+                    <i class="fa-solid fa-list"></i> Token Queue
+                </a>
 
-            <a class="nav-link @(currentController == "Admin" && currentAction == "Prescriptions" ? "active" : "")"
-               asp-controller="Admin" asp-action="Prescriptions">
-                <i class="fa-solid fa-book-medical"></i> Prescriptions
-            </a>
-            <a class="nav-link @(currentController == "Admin" && currentAction == "Medicines" ? "active" : "")"
-               asp-controller="Admin" asp-action="Medicines">
-                <i class="fa-solid fa-pills"></i> Medicines
-            </a>
+                <a class="nav-link @(currentController == "Admin" && currentAction == "Prescriptions" ? "active" : "")"
+                   asp-controller="Admin" asp-action="Prescriptions">
+                    <i class="fa-solid fa-book-medical"></i> Prescriptions
+                </a>
+                <a class="nav-link @(currentController == "Admin" && currentAction == "Medicines" ? "active" : "")"
+                   asp-controller="Admin" asp-action="Medicines">
+                    <i class="fa-solid fa-pills"></i> Medicines
+                </a>
 
-            <a class="nav-link @(currentController == "Admin" && currentAction == "Templates" ? "active" : "")"
-               asp-controller="Admin" asp-action="Templates">
-                <i class="fa-regular fa-file-lines"></i> Templates
-            </a>
+                <a class="nav-link @(currentController == "Admin" && currentAction == "Templates" ? "active" : "")"
+                   asp-controller="Admin" asp-action="Templates">
+                    <i class="fa-regular fa-file-lines"></i> Templates
+                </a>
 
-            <a class="nav-link @(currentController == "Admin" && currentAction == "Settings" ? "active" : "")"
-               asp-controller="Admin" asp-action="Settings">
-                <i class="fa-solid fa-gear"></i> Settings
-            </a>
+                <a class="nav-link @(currentController == "Admin" && currentAction == "Settings" ? "active" : "")"
+                   asp-controller="Admin" asp-action="Settings">
+                    <i class="fa-solid fa-gear"></i> Settings
+                </a>
 
-        </nav>
+                <hr class="mx-3 my-2" />
+
+                <a class="nav-link text-danger" asp-controller="Login" asp-action="Logout">
+                    <i class="fa-solid fa-sign-out-alt"></i> Logout
+                </a>
+
+            </nav>
+        </div>
 
     </div>
+
+    <!-- BACKDROP FOR MOBILE -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
     <!-- CONTENT -->
     <div class="content">
@@ -227,11 +300,15 @@
 
     <script>
         const toggleBtn = document.getElementById("menuToggle");
+        const backdrop = document.getElementById("sidebarBackdrop");
         const sidebar = document.getElementById("sidebar");
 
-        toggleBtn?.addEventListener("click", function () {
+        function toggleSidebar() {
             sidebar.classList.toggle("show");
-        });
+        }
+
+        toggleBtn?.addEventListener("click", toggleSidebar);
+        backdrop?.addEventListener("click", toggleSidebar);
     </script>
 
 </body>

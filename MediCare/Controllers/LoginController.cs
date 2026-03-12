@@ -1,4 +1,4 @@
-﻿using MediCare.Services;
+using MediCare.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MediCare.Controllers
@@ -13,6 +13,40 @@ namespace MediCare.Controllers
         }
         public IActionResult Login()
         {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Login(string Email, string Password)
+        {
+            if (string.IsNullOrEmpty(Email) || string.IsNullOrEmpty(Password))
+            {
+                ViewBag.Error = "Please enter both email and password.";
+                return View();
+            }
+
+            // Role-based redirection logic with hardcoded passwords
+            if (Email.ToLower() == "admin@medicare" && Password == "123")
+            {
+                return RedirectToAction("Dashboard", "Admin");
+            }
+            else if (Email.ToLower() == "doctor@medicare" && Password == "123")
+            {
+                // Specifically requested to redirect to Admin/Dashboard
+                return RedirectToAction("Dashboard", "Doctor");
+            }
+            else if (Email.ToLower() == "staff@medicare" && Password == "123")
+            {
+                // Specifically requested to redirect to Admin/Dashboard
+                return RedirectToAction("Dashboard", "Staff");
+            }
+            else if (Email.ToLower() == "user@medicare" && Password == "123")
+            {
+                return RedirectToAction("Dashboard", "User");
+            }
+
+            // Default fallback if no role matches or password is wrong
+            ViewBag.Error = "Invalid email or password.";
             return View();
         }
         [HttpPost]
@@ -157,6 +191,11 @@ Need help? Contact us at <br>
         public IActionResult Register()
         {
             return View();
+        }
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear();
+            return RedirectToAction("Index", "Home");
         }
     }
 }

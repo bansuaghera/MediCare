@@ -1,4 +1,4 @@
-﻿@{
+@{
     Layout = null;
 }
 
@@ -135,42 +135,52 @@
                     <p class="text-muted">Please login to your account</p>
                 </div>
 
-                <form asp-controller="User" asp-action="Dashboard" method="post">
+                @if (ViewBag.Error != null)
+                {
+                    <div class="alert alert-danger py-2" role="alert">
+                        <i class="fa-solid fa-circle-exclamation me-2"></i> @ViewBag.Error
+                    </div>
+                }
+
+                <form asp-controller="Login" asp-action="Login" method="post">
 
                     <div class="mb-3">
-                        <label>Email Address</label>
+                        <label class="form-label">Email Address</label>
                         <div class="input-group">
-                            <span class="input-group-text bg-white">
-                                <i class="fa-regular fa-envelope"></i>
+                            <span class="input-group-text bg-white border-end-0">
+                                <i class="fa-regular fa-envelope text-muted"></i>
                             </span>
-                            <input type="email" name="Email" class="form-control" placeholder="Enter your email" required />
+                            <input type="email" name="Email" class="form-control border-start-0" placeholder="admin@medicare" required />
                         </div>
                     </div>
 
                     <div class="mb-3">
-                        <label>Password</label>
+                        <label class="form-label">Password</label>
                         <div class="input-group">
-                            <span class="input-group-text bg-white">
-                                <i class="fa-solid fa-lock"></i>
+                            <span class="input-group-text bg-white border-end-0">
+                                <i class="fa-solid fa-lock text-muted"></i>
                             </span>
-                            <input type="password" name="Password" class="form-control" placeholder="Enter your password" required />
+                            <input type="password" name="Password" class="form-control border-start-0" placeholder="••••••••" required />
                         </div>
                     </div>
 
-                    <div class="d-flex justify-content-between mb-3">
-                        <div>
-                            <input type="checkbox" /> Remember me
-                            <a asp-controller="Login" asp-action="ForgotPassword" class="text-success">
-                                Forgot password?
-                            </a>
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="rememberMe" />
+                            <label class="form-check-label small" for="rememberMe">Remember me</label>
+                        </div>
+                        <a asp-controller="Login" asp-action="ForgotPassword" class="text-success small text-decoration-none">
+                            Forgot password?
+                        </a>
+                    </div>
 
-                    <button type="submit" class="btn btn-login w-100 text-white">
+                    <button type="submit" class="btn btn-login w-100 text-white shadow-sm">
                         Login
                     </button>
 
                     <div class="text-center mt-4">
-                        Don't have an account?
-                        <a asp-controller="Login" asp-action="Register" class="text-success">Sign up</a>
+                        <span class="text-muted small">Don't have an account?</span>
+                        <a asp-controller="Login" asp-action="Register" class="text-success small text-decoration-none fw-bold">Sign up</a>
                     </div>
 
                 </form>

@@ -1,0 +1,177 @@
+@{
+    Layout = null;
+    ViewData["Title"] = "Contact Us - MediCare";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="~/css/landingPage.css" asp-append-version="true">
+    <link rel="stylesheet" href="~/css/contact.css" asp-append-version="true">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="contact-container">
+        <!-- Navbar -->
+        <nav class="navbar">
+            <a href="/" class="nav-brand">
+                <div class="brand-logo">
+                    <i data-lucide="activity"></i>
+                </div>
+                <h2 class="brand-name">Medi<span>Care</span></h2>
+            </a>
+
+            <div class="nav-links">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/Home/About" class="nav-link">About</a>
+                <a href="/Home/Contact" class="nav-link active">Contact</a>
+            </div>
+
+            <div class="nav-auth">
+                <a href="/Login/Login" class="btn btn-outline">Login</a>
+                <a href="/Login/Register" class="btn btn-primary">Join Now</a>
+            </div>
+        </nav>
+
+        <!-- Header -->
+        <header class="contact-header">
+            <div class="hero-badge" style="margin: 0 auto 2rem">Contact Us</div>
+            <h1>Let's Start a <span>Conversation</span></h1>
+            <p>Have questions about our platform? Our specialized clinical team is ready to assist you 24/7.</p>
+        </header>
+
+        <!-- Contact Grid -->
+        <section class="contact-grid">
+            <div class="contact-info">
+                <div class="info-item">
+                    <div class="info-icon"><i data-lucide="mail"></i></div>
+                    <div class="info-content">
+                        <h4>Email Support</h4>
+                        <p>For technical inquiries and partner clinical support.</p>
+                        <a href="mailto:support@medicare.com" style="color: var(--primary); font-weight: 700; text-decoration: none;">support@medicare.com</a>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon"><i data-lucide="phone"></i></div>
+                    <div class="info-content">
+                        <h4>Direct Hotline</h4>
+                        <p>Immediate assistance for hospitals and clinics.</p>
+                        <a href="tel:0282222475" style="color: var(--primary); font-weight: 700; text-decoration: none;">0282222475</a>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon"><i data-lucide="map-pin"></i></div>
+                    <div class="info-content">
+                        <h4>Clinical HQ</h4>
+                        <p>Healthcare Innovation Hub, 12th Floor, Metro Plaza, Silicon Valley.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="contact-form-box">
+                <form class="form-grid">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" placeholder="Enter your Name"" />
+                    </div>
+                    <div class="form-group">
+                        <label>Professional Email</label>
+                        <input type="email" placeholder="Enter your Email" />
+                    </div>
+                    <div class="form-group">
+                        <label>Clinic/Hospital Name</label>
+                        <input type="text" placeholder="City Medical Center" />
+                    </div>
+                    <div class="form-group">
+                        <label>Inquiry Type</label>
+                        <input type="text" placeholder="e.g. Partnership" />
+                    </div>
+                    <div class="form-group full">
+                        <label>Your Message</label>
+                        <textarea rows="6" placeholder="Tell us how we can help your medical practice flourish..."></textarea>
+                    </div>
+                    <div class="form-group full">
+                        <button class="btn btn-primary submit-btn">
+                            Send Message <i data-lucide="send" style="width: 18px; height: 18px; margin-left: 8px;"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-top">
+                <div class="f-brand">
+                    <div class="nav-brand" style="justify-content: flex-start; margin-bottom: 20px; color: white;">
+                        <div class="brand-logo" style="box-shadow: none;">
+                            <i data-lucide="activity"></i>
+                        </div>
+                        <h2 class="brand-name" style="margin-bottom: 0;">Medi<span>Care</span></h2>
+                    </div>
+                    <p>Empowering healthcare providers with state-of-the-art technology to deliver exceptional care.</p>
+                    <div class="social-links">
+                        <a href="#" class="social-btn"><i data-lucide="instagram"></i></a>
+                        <a href="#" class="social-btn"><i data-lucide="twitter"></i></a>
+                        <a href="#" class="social-btn"><i data-lucide="linkedin"></i></a>
+                        <a href="#" class="social-btn"><i data-lucide="facebook"></i></a>
+                    </div>
+                </div>
+
+                <div class="f-links">
+                    <h5>Platform</h5>
+                    <ul>
+                        <li><a href="#">Pricing Models</a></li>
+                        <li><a href="#">Global Reach</a></li>
+                        <li><a href="#">Security Audit</a></li>
+                        <li><a href="#">Case Studies</a></li>
+                    </ul>
+                </div>
+
+                <div class="f-links">
+                    <h5>Company</h5>
+                    <ul>
+                        <li><a href="/Home/About">About Us</a></li>
+                        <li><a href="/Home/Contact">Contact</a></li>
+                        <li><a href="#">Our Vision</a></li>
+                        <li><a href="#">Partnerships</a></li>
+                    </ul>
+                </div>
+
+                <div class="f-newsletter">
+                    <h5>Stay Updated</h5>
+                    <p>Get the latest analytics and healthcare news delivered to your inbox weekly.</p>
+                    <div class="input-group">
+                        <input type="email" placeholder="Email address" />
+                        <button class="btn btn-primary">Subscribe</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; @DateTime.Now.Year MediCare Smart OPD. Created with Excellence.</p>
+                <div class="footer-legal">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="~/js/landingPage.js" asp-append-version="true"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
