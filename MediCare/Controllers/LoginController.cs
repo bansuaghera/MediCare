@@ -11,91 +11,64 @@ namespace MediCare.Controllers
         {
             _emailService = emailService;
         }
+
+        // LOGIN PAGE
         public IActionResult Login()
         {
             return View();
         }
 
+        // LOGIN POST
         [HttpPost]
         public IActionResult Login(string Email, string Password)
         {
-<<<<<<< HEAD
-            if (Email == "doctor@medicare" && Password == "123")
-            {
-                return RedirectToAction("Dashboard", "Doctor");
-            }
-            if (Email == "user@medicare" && Password == "123")
-            {
-                return RedirectToAction("Dashboard", "User");
-            }
-            if (Email == "admin@medicare" && Password == "123")
-            {
-                return RedirectToAction("Dashboard", "Admin");
-            }
-            if (Email == "staff@medicare" && Password == "123")
-            {
-                return RedirectToAction("Dashboard", "Staff");
-            }
-
-            ViewBag.Error = "Invalid Login Credentials!";
-            return View();
-        }
-
-        public IActionResult Logout()
-        {
-            HttpContext.Session.Clear();
-            return RedirectToAction("Login", "Login");
-        }
-=======
             if (string.IsNullOrEmpty(Email) || string.IsNullOrEmpty(Password))
             {
                 ViewBag.Error = "Please enter both email and password.";
                 return View();
             }
 
-            // Role-based redirection logic with hardcoded passwords
-            if (Email.ToLower() == "admin@medicare" && Password == "123")
+            Email = Email.ToLower();
+
+            if (Email == "admin@medicare" && Password == "123")
             {
+                HttpContext.Session.SetString("Role", "Admin");
                 return RedirectToAction("Dashboard", "Admin");
             }
-            else if (Email.ToLower() == "doctor@medicare" && Password == "123")
+            else if (Email == "doctor@medicare" && Password == "123")
             {
-                // Specifically requested to redirect to Admin/Dashboard
+                HttpContext.Session.SetString("Role", "Doctor");
                 return RedirectToAction("Dashboard", "Doctor");
             }
-            else if (Email.ToLower() == "staff@medicare" && Password == "123")
+            else if (Email == "staff@medicare" && Password == "123")
             {
-                // Specifically requested to redirect to Admin/Dashboard
+                HttpContext.Session.SetString("Role", "Staff");
                 return RedirectToAction("Dashboard", "Staff");
             }
-            else if (Email.ToLower() == "user@medicare" && Password == "123")
+            else if (Email == "user@medicare" && Password == "123")
             {
+                HttpContext.Session.SetString("Role", "User");
                 return RedirectToAction("Dashboard", "User");
             }
 
-            // Default fallback if no role matches or password is wrong
             ViewBag.Error = "Invalid email or password.";
             return View();
         }
->>>>>>> d568bf40c497d601ca460622fb10fd256c8384d4
-        [HttpPost]
-        public IActionResult ResetPassword(string NewPassword, string ConfirmPassword)
+
+        // LOGOUT
+        public IActionResult Logout()
         {
-            if (NewPassword != ConfirmPassword)
-            {
-                ViewBag.Error = "Passwords do not match!";
-                return View();
-            }
-
-            // TODO: Update password in database
-
-            return RedirectToAction("Login");
+            HttpContext.Session.Clear();
+            return RedirectToAction("Index", "Home");
         }
+
+        // FORGOT PASSWORD PAGE
         [HttpGet]
         public IActionResult ForgotPassword()
         {
             return View();
         }
+
         // SEND OTP
         [HttpPost]
         public IActionResult ForgotPassword(string Email)
@@ -106,82 +79,33 @@ namespace MediCare.Controllers
                 return View();
             }
 
-            // Generate 6 digit OTP
             Random random = new Random();
             string otp = random.Next(100000, 999999).ToString();
 
-            // Store OTP in session
             HttpContext.Session.SetString("OTP", otp);
             HttpContext.Session.SetString("ResetEmail", Email);
 
             string subject = "MediCare Password Reset OTP";
+
             string body = @"
 <!DOCTYPE html>
 <html>
-<head>
-<meta charset='UTF-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1.0'>
-</head>
-<body style='margin:0; padding:0; background-color:#f4f6f9; font-family:Segoe UI, Arial, sans-serif;'>
+<body style='font-family:Segoe UI;background:#f4f6f9;padding:30px;'>
 
-<table width='100%' cellpadding='0' cellspacing='0' style='padding:30px 0;'>
-<tr>
-<td align='center'>
+<div style='max-width:600px;margin:auto;background:white;border-radius:10px;padding:30px;text-align:center;'>
 
-<table width='600' cellpadding='0' cellspacing='0' 
-style='background:#ffffff; border-radius:12px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,0.1);'>
+<h2 style='color:#16a34a;'>MediCare+</h2>
+<h3>Password Reset Verification</h3>
 
-<!-- Header -->
-<tr>
-<td style='background: linear-gradient(135deg,#16a34a,#14b8a6); padding:30px; text-align:center; color:white;'>
-<h2 style='margin:0;'>MediCare+</h2>
-<p style='margin:5px 0 0 0;'>Smart Hospital OPD & Patient Care</p>
-</td>
-</tr>
+<p>Use the OTP below to reset your password</p>
 
-<!-- Body -->
-<tr>
-<td style='padding:40px; text-align:center;'>
-
-<h3 style='margin-top:0;'>Password Reset Verification</h3>
-
-<p style='color:#555; font-size:15px;'>
-We received a request to reset your password.
-Use the OTP below to continue.
-</p>
-
-<div style='margin:30px 0; font-size:28px; font-weight:bold; letter-spacing:6px; 
-background:#f1f5f9; padding:15px 25px; display:inline-block; border-radius:8px;'>
+<div style='font-size:28px;font-weight:bold;background:#f1f5f9;padding:15px;border-radius:8px;display:inline-block;letter-spacing:5px;'>
 " + otp + @"
 </div>
 
-<p style='color:#777; font-size:14px;'>
-This OTP is valid for <strong>5 minutes</strong>.
-Do not share this code with anyone.
-</p>
+<p style='margin-top:20px;'>This OTP is valid for 5 minutes.</p>
 
-<hr style='margin:30px 0; border:none; border-top:1px solid #eee;'>
-
-<p style='font-size:13px; color:#999;'>
-If you didn't request this, please ignore this email.
-</p>
-
-</td>
-</tr>
-
-<!-- Footer -->
-<tr>
-<td style='background:#f9fafb; padding:20px; text-align:center; font-size:13px; color:#777;'>
-Need help? Contact us at <br>
-<strong style='color:#16a34a;'>support@medicare.com</strong>
-</td>
-</tr>
-
-</table>
-
-</td>
-</tr>
-</table>
+</div>
 
 </body>
 </html>
@@ -198,6 +122,7 @@ Need help? Contact us at <br>
             return View();
         }
 
+        // VERIFY OTP
         [HttpPost]
         public IActionResult VerifyOTP(string UserOTP)
         {
@@ -212,19 +137,31 @@ Need help? Contact us at <br>
             return View();
         }
 
+        // RESET PASSWORD PAGE
         public IActionResult ResetPassword()
         {
             return View();
         }
 
+        // RESET PASSWORD POST
+        [HttpPost]
+        public IActionResult ResetPassword(string NewPassword, string ConfirmPassword)
+        {
+            if (NewPassword != ConfirmPassword)
+            {
+                ViewBag.Error = "Passwords do not match!";
+                return View();
+            }
+
+            // TODO: Update password in database
+
+            return RedirectToAction("Login");
+        }
+
+        // REGISTER PAGE
         public IActionResult Register()
         {
             return View();
-        }
-        public IActionResult Logout()
-        {
-            HttpContext.Session.Clear();
-            return RedirectToAction("Index", "Home");
         }
     }
 }
