@@ -1,4 +1,4 @@
-﻿using MediCare.Services;
+using MediCare.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MediCare.Controllers
@@ -14,6 +14,36 @@ namespace MediCare.Controllers
         public IActionResult Login()
         {
             return View();
+        }
+
+        [HttpPost]
+        public IActionResult Login(string Email, string Password)
+        {
+            if (Email == "doctor@medicare" && Password == "123")
+            {
+                return RedirectToAction("Dashboard", "Doctor");
+            }
+            if (Email == "user@medicare" && Password == "123")
+            {
+                return RedirectToAction("Dashboard", "User");
+            }
+            if (Email == "admin@medicare" && Password == "123")
+            {
+                return RedirectToAction("Dashboard", "Admin");
+            }
+            if (Email == "staff@medicare" && Password == "123")
+            {
+                return RedirectToAction("Dashboard", "Staff");
+            }
+
+            ViewBag.Error = "Invalid Login Credentials!";
+            return View();
+        }
+
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear();
+            return RedirectToAction("Login", "Login");
         }
         [HttpPost]
         public IActionResult ResetPassword(string NewPassword, string ConfirmPassword)
