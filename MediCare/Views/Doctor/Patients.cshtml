@@ -1,5 +1,5 @@
 @{
-    ViewData["Title"] = "Patients";
+    ViewData["Title"] = "Patient History";
     Layout = "~/Views/Shared/_DoctorLayout.cshtml";
 }
 
@@ -7,46 +7,242 @@
     .page-header {
         margin-bottom: 30px;
     }
+
     .page-header h3 {
         font-weight: 700;
         margin-bottom: 4px;
         color: #1a1a1a;
         font-size: 24px;
     }
+
     .page-header p {
         color: #6b7280;
         font-size: 14px;
     }
 
-    .placeholder-card {
+    /* Card Containers */
+    .content-card {
         background: white;
         border-radius: 16px;
-        padding: 40px;
-        text-align: center;
+        padding: 30px;
         box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        margin-bottom: 24px;
     }
-    .placeholder-card i {
-        font-size: 48px;
-        color: #cbd5e1;
-        margin-bottom: 16px;
+
+    /* Patient Details Card */
+    .patient-profile {
+        display: flex;
+        align-items: flex-start;
+        gap: 24px;
     }
-    .placeholder-card h5 {
+
+    .avatar-wrapper {
+        width: 80px;
+        height: 80px;
+        background-color: #dbeafe; /* light blue */
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .avatar-wrapper i {
+        font-size: 32px;
+        color: #3b82f6; /* blue */
+    }
+
+    .profile-info {
+        flex-grow: 1;
+    }
+
+    .profile-info h4 {
+        margin: 0 0 8px 0;
+        font-size: 20px;
+        font-weight: 700;
         color: #1a1a1a;
-        font-weight: 600;
-        margin-bottom: 8px;
     }
-    .placeholder-card p {
+
+    .meta-details {
+        font-size: 14px;
         color: #6b7280;
+        margin-bottom: 20px;
+    }
+
+    .medical-history-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #1a1a1a;
+        text-transform: uppercase;
+        margin-bottom: 4px;
+        letter-spacing: 0.5px;
+    }
+
+    .medical-history-value {
+        font-size: 14px;
+        color: #6b7280;
+        margin: 0;
+    }
+
+    /* Visit History Section */
+    .visit-history-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-top: 0;
+        margin-bottom: 24px;
+    }
+
+    .visit-card {
+        border: 1px solid #f1f5f9;
+        border-radius: 16px;
+        padding: 24px;
+        margin-bottom: 20px;
+    }
+
+    .visit-card:last-child {
+        margin-bottom: 0;
+    }
+
+    .visit-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+
+    .date-icon {
+        width: 36px;
+        height: 36px;
+        background-color: #eff6ff;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .date-icon i {
+        color: #3b82f6;
+        font-size: 16px;
+    }
+
+    .visit-date {
+        font-weight: 600;
+        font-size: 15px;
+        color: #1a1a1a;
+    }
+
+    .visit-details {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .detail-group {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .detail-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .detail-value {
+        font-size: 14px;
+        color: #1a1a1a;
+        margin: 0;
     }
 </style>
 
 <div class="page-header">
-    <h3>Patient Directory</h3>
-    <p>Manage your patients</p>
+    <h3>Patient History</h3>
+    <p>Complete medical history</p>
 </div>
 
-<div class="placeholder-card">
-    <i class="fa-regular fa-user"></i>
-    <h5>Patient Management</h5>
-    <p>This module is under development.</p>
+<!-- Patient Details Card -->
+<div class="content-card">
+    <div class="patient-profile">
+        <div class="avatar-wrapper">
+            <i class="fa-regular fa-user"></i>
+        </div>
+        <div class="profile-info">
+            <h4>John Smith</h4>
+            <div class="meta-details">
+                45 years &bull; Male &bull; O+
+            </div>
+            
+            <div class="medical-history">
+                <div class="medical-history-label">Medical History</div>
+                <p class="medical-history-value">Hypertension, Diabetes Type 2</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Visit History Section -->
+<div class="content-card" style="padding-bottom: 40px;">
+    <h4 class="visit-history-title">Visit History</h4>
+    
+    <div class="visit-list">
+        
+        <!-- Visit 1 -->
+        <div class="visit-card">
+            <div class="visit-header">
+                <div class="date-icon">
+                    <i class="fa-regular fa-calendar"></i>
+                </div>
+                <div class="visit-date">2024-02-10</div>
+            </div>
+            
+            <div class="visit-details">
+                <div class="detail-group">
+                    <div class="detail-label">Diagnosis</div>
+                    <div class="detail-value">Routine Checkup</div>
+                </div>
+                
+                <div class="detail-group">
+                    <div class="detail-label">Treatment</div>
+                    <div class="detail-value">Blood pressure monitoring</div>
+                </div>
+                
+                <div class="detail-group">
+                    <div class="detail-label">Prescription</div>
+                    <div class="detail-value">Amlodipine 5mg</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Visit 2 -->
+        <div class="visit-card">
+            <div class="visit-header">
+                <div class="date-icon">
+                    <i class="fa-regular fa-calendar"></i>
+                </div>
+                <div class="visit-date">2024-01-25</div>
+            </div>
+            
+            <div class="visit-details">
+                <div class="detail-group">
+                    <div class="detail-label">Diagnosis</div>
+                    <div class="detail-value">Fever and general fatigue</div>
+                </div>
+                
+                <div class="detail-group">
+                    <div class="detail-label">Treatment</div>
+                    <div class="detail-value">Rest and hydration advised</div>
+                </div>
+                
+                <div class="detail-group">
+                    <div class="detail-label">Prescription</div>
+                    <div class="detail-value">Paracetamol 500mg</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
 </div>
