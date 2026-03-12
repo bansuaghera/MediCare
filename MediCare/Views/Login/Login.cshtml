@@ -134,7 +134,16 @@
                     <h3>Welcome Back 👋</h3>
                     <p class="text-muted">Please login to your account</p>
                 </div>
+                
+                @if (ViewBag.Error != null)
+                {
+                    <div class="alert alert-danger" role="alert">
+                        @ViewBag.Error
+                    </div>
+                }
 
+<<<<<<< HEAD
+=======
                 @if (ViewBag.Error != null)
                 {
                     <div class="alert alert-danger py-2" role="alert">
@@ -142,6 +151,7 @@
                     </div>
                 }
 
+>>>>>>> d568bf40c497d601ca460622fb10fd256c8384d4
                 <form asp-controller="Login" asp-action="Login" method="post">
 
                     <div class="mb-3">

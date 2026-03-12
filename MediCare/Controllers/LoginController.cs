@@ -19,6 +19,34 @@ namespace MediCare.Controllers
         [HttpPost]
         public IActionResult Login(string Email, string Password)
         {
+<<<<<<< HEAD
+            if (Email == "doctor@medicare" && Password == "123")
+            {
+                return RedirectToAction("Dashboard", "Doctor");
+            }
+            if (Email == "user@medicare" && Password == "123")
+            {
+                return RedirectToAction("Dashboard", "User");
+            }
+            if (Email == "admin@medicare" && Password == "123")
+            {
+                return RedirectToAction("Dashboard", "Admin");
+            }
+            if (Email == "staff@medicare" && Password == "123")
+            {
+                return RedirectToAction("Dashboard", "Staff");
+            }
+
+            ViewBag.Error = "Invalid Login Credentials!";
+            return View();
+        }
+
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear();
+            return RedirectToAction("Login", "Login");
+        }
+=======
             if (string.IsNullOrEmpty(Email) || string.IsNullOrEmpty(Password))
             {
                 ViewBag.Error = "Please enter both email and password.";
@@ -49,6 +77,7 @@ namespace MediCare.Controllers
             ViewBag.Error = "Invalid email or password.";
             return View();
         }
+>>>>>>> d568bf40c497d601ca460622fb10fd256c8384d4
         [HttpPost]
         public IActionResult ResetPassword(string NewPassword, string ConfirmPassword)
         {

@@ -1,52 +1,198 @@
 @{
-    ViewData["Title"] = "Examination";
+    ViewData["Title"] = "Examination Notes";
     Layout = "~/Views/Shared/_DoctorLayout.cshtml";
 }
 
 <style>
     .page-header {
         margin-bottom: 30px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
     }
-    .page-header h3 {
+
+    .back-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: transparent;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #1a1a1a;
+        font-size: 16px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .back-btn:hover {
+        background: rgba(0,0,0,0.05);
+    }
+
+    .header-text h3 {
         font-weight: 700;
-        margin-bottom: 4px;
+        margin: 0 0 4px 0;
         color: #1a1a1a;
         font-size: 24px;
     }
-    .page-header p {
+
+    .header-text p {
         color: #6b7280;
         font-size: 14px;
+        margin: 0;
     }
 
-    .placeholder-card {
+    /* Container */
+    .form-card {
         background: white;
         border-radius: 16px;
         padding: 40px;
-        text-align: center;
         box-shadow: 0 4px 15px rgba(0,0,0,0.02);
     }
-    .placeholder-card i {
-        font-size: 48px;
-        color: #cbd5e1;
-        margin-bottom: 16px;
+
+    /* Form Layout */
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px 30px;
     }
-    .placeholder-card h5 {
-        color: #1a1a1a;
+
+    .form-group-full {
+        grid-column: 1 / -1;
+    }
+
+    .form-label {
+        display: block;
+        font-size: 13px;
         font-weight: 600;
-        margin-bottom: 8px;
+        color: #4b5563;
+        margin-bottom: 10px;
     }
-    .placeholder-card p {
-        color: #6b7280;
+
+    .form-control {
+        width: 100%;
+        padding: 14px 16px;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        background-color: #f9fafb;
+        font-family: inherit;
+        font-size: 14px;
+        color: #1a1a1a;
+        transition: 0.2s;
+        box-sizing: border-box;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #10b981;
+        background-color: white;
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 120px;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        display: flex;
+        gap: 16px;
+        margin-top: 40px;
+    }
+
+    .btn {
+        padding: 12px 24px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        transition: 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-family: inherit;
+    }
+
+    .btn-save {
+        background: #10b981;
+        color: white;
+        border: none;
+    }
+
+    .btn-save:hover {
+        background: #059669;
+    }
+
+    .btn-outline {
+        background: white;
+        color: #4b5563;
+        border: 1px solid #d1d5db;
+    }
+
+    .btn-outline:hover {
+        background: #f9fafb;
+        color: #1a1a1a;
+    }
+
+    @@media (max-width: 768px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
     }
 </style>
 
 <div class="page-header">
-    <h3>Patient Examination</h3>
-    <p>Perform examinations</p>
+    <button class="back-btn"><i class="fa-solid fa-chevron-left"></i></button>
+    <div class="header-text">
+        <h3>Examination Notes</h3>
+        <p>Patient ID: #1</p>
+    </div>
 </div>
 
-<div class="placeholder-card">
-    <i class="fa-regular fa-clock"></i>
-    <h5>Examination Module</h5>
-    <p>This module is under development.</p>
+<div class="form-card">
+    <div class="form-grid">
+        <div class="form-group">
+            <label class="form-label">Blood Pressure</label>
+            <input type="text" class="form-control" />
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">Temperature (&deg;F)</label>
+            <input type="text" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Pulse Rate</label>
+            <input type="text" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Weight (kg)</label>
+            <input type="text" class="form-control" />
+        </div>
+
+        <div class="form-group-full mt-2">
+            <label class="form-label">Symptoms</label>
+            <textarea class="form-control"></textarea>
+        </div>
+
+        <div class="form-group-full">
+            <label class="form-label">Diagnosis</label>
+            <textarea class="form-control"></textarea>
+        </div>
+
+        <div class="form-group-full">
+            <label class="form-label">Treatment Plan</label>
+            <textarea class="form-control"></textarea>
+        </div>
+    </div>
+
+    <div class="action-buttons">
+        <button class="btn btn-save">
+            <i class="fa-solid fa-check"></i> Save Notes
+        </button>
+        <button class="btn btn-outline">Create Prescription</button>
+    </div>
 </div>
