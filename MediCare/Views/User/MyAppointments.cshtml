@@ -1,4 +1,4 @@
-﻿@{
+@{
     ViewData["Title"] = "My Appointments";
     Layout = "~/Views/Shared/_UserLayout.cshtml";
 }
@@ -101,10 +101,13 @@
 <div class="appointment-card">
     <div class="appointment-top">
         <div>
-            <div class="doctor-name">Dr. Sarah Johnson</div>
+            <div class="doctor-name">Dr. Priya Patel</div>
             <div class="speciality">Cardiology</div>
         </div>
-        <span class="status-badge confirmed">Confirmed</span>
+        <select class="status-badge confirmed" onchange="this.className = 'status-badge ' + this.value" style="border:none; outline:none; cursor:pointer;">
+            <option value="confirmed" selected>Confirmed</option>
+            <option value="completed">Completed</option>
+        </select>
     </div>
 
     <div class="appointment-details">
@@ -113,7 +116,7 @@
         <div><i class="fa fa-location-dot"></i> Room 101</div>
     </div>
 
-    <button class="btn-reschedule">Reschedule</button>
+    <a asp-action="EditAppointment" class="btn btn-reschedule text-decoration-none text-dark">Reschedule</a>
     <button class="btn-cancel">Cancel</button>
 </div>
 
@@ -121,10 +124,13 @@
 <div class="appointment-card">
     <div class="appointment-top">
         <div>
-            <div class="doctor-name">Dr. Michael Chen</div>
+            <div class="doctor-name">Dr. Amit Kumar</div>
             <div class="speciality">Pediatrics</div>
         </div>
-        <span class="status-badge confirmed">Confirmed</span>
+        <select class="status-badge confirmed" onchange="this.className = 'status-badge ' + this.value" style="border:none; outline:none; cursor:pointer;">
+            <option value="confirmed" selected>Confirmed</option>
+            <option value="completed">Completed</option>
+        </select>
     </div>
 
     <div class="appointment-details">
@@ -133,7 +139,7 @@
         <div><i class="fa fa-location-dot"></i> Room 102</div>
     </div>
 
-    <button class="btn-reschedule">Reschedule</button>
+    <a asp-action="EditAppointment" class="btn btn-reschedule text-decoration-none text-dark">Reschedule</a>
     <button class="btn-cancel">Cancel</button>
 </div>
 
@@ -141,15 +147,61 @@
 <div class="appointment-card">
     <div class="appointment-top">
         <div>
-            <div class="doctor-name">Dr. Emily Davis</div>
+            <div class="doctor-name">Dr. Neha Singh</div>
             <div class="speciality">Dermatology</div>
         </div>
-        <span class="status-badge completed">Completed</span>
+        <select class="status-badge completed" onchange="this.className = 'status-badge ' + this.value" style="border:none; outline:none; cursor:pointer;">
+            <option value="confirmed">Confirmed</option>
+            <option value="completed" selected>Completed</option>
+        </select>
     </div>
 
     <div class="appointment-details">
         <div><i class="fa fa-calendar"></i> 2024-02-10</div>
         <div><i class="fa fa-clock"></i> 09:00 AM</div>
         <div><i class="fa fa-location-dot"></i> Room 103</div>
+    </div>
+</div>
+
+<!-- Appointment 4 -->
+<div class="appointment-card">
+    <div class="appointment-top">
+        <div>
+            <div class="doctor-name">Dr. Anjali Gupta</div>
+            <div class="speciality">Orthopedics</div>
+        </div>
+        <select class="status-badge confirmed" onchange="this.className = 'status-badge ' + this.value" style="border:none; outline:none; cursor:pointer;">
+            <option value="confirmed" selected>Confirmed</option>
+            <option value="completed">Completed</option>
+        </select>
+    </div>
+
+    <div class="appointment-details">
+        <div><i class="fa fa-calendar"></i> 2024-03-05</div>
+        <div><i class="fa fa-clock"></i> 11:30 AM</div>
+        <div><i class="fa fa-location-dot"></i> Room 205</div>
+    </div>
+
+    <a asp-action="EditAppointment" class="btn btn-reschedule text-decoration-none text-dark">Reschedule</a>
+    <button class="btn-cancel">Cancel</button>
+</div>
+
+<!-- Appointment 5 -->
+<div class="appointment-card">
+    <div class="appointment-top">
+        <div>
+            <div class="doctor-name">Dr. Vikram Desai</div>
+            <div class="speciality">Neurology</div>
+        </div>
+        <select class="status-badge completed" onchange="this.className = 'status-badge ' + this.value" style="border:none; outline:none; cursor:pointer;">
+            <option value="confirmed">Confirmed</option>
+            <option value="completed" selected>Completed</option>
+        </select>
+    </div>
+
+    <div class="appointment-details">
+        <div><i class="fa fa-calendar"></i> 2024-01-22</div>
+        <div><i class="fa fa-clock"></i> 04:15 PM</div>
+        <div><i class="fa fa-location-dot"></i> Room 304</div>
     </div>
 </div>

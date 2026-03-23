@@ -6,10 +6,12 @@ namespace MediCare.Controllers
     public class LoginController : Controller
     {
         private readonly EmailService _emailService;
+        private readonly UserService _userService;
 
-        public LoginController(EmailService emailService)
+        public LoginController(EmailService emailService, UserService userService)
         {
             _emailService = emailService;
+            _userService = userService;
         }
 
         public IActionResult Login()
@@ -26,21 +28,24 @@ namespace MediCare.Controllers
                 return View();
             }
 
-            if (Email.ToLower() == "doctor@medicare" && Password == "123")
+            // Default Admin (Bypass approval check)
+            if (Email.ToLower() == "agherabansi2@gmail.com" && Password == "201040")
             {
-                return RedirectToAction("Dashboard", "Doctor");
-            }
-            else if (Email.ToLower() == "user@medicare" && Password == "123")
-            {
-                return RedirectToAction("Dashboard", "User");
-            }
-            else if (Email.ToLower() == "admin@medicare" && Password == "123")
-            {
+                HttpContext.Session.SetString("UserRole", "Admin");
                 return RedirectToAction("Dashboard", "Admin");
             }
-            else if (Email.ToLower() == "staff@medicare" && Password == "123")
+
+            var user = _userService.GetUserByEmail(Email);
+            if (user != null && user.Password == Password)
             {
-                return RedirectToAction("Dashboard", "Staff");
+                if (user.Status != "Approved")
+                {
+                    ViewBag.Error = $"Your account is {user.Status}. Please wait for admin approval.";
+                    return View();
+                }
+
+                HttpContext.Session.SetString("UserRole", user.Role);
+                return RedirectToAction("Dashboard", user.Role);
             }
 
             ViewBag.Error = "Invalid Login Credentials!";
@@ -116,6 +121,25 @@ namespace MediCare.Controllers
         public IActionResult Register()
         {
             return View();
+        }
+
+        [HttpPost]
+        public IActionResult Register(string FirstName, string LastName, string Email, string phone, string Password, string Role)
+        {
+            var newUser = new MediCare.Models.AppUser
+            {
+                FirstName = FirstName,
+                LastName = LastName,
+                Email = Email,
+                Phone = phone,
+                Password = Password,
+                Role = Role
+            };
+
+            _userService.AddUser(newUser);
+
+            // After registration, redirect to login page as requested
+            return RedirectToAction("Login");
         }
 
         public IActionResult Logout()

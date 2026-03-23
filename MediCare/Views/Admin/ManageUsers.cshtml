@@ -1,0 +1,101 @@
+@model IEnumerable<MediCare.Models.AppUser>
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Manage Users";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Manage Users</h2>
+            <p class="text-muted">Manage user roles and account statuses</p>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light text-muted small text-uppercase">
+                        <tr>
+                            <th class="ps-4 py-3">User</th>
+                            <th class="py-3">Current Role</th>
+                            <th class="py-3">Status</th>
+                            <th class="py-3">Change Role</th>
+                            <th class="pe-4 py-3 text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var user in Model)
+                            {
+                                <tr>
+                                    <td class="ps-4">
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-sm bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                                <i class="fa-solid fa-user"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold text-dark">@user.FirstName @user.LastName</div>
+                                                <small class="text-muted">@user.Email</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-2 rounded-pill">
+                                            @user.Role
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <form asp-action="ChangeStatus" method="post" class="d-flex align-items-center m-0 p-0">
+                                            <input type="hidden" name="id" value="@user.Id" />
+                                            <select name="status" class="form-select form-select-sm rounded-pill fw-bold border-0 
+                                                @(user.Status == "Approved" ? "text-success bg-success bg-opacity-10" : 
+                                                  user.Status == "Pending" ? "text-warning bg-warning bg-opacity-10" : 
+                                                  "text-danger bg-danger bg-opacity-10")"
+                                                style="width: 120px; cursor: pointer;" onchange="this.form.submit()">
+                                                <option class="text-dark bg-white" value="Approved" selected="@(user.Status == "Approved")">Approved</option>
+                                                <option class="text-dark bg-white" value="Pending" selected="@(user.Status == "Pending")">Pending</option>
+                                                <option class="text-dark bg-white" value="Rejected" selected="@(user.Status == "Rejected")">Rejected</option>
+                                            </select>
+                                        </form>
+                                    </td>
+                                    <td>
+                                        <form asp-action="ChangeRole" method="post" class="d-flex gap-2">
+                                            <input type="hidden" name="id" value="@user.Id" />
+                                            <select name="role" class="form-select form-select-sm rounded-pill" style="width: 130px;">
+                                                <option value="Admin" selected="@(user.Role == "Admin")">Admin</option>
+                                                <option value="Doctor" selected="@(user.Role == "Doctor")">Doctor</option>
+                                                <option value="Staff" selected="@(user.Role == "Staff")">Staff</option>
+                                                <option value="User" selected="@(user.Role == "User")">User</option>
+                                            </select>
+                                            <button type="submit" class="btn btn-sm btn-primary rounded-pill">Update</button>
+                                        </form>
+                                    </td>
+                                    <td class="pe-4 text-end">
+                                        <form asp-action="DeleteUser" method="post" onsubmit="return confirm('Are you sure you want to delete this user?');">
+                                            <input type="hidden" name="id" value="@user.Id" />
+                                            <input type="hidden" name="returnUrl" value="@Url.Action("ManageUsers")" />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger shadow-sm rounded-pill">
+                                                <i class="fa-solid fa-trash-can"></i> Delete
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center py-5 text-muted">
+                                    <p>No users registered yet.</p>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

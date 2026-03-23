@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace MediCare.Controllers
@@ -15,6 +15,10 @@ namespace MediCare.Controllers
         }
 
         public IActionResult BookAppointment()
+        {
+            return View();
+        }
+        public IActionResult EditAppointment(int id)
         {
             return View();
         }

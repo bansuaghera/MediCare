@@ -1,4 +1,4 @@
-﻿@{
+@{
     Layout = null;
 }
 
@@ -8,128 +8,137 @@
     <title>Register - MediCare+</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
-
-    <style>
-        body {
-            margin: 0;
-            font-family: 'Segoe UI';
-        }
-
-        .container-login {
-            display: flex;
-            height: 100vh;
-        }
-
-        .left {
-            flex: 1;
-            background: linear-gradient(135deg,#16a34a,#14b8a6);
-            color: white;
-            padding: 60px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .right {
-            flex: 1;
-            background: #f4f6f9;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .card-box {
-            width: 450px;
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
-        }
-
-        .form-control {
-            height: 45px;
-            border-radius: 10px;
-        }
-
-        .btn-custom {
-            background: linear-gradient(135deg,#16a34a,#14b8a6);
-            border: none;
-            height: 45px;
-            border-radius: 10px;
-            font-weight: 600;
-        }
-    </style>
+    <link href="~/css/register.css" rel="stylesheet" />
 </head>
 
 <body>
+    <div class="register-container">
 
-    <div class="container-login">
-
-        <div class="left">
-            <h1>Join Our Healthcare Platform</h1>
-            <p class="mt-4">
-                Create your account and get access to our
-                comprehensive healthcare management system.
-            </p>
-
-            <ul class="mt-4">
-                <li>Book appointments instantly</li>
-                <li>Access medical records anytime</li>
-                <li>Track your health journey</li>
-            </ul>
+      <!-- LEFT SIDE -->
+      <div class="left-section">
+        <div class="brand">
+          <div class="brand-icon-box">
+            <i class="fa-solid fa-heart-pulse brand-icon-svg"></i>
+          </div>
+          <div class="brand-text">
+            <h3>MediCare</h3>
+            <span>Smart OPD</span>
+          </div>
         </div>
 
-        <div class="right">
+        <div class="left-content">
+          <h1>Join Our Healthcare Platform</h1>
+          <p>
+            Create your account and get access to our
+            comprehensive healthcare management system.
+          </p>
 
-            <div class="card-box">
-                <h3 class="text-center mb-3">Create Account</h3>
-                <p class="text-center text-muted">Register for MediCare Smart OPD</p>
+          <ul class="benefits-list">
+            <li>
+              <i class="fa-regular fa-circle-check check-icon"></i>
+              <span>Book appointments instantly</span>
+            </li>
+            <li>
+              <i class="fa-regular fa-circle-check check-icon"></i>
+              <span>Access medical records anytime</span>
+            </li>
+            <li>
+              <i class="fa-regular fa-circle-check check-icon"></i>
+              <span>Track your health journey</span>
+            </li>
+          </ul>
+        </div>
 
-                <form asp-controller="Login" asp-action="Register" method="post">
+        <!-- Subtle decorative circles for background -->
+        <div class="decoration-circle circle-1"></div>
+        <div class="decoration-circle circle-2"></div>
+      </div>
 
-                    <div class="row mb-3">
-                        <div class="col">
-                            <input type="text" name="FirstName" class="form-control" placeholder="First Name" required />
-                        </div>
-                        <div class="col">
-                            <input type="text" name="LastName" class="form-control" placeholder="Last Name" required />
-                        </div>
-                    </div>
+      <!-- RIGHT SIDE -->
+      <div class="right-section">
 
-                    <div class="mb-3">
-                        <input type="email" name="Email" class="form-control" placeholder="Email Address" required />
-                    </div>
+        <div class="top-logo">
+          <!-- <img src="logo.png" alt="MediCare+" /> -->
+        </div>
 
-                    <div class="mb-3">
-                        <input type="number" name="phone" class="form-control" placeholder="Phone Number" required />
-                    </div>
+        <div class="register-card">
+          <h2>Create Account</h2>
+          <p class="subtitle">Register for MediCare Smart OPD</p>
 
-                    <div class="mb-3">
-                        <input type="password" name="Password" class="form-control" placeholder="Create Password" required />
-                    </div>
+          <form asp-controller="Login" asp-action="Register" method="post" class="register-form">
 
-                    <div class="mb-3">
-                        <input type="password" name="Confirm Password" class="form-control" placeholder="Confirm Password" required />
-                    </div>
-
-
-                    <button type="submit" class="btn btn-custom w-100 text-white">
-                        Create Account
-                    </button>
-
-                    <div class="text-center mt-3">
-                        Already have an account?
-                        <a asp-controller="Login" asp-action="Login" class="text-success">Login</a>
-                    </div>
-
-                </form>
+            <div class="name-row">
+              <div class="input-with-icon">
+                <i class="fa-regular fa-user input-icon"></i>
+                <input type="text" name="FirstName" placeholder="First Name" required />
+              </div>
+              <div class="input-with-icon">
+                <i class="fa-regular fa-user input-icon"></i>
+                <input type="text" name="LastName" placeholder="Last Name" required />
+              </div>
             </div>
 
+            <div class="input-with-icon">
+              <i class="fa-regular fa-envelope input-icon"></i>
+              <input type="email" name="Email" placeholder="Enter your email" required />
+            </div>
+
+            <div class="input-with-icon">
+              <i class="fa-solid fa-phone input-icon"></i>
+              <input type="tel" name="phone" placeholder="+91 99999 99999" required />
+            </div>
+
+            <div class="input-with-icon">
+              <i class="fa-solid fa-user-tag input-icon"></i>
+              <select name="Role" required style="width: 100%; padding: 16px 16px 16px 65px; border-radius: 12px; border: 1px solid transparent; background: #f1f5f9; font-size: 15px; color: #1e293b; transition: all 0.3s ease; -webkit-appearance: none;">
+                  <option value="" disabled selected>Select Role</option>
+                  <option value="Doctor">Doctor</option>
+                  <option value="Staff">Staff</option>
+                  <option value="User">User</option>
+              </select>
+            </div>
+
+            <div class="input-with-icon">
+              <i class="fa-solid fa-lock input-icon"></i>
+              <input type="password" name="Password" placeholder="Create a strong password" required />
+            </div>
+
+            <div class="input-with-icon">
+              <i class="fa-solid fa-lock input-icon"></i>
+              <input type="password" name="ConfirmPassword" placeholder="Confirm your password" required />
+            </div>
+
+            <div class="terms">
+              <input type="checkbox" id="terms" required />
+              <label for="terms">
+                I agree to the <a href="#">Terms and Service</a> and 
+                <a href="#">Privacy Policy</a>
+              </label>
+            </div>
+
+            <button type="submit" class="register-btn">
+              Create Account
+            </button>
+
+          </form>
+
+          <div class="login-link">
+            Already have an account? <a asp-controller="Login" asp-action="Login">Login</a>
+          </div>
+
         </div>
 
-    </div>
+        <div class="support-footer">
+          Need help? <a href="mailto:support@medicare.com">support@medicare.com</a>
+        </div>
 
+        <button class="floating-help-btn">
+          <i class="fa-regular fa-circle-question" style="font-size: 24px;"></i>
+        </button>
+
+      </div>
+
+    </div>
 </body>
 </html>

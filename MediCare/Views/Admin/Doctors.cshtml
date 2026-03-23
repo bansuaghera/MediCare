@@ -1,4 +1,4 @@
-﻿@{
+@{
     ViewData["Title"] = "Doctors";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
@@ -159,64 +159,94 @@
             </tr>
         </thead>
         <tbody>
-
             <tr>
                 <td>
                     <div class="doctor-name">
-                        <div class="avatar">👩‍⚕</div>
-                        Dr. Sarah Johnson
+                        <div class="avatar">DS</div>
+                        Dr. Sharma
                     </div>
                 </td>
                 <td>Cardiology</td>
-                <td>+1234-567-8900</td>
-                <td>sarah.j@hospital.com</td>
-                <td>145</td>
-                <td><span class="badge active-badge">Active</span></td>
+                <td>123-123-1234</td>
+                <td>sharma@medicare</td>
+                <td>120</td>
+                <td>
+                    <select class="badge active-badge" onchange="this.className = 'badge ' + this.value" style="border:none; cursor:pointer;">
+                        <option value="active-badge" selected>Active</option>
+                        <option value="leave-badge">On Leave</option>
+                    </select>
+                </td>
                 <td class="actions">
-                    <span>👁</span>
-                    <span>✏</span>
-                    <span>🗑</span>
+                    <a asp-action="EditDoctor" style="text-decoration: none;"><span title="Edit">✏️</span></a>
+                    <span title="Delete" style="color:red;">🗑️</span>
                 </td>
             </tr>
-
             <tr>
                 <td>
                     <div class="doctor-name">
-                        <div class="avatar">👨‍⚕</div>
-                        Dr. Michael Chen
+                        <div class="avatar" style="background:#d4edda; color:#155724;">JA</div>
+                        Dr. Kapoor
+                    </div>
+                </td>
+                <td>Neurology</td>
+                <td>321-321-4321</td>
+                <td>kapoor@medicare</td>
+                <td>85</td>
+                <td>
+                    <select class="badge active-badge" onchange="this.className = 'badge ' + this.value" style="border:none; cursor:pointer;">
+                        <option value="active-badge" selected>Active</option>
+                        <option value="leave-badge">On Leave</option>
+                    </select>
+                </td>
+                <td class="actions">
+                    <a asp-action="EditDoctor" style="text-decoration: none;"><span title="Edit">✏️</span></a>
+                    <span title="Delete" style="color:red;">🗑️</span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="doctor-name">
+                        <div class="avatar" style="background:#fff3cd; color:#856404;">BC</div>
+                        Dr. Gupta
                     </div>
                 </td>
                 <td>Pediatrics</td>
-                <td>+1234-567-8901</td>
-                <td>michael.c@hospital.com</td>
-                <td>132</td>
-                <td><span class="badge active-badge">Active</span></td>
+                <td>555-666-7777</td>
+                <td>gupta@medicare</td>
+                <td>150</td>
+                <td>
+                    <select class="badge leave-badge" onchange="this.className = 'badge ' + this.value" style="border:none; cursor:pointer;">
+                        <option value="active-badge">Active</option>
+                        <option value="leave-badge" selected>On Leave</option>
+                    </select>
+                </td>
                 <td class="actions">
-                    <span>👁</span>
-                    <span>✏</span>
-                    <span>🗑</span>
+                    <a asp-action="EditDoctor" style="text-decoration: none;"><span title="Edit">✏️</span></a>
+                    <span title="Delete" style="color:red;">🗑️</span>
                 </td>
             </tr>
-
             <tr>
                 <td>
                     <div class="doctor-name">
-                        <div class="avatar">👩‍⚕</div>
-                        Dr. Emily Davis
+                        <div class="avatar" style="background:#cce5ff; color:#004085;">EM</div>
+                        Dr. Singh
                     </div>
                 </td>
-                <td>Dermatology</td>
-                <td>+1234-567-8902</td>
-                <td>emily.d@hospital.com</td>
-                <td>98</td>
-                <td><span class="badge leave-badge">On Leave</span></td>
+                <td>Orthopedics</td>
+                <td>999-888-7777</td>
+                <td>singh@medicare</td>
+                <td>200</td>
+                <td>
+                    <select class="badge active-badge" onchange="this.className = 'badge ' + this.value" style="border:none; cursor:pointer;">
+                        <option value="active-badge" selected>Active</option>
+                        <option value="leave-badge">On Leave</option>
+                    </select>
+                </td>
                 <td class="actions">
-                    <span>👁</span>
-                    <span>✏</span>
-                    <span>🗑</span>
+                    <a asp-action="EditDoctor" style="text-decoration: none;"><span title="Edit">✏️</span></a>
+                    <span title="Delete" style="color:red;">🗑️</span>
                 </td>
             </tr>
-
         </tbody>
     </table>
 

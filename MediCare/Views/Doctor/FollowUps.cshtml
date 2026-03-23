@@ -179,40 +179,91 @@
             </thead>
             <tbody>
                 <tr>
-                    <td class="patient-name">John Smith</td>
+                    <td class="patient-name">Rahul Sharma</td>
                     <td>2024-02-10</td>
                     <td>2024-02-24</td>
                     <td>Hypertension</td>
-                    <td><span class="badge-status status-scheduled">Scheduled</span></td>
+                    <td>
+                        <select class="badge-status status-scheduled" onchange="this.className = 'badge-status ' + this.value" style="border:none; cursor:pointer; background-color: inherit; outline:none;">
+                            <option value="status-scheduled" selected>Scheduled</option>
+                            <option value="status-pending">Pending</option>
+                        </select>
+                    </td>
                     <td>
                         <div class="actions-cell">
-                            <button class="action-btn" onclick="alert('View details')"><i class="fa-regular fa-eye"></i></button>
+                            <a asp-action="Profile" class="action-btn text-decoration-none"><i class="fa-regular fa-eye"></i></a>
                             <button class="action-btn" onclick="alert('Call patient')"><i class="fa-solid fa-phone"></i></button>
                         </div>
                     </td>
                 </tr>
                 <tr>
-                    <td class="patient-name">Sarah Johnson</td>
+                    <td class="patient-name">Priya Patel</td>
                     <td>2024-02-11</td>
                     <td>2024-02-25</td>
                     <td>Diabetes Check</td>
-                    <td><span class="badge-status status-pending">Pending</span></td>
+                    <td>
+                        <select class="badge-status status-pending" onchange="this.className = 'badge-status ' + this.value" style="border:none; cursor:pointer; background-color: inherit; outline:none;">
+                            <option value="status-scheduled">Scheduled</option>
+                            <option value="status-pending" selected>Pending</option>
+                        </select>
+                    </td>
                     <td>
                         <div class="actions-cell">
-                            <button class="action-btn" onclick="alert('View details')"><i class="fa-regular fa-eye"></i></button>
+                            <a asp-action="Profile" class="action-btn text-decoration-none"><i class="fa-regular fa-eye"></i></a>
                             <button class="action-btn" onclick="alert('Call patient')"><i class="fa-solid fa-phone"></i></button>
                         </div>
                     </td>
                 </tr>
                 <tr>
-                    <td class="patient-name">Michael Chen</td>
+                    <td class="patient-name">Amit Kumar</td>
                     <td>2024-02-08</td>
                     <td>2024-02-22</td>
                     <td>Post Surgery</td>
-                    <td><span class="badge-status status-scheduled">Scheduled</span></td>
+                    <td>
+                        <select class="badge-status status-scheduled" onchange="this.className = 'badge-status ' + this.value" style="border:none; cursor:pointer; background-color: inherit; outline:none;">
+                            <option value="status-scheduled" selected>Scheduled</option>
+                            <option value="status-pending">Pending</option>
+                        </select>
+                    </td>
                     <td>
                         <div class="actions-cell">
-                            <button class="action-btn" onclick="alert('View details')"><i class="fa-regular fa-eye"></i></button>
+                            <a asp-action="Profile" class="action-btn text-decoration-none"><i class="fa-regular fa-eye"></i></a>
+                            <button class="action-btn" onclick="alert('Call patient')"><i class="fa-solid fa-phone"></i></button>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="patient-name">Neha Singh</td>
+                    <td>2024-02-05</td>
+                    <td>2024-02-19</td>
+                    <td>Asthma Follow-up</td>
+                    <td>
+                        <select class="badge-status status-pending" onchange="this.className = 'badge-status ' + this.value" style="border:none; cursor:pointer; background-color: inherit; outline:none;">
+                            <option value="status-scheduled">Scheduled</option>
+                            <option value="status-pending" selected>Pending</option>
+                        </select>
+                    </td>
+                    <td>
+                        <div class="actions-cell">
+                            <a asp-action="Profile" class="action-btn text-decoration-none"><i class="fa-regular fa-eye"></i></a>
+                            <button class="action-btn" onclick="alert('Call patient')"><i class="fa-solid fa-phone"></i></button>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="patient-name">Vikram Desai</td>
+                    <td>2024-02-01</td>
+                    <td>2024-02-15</td>
+                    <td>Routine Check</td>
+                    <td>
+                        <select class="badge-status status-scheduled" onchange="this.className = 'badge-status ' + this.value" style="border:none; cursor:pointer; background-color: inherit; outline:none;">
+                            <option value="status-scheduled" selected>Scheduled</option>
+                            <option value="status-pending">Pending</option>
+                        </select>
+                    </td>
+                    <td>
+                        <div class="actions-cell">
+                            <a asp-action="Profile" class="action-btn text-decoration-none"><i class="fa-regular fa-eye"></i></a>
                             <button class="action-btn" onclick="alert('Call patient')"><i class="fa-solid fa-phone"></i></button>
                         </div>
                     </td>

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 
 namespace MediCare.Controllers
 {
@@ -9,6 +9,14 @@ namespace MediCare.Controllers
             return View();
         }
         public IActionResult RegisterPatient()
+        {
+            return View();
+        }
+        public IActionResult EditPatient(int id)
+        {
+            return View();
+        }
+        public IActionResult EditAppointment(int id)
         {
             return View();
         }
@@ -45,5 +53,9 @@ namespace MediCare.Controllers
             return View();
         }
 
+        public IActionResult Profile()
+        {
+            return View();
+        }
     }
 }

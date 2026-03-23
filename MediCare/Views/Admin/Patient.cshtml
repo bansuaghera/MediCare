@@ -1,4 +1,4 @@
-﻿@{
+@{
     ViewData["Title"] = "Patients";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
@@ -143,47 +143,93 @@
         </thead>
         <tbody>
             <tr>
-                <td>1</td>
-                <td>John Smith</td>
+                <td>P-101</td>
+                <td>Karan Reddy</td>
                 <td>45</td>
                 <td>Male</td>
-                <td>+1234-567-8900</td>
-                <td>2024-02-10</td>
-                <td><span class="badge active-badge">Active</span></td>
+                <td>123-456-7890</td>
+                <td>2024-05-01</td>
+                <td>
+                    <select class="badge active-badge" onchange="this.className = 'badge ' + this.value" style="border:none; cursor:pointer;">
+                        <option value="active-badge" selected>Active</option>
+                        <option value="inactive-badge">Inactive</option>
+                    </select>
+                </td>
                 <td class="actions">
-                    <span>👁</span>
-                    <span>✏</span>
-                    <span>🗑</span>
+                    <a asp-action="EditPatient" style="text-decoration: none;"><span title="Edit">✏️</span></a>
+                    <span title="Delete" style="color:red;">🗑️</span>
                 </td>
             </tr>
-
             <tr>
-                <td>2</td>
-                <td>Sarah Johnson</td>
+                <td>P-102</td>
+                <td>Riya Sharma</td>
                 <td>32</td>
                 <td>Female</td>
-                <td>+1234-567-8901</td>
-                <td>2024-02-09</td>
-                <td><span class="badge active-badge">Active</span></td>
+                <td>098-765-4321</td>
+                <td>2024-04-15</td>
+                <td>
+                    <select class="badge inactive-badge" onchange="this.className = 'badge ' + this.value" style="border:none; cursor:pointer;">
+                        <option value="active-badge">Active</option>
+                        <option value="inactive-badge" selected>Inactive</option>
+                    </select>
+                </td>
                 <td class="actions">
-                    <span>👁</span>
-                    <span>✏</span>
-                    <span>🗑</span>
+                    <a asp-action="EditPatient" style="text-decoration: none;"><span title="Edit">✏️</span></a>
+                    <span title="Delete" style="color:red;">🗑️</span>
                 </td>
             </tr>
-
             <tr>
-                <td>3</td>
-                <td>Michael Chen</td>
-                <td>58</td>
-                <td>Male</td>
-                <td>+1234-567-8902</td>
-                <td>2024-01-28</td>
-                <td><span class="badge inactive-badge">Inactive</span></td>
+                <td>P-103</td>
+                <td>Anjali Verma</td>
+                <td>28</td>
+                <td>Female</td>
+                <td>555-123-4567</td>
+                <td>2024-05-10</td>
+                <td>
+                    <select class="badge active-badge" onchange="this.className = 'badge ' + this.value" style="border:none; cursor:pointer;">
+                        <option value="active-badge" selected>Active</option>
+                        <option value="inactive-badge">Inactive</option>
+                    </select>
+                </td>
                 <td class="actions">
-                    <span>👁</span>
-                    <span>✏</span>
-                    <span>🗑</span>
+                    <a asp-action="EditPatient" style="text-decoration: none;"><span title="Edit">✏️</span></a>
+                    <span title="Delete" style="color:red;">🗑️</span>
+                </td>
+            </tr>
+            <tr>
+                <td>P-104</td>
+                <td>Rahul Joshi</td>
+                <td>50</td>
+                <td>Male</td>
+                <td>555-987-6543</td>
+                <td>2024-03-20</td>
+                <td>
+                    <select class="badge active-badge" onchange="this.className = 'badge ' + this.value" style="border:none; cursor:pointer;">
+                        <option value="active-badge" selected>Active</option>
+                        <option value="inactive-badge">Inactive</option>
+                    </select>
+                </td>
+                <td class="actions">
+                    <a asp-action="EditPatient" style="text-decoration: none;"><span title="Edit">✏️</span></a>
+                    <span title="Delete" style="color:red;">🗑️</span>
+                </td>
+            </tr>
+            <tr>
+                <td>P-105</td>
+                <td>Sanjay Mishra</td>
+                <td>12</td>
+                <td>Male</td>
+                <td>555-555-5555</td>
+                <td>2024-05-18</td>
+                <td>
+                    <select class="badge active-badge" onchange="this.className = 'badge ' + this.value" style="border:none; cursor:pointer;">
+                        <option value="active-badge" selected>Active</option>
+                        <option value="inactive-badge">Inactive</option>
+                    </select>
+                </td>
+                <td class="actions">
+                    <a asp-action="EditPatient" style="text-decoration: none;"><span title="Edit">✏️</span></a>
+                    <span title="Delete" style="color:red;">🗑️</span>
                 </td>
             </tr>
         </tbody>

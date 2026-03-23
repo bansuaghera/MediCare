@@ -1,4 +1,4 @@
-﻿@{
+@{
     ViewData["Title"] = "Appointments";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
@@ -107,62 +107,101 @@
             </tr>
         </thead>
         <tbody>
-
             <tr>
-                <td>1</td>
-                <td>John Smith</td>
-                <td>Dr. Sarah Johnson</td>
-                <td>2024-02-12</td>
+                <td>#1001</td>
+                <td>Karan Reddy</td>
+                <td>Dr. Sharma</td>
+                <td>2024-05-20</td>
                 <td>10:00 AM</td>
                 <td>Checkup</td>
-                <td><span class="badge confirmed">Confirmed</span></td>
-                <td><i class="fa fa-eye"></i></td>
+                <td>
+                    <select class="badge pending" onchange="this.className = 'badge ' + this.value" style="border:none; cursor:pointer;">
+                        <option value="pending" selected>Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </td>
+                <td>
+                    <span style="cursor:pointer; margin-right:8px;" title="Edit">✏️</span>
+                    <span style="cursor:pointer; color:red;" title="Delete">🗑️</span>
+                </td>
             </tr>
-
             <tr>
-                <td>2</td>
-                <td>Sarah Johnson</td>
-                <td>Dr. Michael Chen</td>
-                <td>2024-02-12</td>
+                <td>#1002</td>
+                <td>Riya Sharma</td>
+                <td>Dr. Kapoor</td>
+                <td>2024-05-21</td>
+                <td>02:30 PM</td>
+                <td>Follow-up</td>
+                <td>
+                    <select class="badge confirmed" onchange="this.className = 'badge ' + this.value" style="border:none; cursor:pointer;">
+                        <option value="pending">Pending</option>
+                        <option value="confirmed" selected>Confirmed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </td>
+                <td>
+                    <span style="cursor:pointer; margin-right:8px;" title="Edit">✏️</span>
+                    <span style="cursor:pointer; color:red;" title="Delete">🗑️</span>
+                </td>
+            </tr>
+            <tr>
+                <td>#1003</td>
+                <td>Anjali Verma</td>
+                <td>Dr. Sharma</td>
+                <td>2024-05-22</td>
                 <td>11:00 AM</td>
                 <td>Consultation</td>
-                <td><span class="badge pending">Pending</span></td>
-                <td><i class="fa fa-eye"></i></td>
+                <td>
+                    <select class="badge pending" onchange="this.className = 'badge ' + this.value" style="border:none; cursor:pointer;">
+                        <option value="pending" selected>Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </td>
+                <td>
+                    <span style="cursor:pointer; margin-right:8px;" title="Edit">✏️</span>
+                    <span style="cursor:pointer; color:red;" title="Delete">🗑️</span>
+                </td>
             </tr>
-
             <tr>
-                <td>3</td>
-                <td>Michael Chen</td>
-                <td>Dr. Emily Davis</td>
-                <td>2024-02-12</td>
-                <td>02:00 PM</td>
-                <td>Follow-up</td>
-                <td><span class="badge confirmed">Confirmed</span></td>
-                <td><i class="fa fa-eye"></i></td>
+                <td>#1004</td>
+                <td>Rahul Joshi</td>
+                <td>Dr. Gupta</td>
+                <td>2024-05-22</td>
+                <td>04:00 PM</td>
+                <td>Therapy</td>
+                <td>
+                    <select class="badge cancelled" onchange="this.className = 'badge ' + this.value" style="border:none; cursor:pointer;">
+                        <option value="pending">Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="cancelled" selected>Cancelled</option>
+                    </select>
+                </td>
+                <td>
+                    <span style="cursor:pointer; margin-right:8px;" title="Edit">✏️</span>
+                    <span style="cursor:pointer; color:red;" title="Delete">🗑️</span>
+                </td>
             </tr>
-
             <tr>
-                <td>4</td>
-                <td>Emily Davis</td>
-                <td>Dr. Robert Wilson</td>
-                <td>2024-02-13</td>
-                <td>09:00 AM</td>
-                <td>Emergency</td>
-                <td><span class="badge cancelled">Cancelled</span></td>
-                <td><i class="fa fa-eye"></i></td>
+                <td>#1005</td>
+                <td>Sanjay Mishra</td>
+                <td>Dr. Kapoor</td>
+                <td>2024-05-23</td>
+                <td>09:15 AM</td>
+                <td>Vaccination</td>
+                <td>
+                    <select class="badge confirmed" onchange="this.className = 'badge ' + this.value" style="border:none; cursor:pointer;">
+                        <option value="pending">Pending</option>
+                        <option value="confirmed" selected>Confirmed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </td>
+                <td>
+                    <span style="cursor:pointer; margin-right:8px;" title="Edit">✏️</span>
+                    <span style="cursor:pointer; color:red;" title="Delete">🗑️</span>
+                </td>
             </tr>
-
-            <tr>
-                <td>5</td>
-                <td>Robert Wilson</td>
-                <td>Dr. Sarah Johnson</td>
-                <td>2024-02-13</td>
-                <td>03:00 PM</td>
-                <td>Checkup</td>
-                <td><span class="badge confirmed">Confirmed</span></td>
-                <td><i class="fa fa-eye"></i></td>
-            </tr>
-
         </tbody>
     </table>
 
