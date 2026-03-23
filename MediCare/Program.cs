@@ -1,10 +1,11 @@
-﻿using MediCare.Services;
+using MediCare.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<EmailService>();
+builder.Services.AddSingleton<UserService>();
 
 // Add Session Service
 builder.Services.AddSession(options =>

@@ -266,9 +266,24 @@
                     <i class="fa-solid fa-pills"></i> Medicines
                 </a>
 
+                <a class="nav-link @(currentController == "Admin" && currentAction == "PendingApprovals" ? "active" : "")"
+                   asp-controller="Admin" asp-action="PendingApprovals">
+                    <i class="fa-solid fa-user-clock"></i> Pending Approvals
+                </a>
+
+                <a class="nav-link @(currentController == "Admin" && currentAction == "ManageUsers" ? "active" : "")"
+                   asp-controller="Admin" asp-action="ManageUsers">
+                    <i class="fa-solid fa-user-gear"></i> Manage Users
+                </a>
+
                 <a class="nav-link @(currentController == "Admin" && currentAction == "Templates" ? "active" : "")"
                    asp-controller="Admin" asp-action="Templates">
                     <i class="fa-regular fa-file-lines"></i> Templates
+                </a>
+
+                <a class="nav-link @(currentController == "Admin" && currentAction == "Profile" ? "active" : "")"
+                   asp-controller="Admin" asp-action="Profile">
+                    <i class="fa-solid fa-user-tie"></i> Profile
                 </a>
 
                 <a class="nav-link @(currentController == "Admin" && currentAction == "Settings" ? "active" : "")"

@@ -1,4 +1,4 @@
-﻿@{
+@{
     ViewData["Title"] = "Patients";
     Layout = "~/Views/Shared/_StaffLayout.cshtml";
 }
@@ -111,75 +111,100 @@
 
             <tr>
                 <td>1</td>
-                <td>John Smith</td>
+                <td>Rahul Sharma</td>
                 <td>45</td>
                 <td>Male</td>
-                <td>+1 234-567-8900</td>
+                <td>+91 98765 43210</td>
                 <td>2024-02-10</td>
-                <td><span class="status-badge status-active">Active</span></td>
+                <td>
+                    <select class="status-badge status-active" onchange="this.className = 'status-badge ' + this.value" style="border:none; cursor:pointer;">
+                        <option value="status-active" selected>Active</option>
+                        <option value="status-inactive">Inactive</option>
+                    </select>
+                </td>
                 <td class="action-icons">
-                    <i class="fa fa-eye"></i>
-                    <i class="fa fa-pen"></i>
+                    <a asp-action="Profile" style="color: inherit;"><i class="fa fa-eye"></i></a>
+                    <a asp-action="EditPatient" style="color: inherit;"><i class="fa fa-pen"></i></a>
                     <i class="fa fa-trash"></i>
                 </td>
             </tr>
 
             <tr>
                 <td>2</td>
-                <td>Sarah Johnson</td>
+                <td>Priya Patel</td>
                 <td>32</td>
                 <td>Female</td>
-                <td>+1 234-567-8901</td>
+                <td>+91 98765 43211</td>
                 <td>2024-02-09</td>
-                <td><span class="status-badge status-active">Active</span></td>
+                <td>
+                    <select class="status-badge status-active" onchange="this.className = 'status-badge ' + this.value" style="border:none; cursor:pointer;">
+                        <option value="status-active" selected>Active</option>
+                        <option value="status-inactive">Inactive</option>
+                    </select>
+                </td>
                 <td class="action-icons">
-                    <i class="fa fa-eye"></i>
-                    <i class="fa fa-pen"></i>
+                    <a asp-action="Profile" style="color: inherit;"><i class="fa fa-eye"></i></a>
+                    <a asp-action="EditPatient" style="color: inherit;"><i class="fa fa-pen"></i></a>
                     <i class="fa fa-trash"></i>
                 </td>
             </tr>
 
             <tr>
                 <td>3</td>
-                <td>Michael Chen</td>
+                <td>Amit Kumar</td>
                 <td>58</td>
                 <td>Male</td>
-                <td>+1 234-567-8902</td>
+                <td>+91 98765 43212</td>
                 <td>2024-01-28</td>
-                <td><span class="status-badge status-inactive">Inactive</span></td>
+                <td>
+                    <select class="status-badge status-inactive" onchange="this.className = 'status-badge ' + this.value" style="border:none; cursor:pointer;">
+                        <option value="status-active">Active</option>
+                        <option value="status-inactive" selected>Inactive</option>
+                    </select>
+                </td>
                 <td class="action-icons">
-                    <i class="fa fa-eye"></i>
-                    <i class="fa fa-pen"></i>
+                    <a asp-action="Profile" style="color: inherit;"><i class="fa fa-eye"></i></a>
+                    <a asp-action="EditPatient" style="color: inherit;"><i class="fa fa-pen"></i></a>
                     <i class="fa fa-trash"></i>
                 </td>
             </tr>
 
             <tr>
                 <td>4</td>
-                <td>Emily Davis</td>
+                <td>Neha Singh</td>
                 <td>28</td>
                 <td>Female</td>
-                <td>+1 234-567-8903</td>
+                <td>+91 98765 43213</td>
                 <td>2024-02-11</td>
-                <td><span class="status-badge status-active">Active</span></td>
+                <td>
+                    <select class="status-badge status-active" onchange="this.className = 'status-badge ' + this.value" style="border:none; cursor:pointer;">
+                        <option value="status-active" selected>Active</option>
+                        <option value="status-inactive">Inactive</option>
+                    </select>
+                </td>
                 <td class="action-icons">
-                    <i class="fa fa-eye"></i>
-                    <i class="fa fa-pen"></i>
+                    <a asp-action="Profile" style="color: inherit;"><i class="fa fa-eye"></i></a>
+                    <a asp-action="EditPatient" style="color: inherit;"><i class="fa fa-pen"></i></a>
                     <i class="fa fa-trash"></i>
                 </td>
             </tr>
 
             <tr>
                 <td>5</td>
-                <td>Robert Wilson</td>
+                <td>Vikram Desai</td>
                 <td>41</td>
                 <td>Male</td>
-                <td>+1 234-567-8904</td>
+                <td>+91 98765 43214</td>
                 <td>2024-02-08</td>
-                <td><span class="status-badge status-active">Active</span></td>
+                <td>
+                    <select class="status-badge status-active" onchange="this.className = 'status-badge ' + this.value" style="border:none; cursor:pointer;">
+                        <option value="status-active" selected>Active</option>
+                        <option value="status-inactive">Inactive</option>
+                    </select>
+                </td>
                 <td class="action-icons">
-                    <i class="fa fa-eye"></i>
-                    <i class="fa fa-pen"></i>
+                    <a asp-action="Profile" style="color: inherit;"><i class="fa fa-eye"></i></a>
+                    <a asp-action="EditPatient" style="color: inherit;"><i class="fa fa-pen"></i></a>
                     <i class="fa fa-trash"></i>
                 </td>
             </tr>

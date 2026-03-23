@@ -297,6 +297,9 @@
                 <a class="nav-link @(currentAction == "FollowUps" ? "active" : "")" asp-controller="Doctor" asp-action="FollowUps">
                     <i class="fa-regular fa-circle-check"></i> Follow-ups
                 </a>
+                <a class="nav-link @(currentAction == "Profile" ? "active" : "")" asp-controller="Doctor" asp-action="Profile">
+                    <i class="fa-regular fa-user"></i> Profile
+                </a>
             </nav>
         </div>
 
@@ -326,7 +329,9 @@
                 <button class="notification-btn">
                     <i class="fa-regular fa-bell"></i>
                 </button>
-                <div class="user-avatar">DR</div>
+                <a href="@Url.Action("Profile", "Doctor")" style="text-decoration: none;">
+                    <div class="user-avatar">DR</div>
+                </a>
             </div>
         </header>
 

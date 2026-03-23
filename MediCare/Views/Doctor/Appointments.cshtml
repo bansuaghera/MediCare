@@ -175,35 +175,68 @@
             <tbody>
                 <tr>
                     <td>09:00 AM</td>
-                    <td class="patient-name">John Smith</td>
+                    <td class="patient-name">Rahul Sharma</td>
                     <td>Checkup</td>
                     <td>A-045</td>
-                    <td><span class="badge-status status-progress">In Progress</span></td>
-                    <td><button class="action-btn"><i class="fa-regular fa-eye"></i></button></td>
+                    <td>
+                        <select class="badge-status status-progress" onchange="this.className = 'badge-status ' + this.value" style="border:none; cursor:pointer; background-color: inherit;">
+                            <option value="status-progress" selected>In Progress</option>
+                            <option value="status-waiting">Waiting</option>
+                        </select>
+                    </td>
+                    <td><a asp-action="Profile" class="action-btn text-decoration-none"><i class="fa-regular fa-eye"></i></a></td>
                 </tr>
                 <tr>
                     <td>09:30 AM</td>
-                    <td class="patient-name">Sarah Johnson</td>
+                    <td class="patient-name">Priya Patel</td>
                     <td>Consultation</td>
                     <td>A-046</td>
-                    <td><span class="badge-status status-waiting">Waiting</span></td>
-                    <td><button class="action-btn"><i class="fa-regular fa-eye"></i></button></td>
+                    <td>
+                        <select class="badge-status status-waiting" onchange="this.className = 'badge-status ' + this.value" style="border:none; cursor:pointer; background-color: inherit;">
+                            <option value="status-progress">In Progress</option>
+                            <option value="status-waiting" selected>Waiting</option>
+                        </select>
+                    </td>
+                    <td><a asp-action="Profile" class="action-btn text-decoration-none"><i class="fa-regular fa-eye"></i></a></td>
                 </tr>
                 <tr>
                     <td>10:00 AM</td>
-                    <td class="patient-name">Michael Chen</td>
+                    <td class="patient-name">Amit Kumar</td>
                     <td>Follow-up</td>
                     <td>A-047</td>
-                    <td><span class="badge-status status-waiting">Waiting</span></td>
-                    <td><button class="action-btn"><i class="fa-regular fa-eye"></i></button></td>
+                    <td>
+                        <select class="badge-status status-waiting" onchange="this.className = 'badge-status ' + this.value" style="border:none; cursor:pointer; background-color: inherit;">
+                            <option value="status-progress">In Progress</option>
+                            <option value="status-waiting" selected>Waiting</option>
+                        </select>
+                    </td>
+                    <td><a asp-action="Profile" class="action-btn text-decoration-none"><i class="fa-regular fa-eye"></i></a></td>
                 </tr>
                 <tr>
                     <td>10:30 AM</td>
-                    <td class="patient-name">Emily Davis</td>
+                    <td class="patient-name">Neha Singh</td>
                     <td>Checkup</td>
                     <td>A-048</td>
-                    <td><span class="badge-status status-waiting">Waiting</span></td>
-                    <td><button class="action-btn"><i class="fa-regular fa-eye"></i></button></td>
+                    <td>
+                        <select class="badge-status status-waiting" onchange="this.className = 'badge-status ' + this.value" style="border:none; cursor:pointer; background-color: inherit;">
+                            <option value="status-progress">In Progress</option>
+                            <option value="status-waiting" selected>Waiting</option>
+                        </select>
+                    </td>
+                    <td><a asp-action="Profile" class="action-btn text-decoration-none"><i class="fa-regular fa-eye"></i></a></td>
+                </tr>
+                <tr>
+                    <td>11:00 AM</td>
+                    <td class="patient-name">Vikram Desai</td>
+                    <td>Consultation</td>
+                    <td>A-049</td>
+                    <td>
+                        <select class="badge-status status-waiting" onchange="this.className = 'badge-status ' + this.value" style="border:none; cursor:pointer; background-color: inherit;">
+                            <option value="status-progress">In Progress</option>
+                            <option value="status-waiting" selected>Waiting</option>
+                        </select>
+                    </td>
+                    <td><a asp-action="Profile" class="action-btn text-decoration-none"><i class="fa-regular fa-eye"></i></a></td>
                 </tr>
             </tbody>
         </table>

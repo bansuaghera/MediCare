@@ -1,4 +1,4 @@
-﻿@{
+@{
     ViewData["Title"] = "Token Queue Dashboard";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
@@ -105,14 +105,17 @@
         <div class="queue-left">
             <div class="token">A-045</div>
             <div>
-                <strong>John Smith</strong><br />
-                <small>Dr. Sarah Johnson</small>
+                <strong>Rahul Sharma</strong><br />
+                <small>Dr. Priya Patel</small>
             </div>
         </div>
         <div class="wait-info">
             <small>Wait Time</small><br />
             <strong>5 min</strong><br />
-            <span class="progress-status">In Progress</span>
+            <select class="progress-status" onchange="this.className = this.value" style="border:none; cursor:pointer; text-align:right; outline:none; background:transparent;">
+                <option value="progress-status" selected>In Progress</option>
+                <option value="waiting">Waiting</option>
+            </select>
         </div>
     </div>
 
@@ -120,14 +123,17 @@
         <div class="queue-left">
             <div class="token">A-046</div>
             <div>
-                <strong>Sarah Johnson</strong><br />
-                <small>Dr. Michael Chen</small>
+                <strong>Priya Patel</strong><br />
+                <small>Dr. Amit Kumar</small>
             </div>
         </div>
         <div class="wait-info">
             <small>Wait Time</small><br />
             <strong>15 min</strong><br />
-            <span class="waiting">Waiting</span>
+            <select class="waiting" onchange="this.className = this.value" style="border:none; cursor:pointer; text-align:right; outline:none; background:transparent;">
+                <option value="progress-status">In Progress</option>
+                <option value="waiting" selected>Waiting</option>
+            </select>
         </div>
     </div>
 
@@ -135,14 +141,17 @@
         <div class="queue-left">
             <div class="token">A-047</div>
             <div>
-                <strong>Michael Chen</strong><br />
-                <small>Dr. Emily Davis</small>
+                <strong>Amit Kumar</strong><br />
+                <small>Dr. Neha Singh</small>
             </div>
         </div>
         <div class="wait-info">
             <small>Wait Time</small><br />
             <strong>22 min</strong><br />
-            <span class="waiting">Waiting</span>
+            <select class="waiting" onchange="this.className = this.value" style="border:none; cursor:pointer; text-align:right; outline:none; background:transparent;">
+                <option value="progress-status">In Progress</option>
+                <option value="waiting" selected>Waiting</option>
+            </select>
         </div>
     </div>
 
@@ -150,14 +159,35 @@
         <div class="queue-left">
             <div class="token">A-048</div>
             <div>
-                <strong>Emily Davis</strong><br />
-                <small>Dr. Robert Wilson</small>
+                <strong>Neha Singh</strong><br />
+                <small>Dr. Vikram Desai</small>
             </div>
         </div>
         <div class="wait-info">
             <small>Wait Time</small><br />
             <strong>30 min</strong><br />
-            <span class="waiting">Waiting</span>
+            <select class="waiting" onchange="this.className = this.value" style="border:none; cursor:pointer; text-align:right; outline:none; background:transparent;">
+                <option value="progress-status">In Progress</option>
+                <option value="waiting" selected>Waiting</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="queue-item">
+        <div class="queue-left">
+            <div class="token">A-049</div>
+            <div>
+                <strong>Vikram Desai</strong><br />
+                <small>Dr. Anjali Gupta</small>
+            </div>
+        </div>
+        <div class="wait-info">
+            <small>Wait Time</small><br />
+            <strong>35 min</strong><br />
+            <select class="waiting" onchange="this.className = this.value" style="border:none; cursor:pointer; text-align:right; outline:none; background:transparent;">
+                <option value="progress-status">In Progress</option>
+                <option value="waiting" selected>Waiting</option>
+            </select>
         </div>
     </div>
 

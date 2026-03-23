@@ -1,4 +1,4 @@
-﻿@{
+@{
     ViewData["Title"] = "Staff";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
@@ -148,67 +148,78 @@
             </tr>
         </thead>
         <tbody>
-
             <tr>
-                <td>1</td>
-                <td>Jennifer Lee</td>
-                <td>Receptionist</td>
-                <td>Morning</td>
-                <td>+1234-567-8900</td>
-                <td>jennifer.l@hospital.com</td>
-                <td><span class="badge active-badge">Active</span></td>
-                <td class="actions">
-                    <span>👁</span>
-                    <span>✏</span>
-                    <span class="delete">🗑</span>
-                </td>
-            </tr>
-
-            <tr>
-                <td>2</td>
-                <td>David Brown</td>
+                <td>S-001</td>
+                <td>Ravi Verma</td>
                 <td>Nurse</td>
-                <td>Night</td>
-                <td>+1234-567-8901</td>
-                <td>david.b@hospital.com</td>
-                <td><span class="badge active-badge">Active</span></td>
-                <td class="actions">
-                    <span>👁</span>
-                    <span>✏</span>
-                    <span class="delete">🗑</span>
-                </td>
-            </tr>
-
-            <tr>
-                <td>3</td>
-                <td>Lisa Anderson</td>
-                <td>Lab Technician</td>
                 <td>Morning</td>
-                <td>+1234-567-8902</td>
-                <td>lisa.a@hospital.com</td>
-                <td><span class="badge active-badge">Active</span></td>
+                <td>111-222-3333</td>
+                <td>ravi@medicare</td>
+                <td>
+                    <select class="badge active-badge" onchange="this.className = 'badge ' + this.value" style="border:none; cursor:pointer;">
+                        <option value="active-badge" selected>Active</option>
+                        <option value="leave-badge">On Leave</option>
+                    </select>
+                </td>
                 <td class="actions">
-                    <span>👁</span>
-                    <span>✏</span>
-                    <span class="delete">🗑</span>
+                    <a asp-action="EditStaff" style="text-decoration: none;"><span title="Edit">✏️</span></a>
+                    <span title="Delete" class="delete">🗑️</span>
                 </td>
             </tr>
-
             <tr>
-                <td>4</td>
-                <td>James Taylor</td>
-                <td>Pharmacist</td>
+                <td>S-002</td>
+                <td>Sneha Roy</td>
+                <td>Receptionist</td>
                 <td>Evening</td>
-                <td>+1234-567-8903</td>
-                <td>james.t@hospital.com</td>
-                <td><span class="badge leave-badge">On Leave</span></td>
+                <td>444-555-6666</td>
+                <td>sneha@medicare</td>
+                <td>
+                    <select class="badge active-badge" onchange="this.className = 'badge ' + this.value" style="border:none; cursor:pointer;">
+                        <option value="active-badge" selected>Active</option>
+                        <option value="leave-badge">On Leave</option>
+                    </select>
+                </td>
                 <td class="actions">
-                    <span>👁</span>
-                    <span>✏</span>
-                    <span class="delete">🗑</span>
+                    <a asp-action="EditStaff" style="text-decoration: none;"><span title="Edit">✏️</span></a>
+                    <span title="Delete" class="delete">🗑️</span>
                 </td>
             </tr>
-
+            <tr>
+                <td>S-003</td>
+                <td>Pooja Nair</td>
+                <td>Manager</td>
+                <td>Morning</td>
+                <td>777-888-9999</td>
+                <td>pooja@medicare</td>
+                <td>
+                    <select class="badge leave-badge" onchange="this.className = 'badge ' + this.value" style="border:none; cursor:pointer;">
+                        <option value="active-badge">Active</option>
+                        <option value="leave-badge" selected>On Leave</option>
+                    </select>
+                </td>
+                <td class="actions">
+                    <a asp-action="EditStaff" style="text-decoration: none;"><span title="Edit">✏️</span></a>
+                    <span title="Delete" class="delete">🗑️</span>
+                </td>
+            </tr>
+            <tr>
+                <td>S-004</td>
+                <td>Ajay Menon</td>
+                <td>Technician</td>
+                <td>Night</td>
+                <td>000-111-2222</td>
+                <td>ajay@medicare</td>
+                <td>
+                    <select class="badge active-badge" onchange="this.className = 'badge ' + this.value" style="border:none; cursor:pointer;">
+                        <option value="active-badge" selected>Active</option>
+                        <option value="leave-badge">On Leave</option>
+                    </select>
+                </td>
+                <td class="actions">
+                    <a asp-action="EditStaff" style="text-decoration: none;"><span title="Edit">✏️</span></a>
+                    <span title="Delete" class="delete">🗑️</span>
+                </td>
+            </tr>
         </tbody>
     </table>
 

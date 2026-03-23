@@ -1,0 +1,117 @@
+@{
+    ViewData["Title"] = "My Profile";
+    Layout = "~/Views/Shared/_DoctorLayout.cshtml";
+}
+
+<div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px;">
+    <div>
+        <h1 style="font-size: 24px; font-weight: 600; margin-bottom: 4px;">My Profile</h1>
+        <p style="color: #666; font-size: 14px; margin: 0;">Manage your personal and professional information</p>
+    </div>
+    <button type="button" onclick="document.getElementById('profileForm').submit()" style="display: flex; align-items: center; gap: 8px; background: #0fb48c; color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 500; cursor: pointer;">
+        <i class="fa-solid fa-pen-to-square"></i>
+        Save Changes
+    </button>
+</div>
+
+<form id="profileForm" method="post" asp-action="UpdateProfile">
+    <div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 24px;">
+
+        <!-- Left Column - Profile Card -->
+        <div style="display: flex; flex-direction: column; gap: 24px;">
+
+            <div style="background: #fff; border-radius: 12px; padding: 32px 24px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); text-align: center; display: flex; flex-direction: column; align-items: center;">
+                <div style="width: 120px; height: 120px; border-radius: 50%; background: #e8fdf5; color: #0fb48c; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; font-size: 48px; font-weight: 700;">
+                    SJ
+                </div>
+                <h2 style="font-size: 22px; font-weight: 700; color: #222; margin-bottom: 4px;">Dr. Priya Patel</h2>
+                <p style="color: #0fb48c; font-weight: 500; margin-bottom: 16px;">Senior Cardiologist</p>
+
+                <div style="display: flex; gap: 8px; margin-bottom: 24px;">
+                    <span style="padding: 6px 12px; background: #f5f5f5; border-radius: 20px; font-size: 12px; font-weight: 500; color: #555;">MBBS</span>
+                    <span style="padding: 6px 12px; background: #f5f5f5; border-radius: 20px; font-size: 12px; font-weight: 500; color: #555;">MD (Cardiology)</span>
+                </div>
+
+                <div style="width: 100%; height: 1px; background: #eee; margin-bottom: 24px;"></div>
+
+                <div style="display: flex; flex-direction: column; gap: 16px; width: 100%; text-align: left;">
+                    <div style="display: flex; align-items: center; gap: 12px; color: #555; font-size: 14px;">
+                        <i class="fa-regular fa-envelope" style="color: #999; width: 18px; text-align: center;"></i> priya.patel@medicare.com
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 12px; color: #555; font-size: 14px;">
+                        <i class="fa-solid fa-phone" style="color: #999; width: 18px; text-align: center;"></i> +91 98765 43210
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 12px; color: #555; font-size: 14px;">
+                        <i class="fa-solid fa-location-dot" style="color: #999; width: 18px; text-align: center;"></i> Room 101, Main Wing
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right Column - Details -->
+        <div style="display: flex; flex-direction: column; gap: 24px;">
+
+            <div style="background: #fff; border-radius: 12px; padding: 32px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 24px; color: #222; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-regular fa-user" style="color: #0fb48c;"></i> Personal Information
+                </h3>
+
+                <div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px;">
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <label style="font-size: 13px; color: #888; font-weight: 500;">First Name</label>
+                        <input type="text" name="FirstName" value="Sarah" style="padding: 12px; border-radius: 8px; border: 1px solid #eee; background: #fff; color: #333; font-size: 15px; outline: none;" />
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <label style="font-size: 13px; color: #888; font-weight: 500;">Last Name</label>
+                        <input type="text" name="LastName" value="Patel" style="padding: 12px; border-radius: 8px; border: 1px solid #eee; background: #fff; color: #333; font-size: 15px; outline: none;" />
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <label style="font-size: 13px; color: #888; font-weight: 500;">Date of Birth</label>
+                        <input type="text" name="DateOfBirth" value="1982-05-14" style="padding: 12px; border-radius: 8px; border: 1px solid #eee; background: #fff; color: #333; font-size: 15px; outline: none;" />
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <label style="font-size: 13px; color: #888; font-weight: 500;">Gender</label>
+                        <select name="Gender" style="padding: 12px; border-radius: 8px; border: 1px solid #eee; background: #fff; color: #333; font-size: 15px; outline: none;">
+                            <option selected>Female</option>
+                            <option>Male</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 24px;">
+                    <label style="font-size: 13px; color: #888; font-weight: 500;">Bio</label>
+                    <textarea name="Bio" style="padding: 12px; border-radius: 8px; border: 1px solid #eee; background: #fff; color: #333; font-size: 15px; outline: none; height: 100px; resize: none;">Dr. Priya Patel is a board-certified cardiologist with over 15 years of experience in diagnosing and treating cardiovascular diseases. She specializes in preventive cardiology and heart failure management.</textarea>
+                </div>
+            </div>
+
+            <div style="background: #fff; border-radius: 12px; padding: 32px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 24px; color: #222; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-shield-halved" style="color: #0fb48c;"></i> Professional Details
+                </h3>
+
+                <div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px;">
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <label style="font-size: 13px; color: #888; font-weight: 500;">Medical License Number</label>
+                        <input type="text" name="LicenseNumber" value="MD-987654321" style="padding: 12px; border-radius: 8px; border: 1px solid #eee; background: #fff; color: #333; font-size: 15px; outline: none;" />
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <label style="font-size: 13px; color: #888; font-weight: 500;">Years of Experience</label>
+                        <input type="text" name="Experience" value="15 Years" style="padding: 12px; border-radius: 8px; border: 1px solid #eee; background: #fff; color: #333; font-size: 15px; outline: none;" />
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <label style="font-size: 13px; color: #888; font-weight: 500;">Consultation Fee</label>
+                        <input type="text" name="ConsultationFee" value="$150.00" style="padding: 12px; border-radius: 8px; border: 1px solid #eee; background: #fff; color: #333; font-size: 15px; outline: none;" />
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <label style="font-size: 13px; color: #888; font-weight: 500;">Hospital Affiliation</label>
+                        <input type="text" name="HospitalAffiliation" value="MediCare General Hospital" style="padding: 12px; border-radius: 8px; border: 1px solid #eee; background: #fff; color: #333; font-size: 15px; outline: none;" />
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</form>

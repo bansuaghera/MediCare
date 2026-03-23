@@ -1,4 +1,4 @@
-﻿@{
+@{
     ViewData["Title"] = "Prescriptions";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
@@ -95,42 +95,77 @@
         <tbody>
             <tr>
                 <td>1</td>
-                <td>John Smith</td>
-                <td>Dr. Sarah Johnson</td>
+                <td>Rahul Sharma</td>
+                <td>Dr. Priya Patel</td>
                 <td>2024-02-12</td>
                 <td>3</td>
-                <td><span class="badge active-badge">Active</span></td>
-                <td><i class="fa fa-eye eye-btn"></i></td>
+                <td>
+                    <select class="badge active-badge" onchange="this.className = 'badge ' + this.value" style="border:none; cursor:pointer;">
+                        <option value="active-badge" selected>Active</option>
+                        <option value="completed-badge">Completed</option>
+                    </select>
+                </td>
+                <td><a asp-action="PrescriptionDetails" style="color: inherit;"><i class="fa fa-eye eye-btn"></i></a></td>
             </tr>
 
             <tr>
                 <td>2</td>
-                <td>Sarah Johnson</td>
-                <td>Dr. Michael Chen</td>
+                <td>Priya Patel</td>
+                <td>Dr. Amit Kumar</td>
                 <td>2024-02-11</td>
                 <td>2</td>
-                <td><span class="badge completed-badge">Completed</span></td>
-                <td><i class="fa fa-eye eye-btn"></i></td>
+                <td>
+                    <select class="badge completed-badge" onchange="this.className = 'badge ' + this.value" style="border:none; cursor:pointer;">
+                        <option value="active-badge">Active</option>
+                        <option value="completed-badge" selected>Completed</option>
+                    </select>
+                </td>
+                <td><a asp-action="PrescriptionDetails" style="color: inherit;"><i class="fa fa-eye eye-btn"></i></a></td>
             </tr>
 
             <tr>
                 <td>3</td>
-                <td>Michael Chen</td>
-                <td>Dr. Emily Davis</td>
+                <td>Amit Kumar</td>
+                <td>Dr. Neha Singh</td>
                 <td>2024-02-10</td>
                 <td>4</td>
-                <td><span class="badge active-badge">Active</span></td>
-                <td><i class="fa fa-eye eye-btn"></i></td>
+                <td>
+                    <select class="badge active-badge" onchange="this.className = 'badge ' + this.value" style="border:none; cursor:pointer;">
+                        <option value="active-badge" selected>Active</option>
+                        <option value="completed-badge">Completed</option>
+                    </select>
+                </td>
+                <td><a asp-action="PrescriptionDetails" style="color: inherit;"><i class="fa fa-eye eye-btn"></i></a></td>
             </tr>
 
             <tr>
                 <td>4</td>
-                <td>Emily Davis</td>
-                <td>Dr. Robert Wilson</td>
+                <td>Neha Singh</td>
+                <td>Dr. Vikram Desai</td>
                 <td>2024-02-09</td>
                 <td>5</td>
-                <td><span class="badge completed-badge">Completed</span></td>
-                <td><i class="fa fa-eye eye-btn"></i></td>
+                <td>
+                    <select class="badge completed-badge" onchange="this.className = 'badge ' + this.value" style="border:none; cursor:pointer;">
+                        <option value="active-badge">Active</option>
+                        <option value="completed-badge" selected>Completed</option>
+                    </select>
+                </td>
+                <td><a asp-action="PrescriptionDetails" style="color: inherit;"><i class="fa fa-eye eye-btn"></i></a></td>
+            </tr>
+
+            <tr>
+                <td>5</td>
+                <td>Vikram Desai</td>
+                <td>Dr. Anjali Gupta</td>
+                <td>2024-02-08</td>
+                <td>1</td>
+                <td>
+                    <select class="badge active-badge" onchange="this.className = 'badge ' + this.value" style="border:none; cursor:pointer;">
+                        <option value="active-badge" selected>Active</option>
+                        <option value="completed-badge">Completed</option>
+                    </select>
+                </td>
+                <td><a asp-action="PrescriptionDetails" style="color: inherit;"><i class="fa fa-eye eye-btn"></i></a></td>
             </tr>
         </tbody>
     </table>
