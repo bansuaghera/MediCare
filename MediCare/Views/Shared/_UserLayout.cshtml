@@ -31,16 +31,22 @@
 
         /* ===== Sidebar ===== */
         .sidebar {
-            width: 240px;
+            width: 260px;
             background: #ffffff;
-            border-right: 1px solid #eee;
-            padding: 20px 15px;
+            border-right: 1px solid #f1f5f9;
+            padding: 25px 20px;
+            display: flex;
+            flex-direction: column;
+            position: sticky;
+            top: 0;
+            height: 100vh;
         }
 
         .logo {
             display: flex;
             align-items: center;
-            margin-bottom: 35px;
+            margin-bottom: 30px;
+            flex-shrink: 0;
         }
 
         .logo-icon {
@@ -64,39 +70,57 @@
             color: #888;
         }
 
+        .menu {
+            overflow-y: auto;
+            flex-grow: 1;
+            margin-bottom: 20px;
+        }
+
         .menu a {
             display: flex;
             align-items: center;
-            padding: 10px 12px;
-            border-radius: 12px;
-            color: #555;
+            padding: 12px 15px;
+            border-radius: 14px;
+            color: #64748b;
             text-decoration: none;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
             transition: 0.2s;
             font-weight: 500;
         }
 
             .menu a i {
-                width: 20px;
-                margin-right: 10px;
+                width: 22px;
+                margin-right: 12px;
+                font-size: 18px;
             }
 
             .menu a:hover {
-                background: #e6f9f1;
+                background: #f8fafc;
                 color: #10b981;
             }
 
             .menu a.active {
-                background: #d1fae5;
+                background: #ecfdf5;
                 color: #059669;
                 font-weight: 600;
             }
 
         .logout {
-            position: absolute;
-            bottom: 20px;
-            color: #666;
+            margin-top: auto;
+            padding: 15px;
+            border-top: 1px solid #f1f5f9;
+            color: #ef4444;
             text-decoration: none;
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+            border-radius: 14px;
+            transition: 0.2s;
+            flex-shrink: 0;
+        }
+        .logout:hover {
+            background: #fef2f2;
+            color: #dc2626;
         }
 
         /* ===== Main Content ===== */
@@ -181,46 +205,66 @@
                 </div>
             </div>
 
+            <div class="text-center mb-4 pb-3 border-bottom">
+                <div style="width: 55px; height: 55px; border-radius: 50%; background: #d1fae5; color: #10b981; font-size: 22px; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; margin: 0 auto 12px; border: 2px solid #10b981; text-transform: uppercase;">
+                    @(Context.Session.GetString("UserName")?.Substring(0, 1) ?? "P")
+                </div>
+                <h6 class="mb-0 fw-bold" style="color: #333;">@(Context.Session.GetString("UserName") ?? "Patient User")</h6>
+                <small class="text-muted" style="font-size: 12px;">@(Context.Session.GetString("UserEmail") ?? "patient@medicare.com")</small>
+            </div>
+
             <div class="menu">
 
                 <a asp-controller="User" asp-action="Dashboard"
-                   class="@(currentAction == "Home" ? "active" : "")">
-                    <i class="fa fa-home"></i> Home
+                   class="@(currentAction == "Dashboard" ? "active" : "")">
+                    <i class="fa-solid fa-house"></i> Home
                 </a>
 
                 <a asp-controller="User" asp-action="Doctors"
                    class="@(currentAction == "Doctors" ? "active" : "")">
-                    <i class="fa fa-user-md"></i> Doctors
+                    <i class="fa-solid fa-user-doctor"></i> Doctors
                 </a>
 
                 <a asp-controller="User" asp-action="BookAppointment"
                    class="@(currentAction == "BookAppointment" ? "active" : "")">
-                    <i class="fa fa-calendar-plus"></i> Book Appointment
+                    <i class="fa-solid fa-square-plus"></i> Book Appointment
                 </a>
 
                 <a asp-controller="User" asp-action="MyAppointments"
                    class="@(currentAction == "MyAppointments" ? "active" : "")">
-                    <i class="fa fa-calendar-check"></i> My Appointments
+                    <i class="fa-solid fa-calendar-check"></i> My Appointments
                 </a>
 
                 <a asp-controller="User" asp-action="TokenStatus"
                    class="@(currentAction == "TokenStatus" ? "active" : "")">
-                    <i class="fa fa-ticket"></i> Token Status
+                    <i class="fa-regular fa-clock"></i> Token Status
                 </a>
 
                 <a asp-controller="User" asp-action="Prescriptions"
                    class="@(currentAction == "Prescriptions" ? "active" : "")">
-                    <i class="fa fa-file-medical"></i> Prescriptions
+                    <i class="fa-solid fa-file-prescription"></i> Prescriptions
                 </a>
 
+                <a asp-action="Notifications" class="@(currentAction == "Notifications" ? "active" : "")">
+                    <i class="fa-regular fa-bell"></i> Notifications
+                </a>
+                
                 <a asp-controller="User" asp-action="History"
                    class="@(currentAction == "History" ? "active" : "")">
-                    <i class="fa fa-history"></i> History
+                    <i class="fa-solid fa-history"></i> History
+                </a>
+
+                <a asp-action="Feedback" class="@(currentAction == "Feedback" ? "active" : "")">
+                    <i class="fa-regular fa-comment-dots"></i> Feedback
                 </a>
 
                 <a asp-controller="User" asp-action="Profile"
                    class="@(currentAction == "Profile" ? "active" : "")">
-                    <i class="fa fa-user"></i> Profile
+                    <i class="fa-regular fa-user"></i> Profile
+                </a>
+
+                <a asp-action="Settings" class="@(currentAction == "Settings" ? "active" : "")">
+                    <i class="fa-solid fa-gear"></i> Settings
                 </a>
 
             </div>
@@ -235,16 +279,25 @@
         <div class="main">
 
             <!-- Topbar -->
-            <div class="topbar">
+            <div class="topbar border-bottom pb-3 mb-4">
 
                 <div class="search-box">
                     <i class="fa fa-search"></i>
-                    <input type="text" placeholder="Search doctors, appointments..." />
+                    <input type="text" placeholder="Search for anything..." class="border-0 shadow-none bg-transparent" />
                 </div>
 
                 <div class="profile-area">
-                    <i class="fa fa-bell"></i>
-                    <div class="profile-circle">PT</div>
+                    <button class="btn btn-link text-muted p-2 shadow-none"><i class="fa-regular fa-moon"></i></button>
+                    <a asp-action="Notifications" class="btn btn-link text-muted p-2 shadow-none position-relative text-decoration-none">
+                        <i class="fa-regular fa-bell"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle" style="width: 8px; height: 8px;"></span>
+                    </a>
+                    
+                    <div style="display: flex; align-items: center; gap: 10px; border-left: 1px solid #e5e7eb; padding-left: 15px; margin-left: 5px;">
+                        <a href="@Url.Action("Profile", "User")" style="text-decoration: none;">
+                            <div class="profile-circle shadow-sm" style="text-transform: uppercase; background: #ecfdf5; color: #10b981; border: 1px solid #10b981;">@(Context.Session.GetString("UserName")?.Substring(0, 1) ?? "P")</div>
+                        </a>
+                    </div>
                 </div>
 
             </div>
@@ -255,6 +308,11 @@
         </div>
 
     </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    @RenderSection("Scripts", required: false)
 
 </body>
 </html>

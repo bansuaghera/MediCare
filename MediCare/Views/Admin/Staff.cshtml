@@ -1,24 +1,10 @@
-﻿@{
-    ViewData["Title"] = "Staff";
+@model IEnumerable<MediCare.Models.AppUser>
+@{
+    ViewData["Title"] = "Staff Member";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
 <style>
-    .topbar {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 20px;
-    }
-
-        .topbar input {
-            width: 50%;
-            padding: 8px;
-            border-radius: 6px;
-            border: 1px solid #ddd;
-        }
-
-    .profile {
-        background: #17b978;
         color: white;
         width: 35px;
         height: 35px;
@@ -43,6 +29,7 @@
         border-radius: 6px;
         border: none;
         cursor: pointer;
+        text-decoration: none;
     }
 
     .card-box {
@@ -86,14 +73,16 @@
         background: #fff4cc;
         color: #b38f00;
     }
-
-    .actions span {
-        cursor: pointer;
-        margin-right: 8px;
+    
+    .rejected-badge {
+        background: #fde2e2;
+        color: #ef4444;
     }
 
-    .delete {
-        color: red;
+    .actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
     }
 
     .pagination {
@@ -112,15 +101,15 @@
 
 <!-- TOPBAR -->
 <div class="topbar">
-    <input type="text" placeholder="Search staff..." />
+    <input type="text" placeholder="Search staff members..." />
     <div class="profile">AD</div>
 </div>
 
 <!-- PAGE HEADER -->
 <div class="page-header">
     <div>
-        <h2>Staff</h2>
-        <small class="text-muted">Manage staff members</small>
+        <h2>Staff Directory</h2>
+        <small class="text-muted">Manage your clinical and administrative team</small>
     </div>
     <a asp-controller="Admin"
        asp-action="AddStaff"
@@ -132,7 +121,12 @@
 <!-- TABLE CARD -->
 <div class="card-box">
 
-    <input class="table-search" type="text" placeholder="Search staff..." />
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <input class="table-search" type="text" placeholder="Search staff..." style="margin-bottom: 0;" />
+        <form asp-action="DeleteAllStaff" method="post" onsubmit="return confirm('WARNING: Are you sure you want to delete ALL staff members? This cannot be undone.');">
+            <button type="submit" class="btn btn-danger" style="border-radius: 8px; padding: 6px 15px;">Delete All</button>
+        </form>
+    </div>
 
     <table>
         <thead>
@@ -140,7 +134,6 @@
                 <th>ID</th>
                 <th>Name</th>
                 <th>Role</th>
-                <th>Shift</th>
                 <th>Phone</th>
                 <th>Email</th>
                 <th>Status</th>
@@ -148,67 +141,36 @@
             </tr>
         </thead>
         <tbody>
-
-            <tr>
-                <td>1</td>
-                <td>Jennifer Lee</td>
-                <td>Receptionist</td>
-                <td>Morning</td>
-                <td>+1234-567-8900</td>
-                <td>jennifer.l@hospital.com</td>
-                <td><span class="badge active-badge">Active</span></td>
-                <td class="actions">
-                    <span>👁</span>
-                    <span>✏</span>
-                    <span class="delete">🗑</span>
-                </td>
-            </tr>
-
-            <tr>
-                <td>2</td>
-                <td>David Brown</td>
-                <td>Nurse</td>
-                <td>Night</td>
-                <td>+1234-567-8901</td>
-                <td>david.b@hospital.com</td>
-                <td><span class="badge active-badge">Active</span></td>
-                <td class="actions">
-                    <span>👁</span>
-                    <span>✏</span>
-                    <span class="delete">🗑</span>
-                </td>
-            </tr>
-
-            <tr>
-                <td>3</td>
-                <td>Lisa Anderson</td>
-                <td>Lab Technician</td>
-                <td>Morning</td>
-                <td>+1234-567-8902</td>
-                <td>lisa.a@hospital.com</td>
-                <td><span class="badge active-badge">Active</span></td>
-                <td class="actions">
-                    <span>👁</span>
-                    <span>✏</span>
-                    <span class="delete">🗑</span>
-                </td>
-            </tr>
-
-            <tr>
-                <td>4</td>
-                <td>James Taylor</td>
-                <td>Pharmacist</td>
-                <td>Evening</td>
-                <td>+1234-567-8903</td>
-                <td>james.t@hospital.com</td>
-                <td><span class="badge leave-badge">On Leave</span></td>
-                <td class="actions">
-                    <span>👁</span>
-                    <span>✏</span>
-                    <span class="delete">🗑</span>
-                </td>
-            </tr>
-
+            @if (Model != null && Model.Any())
+            {
+                @foreach (var user in Model)
+                {
+                    <tr>
+                        <td>S-@user.Id.ToString("D3")</td>
+                        <td><strong>@user.FirstName @user.LastName</strong></td>
+                        <td>@user.Role</td>
+                        <td>@user.Phone</td>
+                        <td>@user.Email</td>
+                        <td>
+                            <span class="badge @(user.Status == "Approved" ? "active-badge" : "rejected-badge")">
+                                @user.Status
+                            </span>
+                        </td>
+                        <td class="actions">
+                            <a asp-action="EditStaff" asp-route-id="@user.Id" style="text-decoration: none;"><span title="Edit">✏️</span></a>
+                            <form asp-action="DeleteUser" asp-route-id="@user.Id" asp-route-returnUrl="/Admin/Staff" method="post" onsubmit="return confirm('Delete this staff member?');">
+                                <button type="submit" style="background:none; border:none; color:red; padding:0; cursor:pointer;" title="Delete">🗑️</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="7" class="text-center py-4">No staff members found.</td>
+                </tr>
+            }
         </tbody>
     </table>
 

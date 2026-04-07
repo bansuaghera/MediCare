@@ -1,0 +1,137 @@
+@{
+    ViewData["Title"] = "Patient Help Center";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+}
+
+<style>
+    .help-card {
+        background: white;
+        border-radius: 25px;
+        padding: 40px;
+        border: 1px solid #f1f5f9;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.03);
+    }
+    .satisfaction-btn {
+        width: 100%;
+        padding: 15px;
+        border-radius: 15px;
+        border: 2px solid #f1f5f9;
+        background: white;
+        font-weight: 700;
+        transition: 0.2s;
+        text-align: center;
+    }
+    .satisfaction-btn:hover, .satisfaction-btn.active {
+        border-color: #10b981;
+        background: #ecfdf5;
+        color: #065f46;
+    }
+    .faq-item {
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px dashed #f1f5f9;
+    }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-5">
+    <div>
+        <h1 class="fw-bold m-0"><i class="fa-regular fa-comment-dots text-success me-2"></i> Clinical Help Center</h1>
+        <p class="text-muted">How can we assist you with your health session today?</p>
+    </div>
+</div>
+
+<div class="row g-5">
+    <!-- Feedback Form -->
+    <div class="col-lg-7">
+        <div class="help-card border">
+            <h4 class="fw-bold mb-4">Submit Experience Report</h4>
+            
+            <form id="mainFeedbackForm">
+                <div class="mb-5 text-center">
+                    <label class="small fw-bold text-muted text-uppercase mb-3 d-block">Overall Satisfaction</label>
+                    <div class="row g-3">
+                        <div class="col-4">
+                            <button type="button" class="satisfaction-btn rounded-pill px-4 py-3 border shadow-sm" onclick="setRating(5, this)">Excellent</button>
+                        </div>
+                        <div class="col-4">
+                            <button type="button" class="satisfaction-btn rounded-pill px-4 py-3 border shadow-sm" onclick="setRating(4, this)">Satisfactory</button>
+                        </div>
+                        <div class="col-4">
+                            <button type="button" class="satisfaction-btn rounded-pill px-4 py-3 border shadow-sm" onclick="setRating(3, this)">Neutral</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="small fw-bold text-muted text-uppercase mb-2 d-block">Detailed Review</label>
+                    <textarea name="Comment" class="form-control rounded-4 border-0 bg-light p-4 shadow-none" rows="6" placeholder="Tell us more about your visit or technical issues..." required></textarea>
+                </div>
+
+                <div class="alert bg-soft-blue border-0 rounded-4 p-4 d-flex align-items-center gap-3 mb-4">
+                    <i class="fa-solid fa-circle-info text-blue-600 fa-lg"></i>
+                    <p class="m-0 text-start small fw-medium text-blue-800">For emergency medical assistance, please contact the clinic desk directly via phone.</p>
+                </div>
+
+                <button type="submit" class="btn btn-emerald-luxury w-100 rounded-pill py-3 fw-bold shadow-sm">
+                    Submit Diagnostic Report
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- FAQ/Support Sidebar -->
+    <div class="col-lg-5">
+        <div class="help-card border h-100 shadow-sm">
+            <h5 class="fw-bold mb-4">Frequently Asked</h5>
+            
+            <div class="faq-item">
+                <h6 class="fw-bold small opacity-75 m-0 mb-2">How do I access my prescription?</h6>
+                <p class="small text-muted m-0">Navigate to the 'Prescriptions' tab and click on the 'Digital Copy' icon to download your Rx.</p>
+            </div>
+
+            <div class="faq-item">
+                <h6 class="fw-bold small opacity-75 m-0 mb-2">Refunds on cancellation?</h6>
+                <p class="small text-muted m-0">Clinical fees are processed according to the hospital policy. Please contact accounts desk.</p>
+            </div>
+
+            <div class="faq-item">
+                <h6 class="fw-bold small opacity-75 m-0 mb-2">Technical login issue?</h6>
+                <p class="small text-muted m-0">Reset your password or clear your browser cache to resolve technical session conflicts.</p>
+            </div>
+
+            <div class="mt-5 text-center">
+                <small class="text-muted d-block mb-3">Still have questions?</small>
+                <a href="tel:+12345678" class="btn btn-outline-secondary w-100 rounded-pill py-3 fw-bold border mb-2">
+                    <i class="fa fa-phone me-2"></i> Voice Support
+                </a>
+                <a href="mailto:support@medicare.com" class="btn btn-outline-secondary w-100 rounded-pill py-3 fw-bold border">
+                    <i class="fa fa-envelope me-2"></i> Email Inquiry
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentRating = 5;
+    function setRating(val, btn) {
+        currentRating = val;
+        $('.satisfaction-btn').removeClass('active');
+        $(btn).addClass('active');
+    }
+
+    $('#mainFeedbackForm').on('submit', function(e) {
+        e.preventDefault();
+        const data = {
+            Rating: currentRating,
+            Comment: $(this).find('textarea').val()
+        };
+
+        $.post('/User/SubmitFeedback', data, function(res) {
+            if(res.success) {
+                alert("Thank you for your clinical feedback!");
+                window.location.reload();
+            }
+        });
+    });
+</script>

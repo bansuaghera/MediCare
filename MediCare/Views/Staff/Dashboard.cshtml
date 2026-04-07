@@ -1,4 +1,4 @@
-﻿@{
+@{
     ViewData["Title"] = "Staff Dashboard";
     Layout = "~/Views/Shared/_StaffLayout.cshtml";
 }
@@ -88,7 +88,7 @@
         <div class="stat-card">
             <div>
                 <small class="text-muted">Today's Appointments</small>
-                <h4 class="fw-bold mb-0">38</h4>
+                <h4 class="fw-bold mb-0">@ViewBag.TodayCount</h4>
             </div>
             <div class="stat-icon icon-green">
                 <i class="fa fa-calendar-check"></i>
@@ -99,8 +99,8 @@
     <div class="col-md-3">
         <div class="stat-card">
             <div>
-                <small class="text-muted">Active Tokens</small>
-                <h4 class="fw-bold mb-0">12</h4>
+                <small class="text-muted">Waiting</small>
+                <h4 class="fw-bold mb-0">@ViewBag.WaitingCount</h4>
             </div>
             <div class="stat-icon icon-purple">
                 <i class="fa fa-ticket"></i>
@@ -111,8 +111,8 @@
     <div class="col-md-3">
         <div class="stat-card">
             <div>
-                <small class="text-muted">New Patients</small>
-                <h4 class="fw-bold mb-0">5</h4>
+                <small class="text-muted">In Progress</small>
+                <h4 class="fw-bold mb-0">@ViewBag.InProgressCount</h4>
             </div>
             <div class="stat-icon icon-pink">
                 <i class="fa fa-user-plus"></i>
@@ -123,8 +123,8 @@
     <div class="col-md-3">
         <div class="stat-card">
             <div>
-                <small class="text-muted">Scheduled Tomorrow</small>
-                <h4 class="fw-bold mb-0">42</h4>
+                <small class="text-muted">Completed Today</small>
+                <h4 class="fw-bold mb-0">@ViewBag.CompletedCount</h4>
             </div>
             <div class="stat-icon icon-orange">
                 <i class="fa fa-clock"></i>
@@ -164,41 +164,24 @@
         <div class="card-box">
             <h5 class="fw-bold mb-3">Today's Appointments</h5>
 
-            <div class="appointment-item">
-                <div>
-                    <div class="appointment-time">09:00 AM</div>
-                    John Smith <br />
-                    <small class="text-muted">Dr. Sarah Johnson</small>
-                </div>
-                <div class="appointment-code">A-045</div>
-            </div>
-
-            <div class="appointment-item">
-                <div>
-                    <div class="appointment-time">09:30 AM</div>
-                    Sarah Johnson <br />
-                    <small class="text-muted">Dr. Michael Chen</small>
-                </div>
-                <div class="appointment-code">A-046</div>
-            </div>
-
-            <div class="appointment-item">
-                <div>
-                    <div class="appointment-time">10:00 AM</div>
-                    Michael Chen <br />
-                    <small class="text-muted">Dr. Emily Davis</small>
-                </div>
-                <div class="appointment-code">A-047</div>
-            </div>
-
-            <div class="appointment-item">
-                <div>
-                    <div class="appointment-time">10:30 AM</div>
-                    Emily Davis <br />
-                    <small class="text-muted">Dr. Robert Wilson</small>
-                </div>
-                <div class="appointment-code">A-048</div>
-            </div>
+            @if (ViewBag.RecentAppointments != null && ((IEnumerable<MediCare.Models.Appointment>)ViewBag.RecentAppointments).Any())
+            {
+                foreach (var app in (IEnumerable<MediCare.Models.Appointment>)ViewBag.RecentAppointments)
+                {
+                    <div class="appointment-item">
+                        <div>
+                            <div class="appointment-time">@app.AppointmentDate.ToString("hh:mm tt")</div>
+                            @app.Patient?.FirstName @app.Patient?.LastName <br />
+                            <small class="text-muted">Dr. @app.Doctor?.FirstName @app.Doctor?.LastName</small>
+                        </div>
+                        <div class="appointment-code">@app.TokenNumber</div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="text-muted">No appointments found for today.</div>
+            }
 
         </div>
     </div>

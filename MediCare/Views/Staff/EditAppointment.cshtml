@@ -1,0 +1,130 @@
+@{
+    ViewData["Title"] = "Edit Appointment";
+    Layout = "~/Views/Shared/_StaffLayout.cshtml";
+}
+
+<style>
+    .page-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+        .page-header i {
+            font-size: 18px;
+            cursor: pointer;
+            color: #6b7280;
+        }
+
+    .card-box {
+        background: #ffffff;
+        border-radius: 18px;
+        padding: 30px;
+        box-shadow: 0 4px 25px rgba(0, 0, 0, 0.05);
+        max-width: 800px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    .form-control, .form-select {
+        border-radius: 12px;
+        padding: 10px 14px;
+        border: 1px solid #e5e7eb;
+    }
+
+    .btn-success-custom {
+        background: #16a34a;
+        border: none;
+        padding: 10px 22px;
+        border-radius: 30px;
+        font-weight: 600;
+    }
+
+        .btn-success-custom:hover {
+            background: #15803d;
+        }
+
+    .btn-cancel {
+        border-radius: 30px;
+        padding: 10px 20px;
+    }
+
+    .form-row {
+        margin-bottom: 20px;
+    }
+</style>
+
+<!-- Header -->
+<div class="page-header">
+    <a asp-action="TodayAppointments" class="text-dark"><i class="fa fa-arrow-left"></i></a>
+    <div>
+        <h4 class="fw-bold mb-0">Edit Appointment</h4>
+        <small class="text-muted">Update appointment details</small>
+    </div>
+</div>
+
+<!-- Card -->
+<div class="card-box">
+
+    <form asp-action="EditAppointment" method="post">
+
+        <div class="row form-row">
+            <div class="col-md-6">
+                <label class="form-label">Patient <span class="text-danger">*</span></label>
+                <select class="form-select">
+                    <option>Select patient</option>
+                    <option>Rahul Sharma</option>
+                    <option>Priya Patel</option>
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Doctor <span class="text-danger">*</span></label>
+                <select class="form-select">
+                    <option>Select doctor</option>
+                    <option>Dr. Priya Patel</option>
+                    <option>Dr. Amit Kumar</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row form-row">
+            <div class="col-md-6">
+                <label class="form-label">Date <span class="text-danger">*</span></label>
+                <input type="date" class="form-control" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Time <span class="text-danger">*</span></label>
+                <input type="time" class="form-control" />
+            </div>
+        </div>
+
+        <div class="form-row">
+            <label class="form-label">Appointment Type <span class="text-danger">*</span></label>
+            <select class="form-select">
+                <option>Select type</option>
+                <option>Checkup</option>
+                <option>Consultation</option>
+                <option>Follow-up</option>
+                <option>Emergency</option>
+            </select>
+        </div>
+
+        <div class="mt-4">
+            <button type="submit" class="btn text-white btn-success-custom me-3">
+                <i class="fa fa-save me-2"></i> Save Changes
+            </button>
+
+            <a asp-action="TodayAppointments" class="btn btn-outline-secondary btn-cancel">
+                Cancel
+            </a>
+        </div>
+
+    </form>
+
+</div>

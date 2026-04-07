@@ -1,6 +1,11 @@
-﻿@{
+@model List<MediCare.Models.Appointment>
+@{
     ViewData["Title"] = "My Appointments";
     Layout = "~/Views/Shared/_UserLayout.cshtml";
+
+    string GetStatusClass(string? status) {
+        return status?.ToLower().Replace(" ", "-") ?? "default";
+    }
 }
 
 <style>
@@ -17,9 +22,9 @@
         transition: 0.3s;
     }
 
-        .appointment-card:hover {
-            transform: translateY(-3px);
-        }
+    .appointment-card:hover {
+        transform: translateY(-3px);
+    }
 
     .appointment-top {
         display: flex;
@@ -42,17 +47,15 @@
         border-radius: 20px;
         font-size: 12px;
         font-weight: 600;
+        border: none;
+        text-transform: capitalize;
     }
 
-    .confirmed {
-        background: #e5e7eb;
-        color: #374151;
-    }
-
-    .completed {
-        background: #e5e7eb;
-        color: #6b7280;
-    }
+    .scheduled { background: #fff4cc; color: #b38f00; }
+    .waiting { background: #dbeafe; color: #1e40af; }
+    .in-progress { background: #e0e7ff; color: #4338ca; }
+    .completed { background: #d1f5e0; color: #0f9b6d; }
+    .cancelled { background: #fee2e2; color: #dc2626; }
 
     .appointment-details {
         display: flex;
@@ -62,16 +65,19 @@
         font-size: 14px;
     }
 
-        .appointment-details i {
-            margin-right: 6px;
-        }
+    .appointment-details i {
+        margin-right: 6px;
+    }
 
     .btn-reschedule {
-        background: #e5e7eb;
+        background: #f3f4f6;
         border: none;
         padding: 8px 18px;
         border-radius: 10px;
         font-weight: 600;
+        text-decoration: none;
+        color: #374151;
+        display: inline-block;
     }
 
     .btn-cancel {
@@ -84,72 +90,205 @@
         margin-left: 10px;
     }
 
-    @@media (max-width: 768px) {
-        .appointment-details {
-            flex-direction: column;
-            gap: 8px;
-        }
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        background: white;
+        border-radius: 20px;
+        margin-top: 20px;
     }
 </style>
 
-<div class="page-header">
-    <h2>My Appointments</h2>
-    <p class="text-muted">View and manage your appointments</p>
-</div>
-
-<!-- Appointment 1 -->
-<div class="appointment-card">
-    <div class="appointment-top">
-        <div>
-            <div class="doctor-name">Dr. Sarah Johnson</div>
-            <div class="speciality">Cardiology</div>
+<div class="page-header d-flex justify-content-between align-items-center">
+    <div>
+        <h2 class="d-flex align-items-center gap-2">My Appointments <span class="badge bg-success bg-opacity-10 text-success" id="totalCount">@Model?.Count ?? 0</span></h2>
+        <p class="text-muted">View and manage your appointments</p>
+    </div>
+    @if (Model != null && Model.Any())
+    {
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary" id="selectAllBtn" style="border-radius:10px; font-weight:600;">Select All</button>
+            <button class="btn btn-outline-danger d-none" id="deleteSelectedBtn" style="border-radius:10px; font-weight:600;" onclick="deleteSelected()">Delete Selected</button>
+            <button class="btn btn-outline-danger" onclick="deleteAllAppointments()" style="border-radius:10px; font-weight:600;">Delete All History</button>
         </div>
-        <span class="status-badge confirmed">Confirmed</span>
-    </div>
-
-    <div class="appointment-details">
-        <div><i class="fa fa-calendar"></i> 2024-02-15</div>
-        <div><i class="fa fa-clock"></i> 10:00 AM</div>
-        <div><i class="fa fa-location-dot"></i> Room 101</div>
-    </div>
-
-    <button class="btn-reschedule">Reschedule</button>
-    <button class="btn-cancel">Cancel</button>
+    }
 </div>
 
-<!-- Appointment 2 -->
-<div class="appointment-card">
-    <div class="appointment-top">
-        <div>
-            <div class="doctor-name">Dr. Michael Chen</div>
-            <div class="speciality">Pediatrics</div>
+@if (Model != null && Model.Any())
+{
+    foreach (var appt in Model)
+    {
+        <div class="appointment-card position-relative" data-id="@appt.Id">
+            <input type="checkbox" class="form-check-input select-box shadow-none" style="position:absolute; top:14px; left:14px;" />
+            <div class="appointment-top">
+                <div>
+                    <div class="doctor-name">Dr. @appt.Doctor?.FirstName @appt.Doctor?.LastName</div>
+                    <div class="speciality">@appt.Doctor?.Specialty</div>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    <span class="status-badge @GetStatusClass(appt.Status)">@appt.Status</span>
+                    <button class="btn btn-sm btn-light" onclick="showDetails(@appt.Id)" title="View Full Details">👁️</button>
+                    <i class="fa fa-trash text-danger" style="cursor:pointer;" title="Delete Permanently" onclick="deleteAppointment(@appt.Id)"></i>
+                </div>
+            </div>
+
+            <div class="appointment-details">
+                <div><i class="fa fa-calendar"></i> @appt.AppointmentDate.ToString("yyyy-MM-dd")</div>
+                <div><i class="fa fa-clock"></i> @appt.TimeSlot</div>
+                <div><i class="fa fa-hashtag"></i> Token: @(string.IsNullOrEmpty(appt.TokenNumber) ? "None" : appt.TokenNumber)</div>
+            </div>
+            
+            <div style="margin-bottom: 15px; color: #6b7280; font-size: 14px;">
+                <strong>Subject:</strong> @(string.IsNullOrEmpty(appt.Subject) ? "General Consultation" : appt.Subject)
+            </div>
+
+            <div class="d-flex gap-2">
+                @if (appt.Status == "Scheduled")
+                {
+                    <a asp-action="EditAppointment" asp-route-id="@appt.Id" class="btn-reschedule">Reschedule</a>
+                    <button class="btn-cancel" onclick="cancelAppointment(@appt.Id)">Cancel</button>
+                }
+                <button class="btn btn-sm btn-outline-info" style="border-radius:10px;" onclick="showDetails(@appt.Id)">Full Details</button>
+            </div>
         </div>
-        <span class="status-badge confirmed">Confirmed</span>
+    }
+}
+else
+{
+    <div class="empty-state">
+        <i class="fa-regular fa-calendar-xmark mb-3" style="font-size: 48px; color: #d1d5db;"></i>
+        <h4>No Appointments Found</h4>
+        <p class="text-muted">You haven't booked any appointments yet.</p>
+        <a asp-action="BookAppointment" class="btn btn-success mt-2" style="border-radius:10px;">Book Now</a>
     </div>
+}
 
-    <div class="appointment-details">
-        <div><i class="fa fa-calendar"></i> 2024-02-20</div>
-        <div><i class="fa fa-clock"></i> 02:00 PM</div>
-        <div><i class="fa fa-location-dot"></i> Room 102</div>
-    </div>
-
-    <button class="btn-reschedule">Reschedule</button>
-    <button class="btn-cancel">Cancel</button>
-</div>
-
-<!-- Appointment 3 -->
-<div class="appointment-card">
-    <div class="appointment-top">
-        <div>
-            <div class="doctor-name">Dr. Emily Davis</div>
-            <div class="speciality">Dermatology</div>
+<!-- Details Modal -->
+<div class="modal fade" id="detailsModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 20px; border: none; box-shadow: 0 20px 50px rgba(0,0,0,0.15);">
+            <div class="modal-header" style="border: none; padding: 25px 30px pb-0;">
+                <h5 class="modal-title font-weight-bold">Appointment Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="padding: 20px 30px;" id="modalContent">
+                <!-- Content loaded via JS -->
+            </div>
+            <div class="modal-footer" style="border: none; padding: 20px 30px;">
+                <button type="button" class="btn btn-light" style="border-radius: 10px;" data-bs-dismiss="modal">Close</button>
+            </div>
         </div>
-        <span class="status-badge completed">Completed</span>
-    </div>
-
-    <div class="appointment-details">
-        <div><i class="fa fa-calendar"></i> 2024-02-10</div>
-        <div><i class="fa fa-clock"></i> 09:00 AM</div>
-        <div><i class="fa fa-location-dot"></i> Room 103</div>
     </div>
 </div>
+
+<script>
+    const emptyState = document.querySelector('.empty-state');
+    const totalCountSpan = document.getElementById('totalCount');
+
+    function cancelAppointment(id) {
+        if (confirm("Are you sure you want to cancel this appointment?")) {
+            $.post('/User/CancelAppointment', { id: id }, function(res) {
+                if (res.success) {
+                    removeCard(id);
+                    updateCounts();
+                } else {
+                    alert("Failed to cancel appointment.");
+                }
+            });
+        }
+    }
+
+    function deleteAppointment(id) {
+        if (confirm("Are you sure you want to PERMANENTLY delete this appointment record? This cannot be undone.")) {
+            $.post('/User/DeleteAppointment', { id: id }, function(res) {
+                if (res.success) {
+                    removeCard(id);
+                    updateCounts();
+                } else {
+                    alert("Failed to delete appointment.");
+                }
+            });
+        }
+    }
+
+    function deleteAllAppointments() {
+        if (confirm("WARNING: Are you sure you want to delete ALL your appointment history? This cannot be undone.")) {
+            $.post('/User/DeleteAllAppointments', function(res) {
+                if (res.success) {
+                    document.querySelectorAll('.appointment-card').forEach(el => el.remove());
+                    updateCounts();
+                } else {
+                    alert("Failed to delete appointments.");
+                }
+            });
+        }
+    }
+
+    function showDetails(id) {
+        $.get('/User/GetAppointmentDetails/' + id, function(data) {
+            var html = `
+                <div class="mb-3"><strong>Doctor:</strong> ${data.doctorName} (${data.specialty})</div>
+                <div class="mb-3"><strong>Date & Time:</strong> ${data.date} at ${data.time}</div>
+                <div class="mb-3"><strong>Token Number:</strong> <span class="badge bg-success">${data.token || 'Not Assigned'}</span></div>
+                <div class="mb-3"><strong>Status:</strong> <span class="badge bg-info">${data.status}</span></div>
+                <div class="mb-3"><strong>Subject:</strong> ${data.subject || 'N/A'}</div>
+                <div class="mb-3"><strong>Notes:</strong> ${data.notes || 'No additional notes provided.'}</div>
+            `;
+            $('#modalContent').html(html);
+            $('#detailsModal').modal('show');
+        });
+    }
+
+    // ------- bulk select / delete --------
+    const selectAllBtn = document.getElementById('selectAllBtn');
+    const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+    const checkboxes = document.querySelectorAll('.select-box');
+
+    function updateCounts() {
+        const totalCards = document.querySelectorAll('.appointment-card').length;
+        if (totalCountSpan) totalCountSpan.textContent = totalCards;
+        const selected = document.querySelectorAll('.select-box:checked').length;
+        if (deleteSelectedBtn) deleteSelectedBtn.classList.toggle('d-none', selected === 0);
+        if (selectAllBtn) selectAllBtn.textContent = selected === checkboxes.length && checkboxes.length > 0 ? "Clear All" : "Select All";
+        if (emptyState) emptyState.style.display = totalCards === 0 ? '' : 'none';
+    }
+
+    if (selectAllBtn) {
+        selectAllBtn.addEventListener('click', () => {
+            const allSelected = Array.from(checkboxes).every(cb => cb.checked);
+            checkboxes.forEach(cb => cb.checked = !allSelected);
+            updateCounts();
+        });
+    }
+
+    checkboxes.forEach(cb => cb.addEventListener('change', updateCounts));
+
+    function deleteSelected() {
+        const ids = Array.from(document.querySelectorAll('.select-box:checked'))
+            .map(cb => parseInt(cb.closest('.appointment-card').getAttribute('data-id')))
+            .filter(id => !Number.isNaN(id));
+        if (ids.length === 0) return;
+        if (!confirm(`Delete ${ids.length} selected appointment(s)?`)) return;
+
+        $.ajax({
+            url: '/User/DeleteSelectedAppointments',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(ids),
+            success: function(res) {
+                if (res.success) {
+                    ids.forEach(removeCard);
+                    updateCounts();
+                }
+                else alert("Failed to delete selected appointments.");
+            }
+        });
+    }
+
+    function removeCard(id) {
+        const card = document.querySelector(`.appointment-card[data-id="${id}"]`);
+        if (card) card.remove();
+    }
+
+    updateCounts();
+</script>

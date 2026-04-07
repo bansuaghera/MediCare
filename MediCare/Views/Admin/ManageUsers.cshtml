@@ -1,0 +1,138 @@
+@model IEnumerable<MediCare.Models.AppUser>
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "User Management";
+}
+
+<style>
+    .user-card {
+        border-radius: 20px;
+        border: 1px solid #f1f5f9;
+        transition: 0.3s;
+    }
+    .user-card:hover {
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    }
+    .role-badge {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 5px 12px;
+    }
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 6px;
+    }
+    .bg-approved { background-color: #10b981; }
+    .bg-pending { background-color: #f59e0b; }
+    .bg-rejected { background-color: #ef4444; }
+</style>
+
+<div class="container-fluid mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold m-0">Platform Users</h2>
+            <p class="text-muted">Manage all accounts registered in the system</p>
+        </div>
+        <div class="d-flex gap-3">
+            <div class="input-group" style="width: 300px;">
+                <span class="input-group-text bg-white border-end-0 rounded-start-pill"><i class="fa fa-search text-muted"></i></span>
+                <input type="text" class="form-control border-start-0 rounded-end-pill" placeholder="Search users...">
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light text-muted small text-uppercase">
+                        <tr>
+                            <th class="ps-4 py-3">Identity</th>
+                            <th class="py-3">Role</th>
+                            <th class="py-3">Contact</th>
+                            <th class="py-3">Status</th>
+                            <th class="pe-4 py-3 text-end">Management</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in Model)
+                        {
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-sm bg-blue-50 text-blue-600 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 42px; height: 42px; background: #eff6ff; color: #3b82f6; font-weight: 700;">
+                                            @user.FirstName[0]@user.LastName[0]
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold text-slate-800">@user.FirstName @user.LastName</div>
+                                            <div class="text-xs text-muted">UID: @user.Id</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    @{
+                                        var roleClass = user.Role == "Admin" ? "bg-primary" : (user.Role == "Doctor" ? "bg-success" : "bg-info");
+                                    }
+                                    <span class="badge @roleClass bg-opacity-10 text-@roleClass.Replace("bg-", "") rounded-pill role-badge">
+                                        @user.Role
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="small fw-medium">@user.Email</div>
+                                    <div class="text-xs text-muted">@user.Phone</div>
+                                </td>
+                                <td>
+                                    @{
+                                        var statusClass = user.Status == "Approved" ? "approved" : (user.Status == "Pending" ? "pending" : "rejected");
+                                        var textClass = user.Status == "Approved" ? "success" : (user.Status == "Pending" ? "warning" : "danger");
+                                    }
+                                    <div class="d-flex align-items-center text-@textClass small fw-bold">
+                                        <span class="status-dot bg-@statusClass"></span>
+                                        @user.Status
+                                    </div>
+                                </td>
+                                <td class="pe-4 text-end">
+                                    <div class="dropdown">
+                                        <button class="btn btn-light btn-sm rounded-pill px-3 shadow-sm border" data-bs-toggle="dropdown">
+                                            Actions <i class="fa fa-chevron-down ms-1 small"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3">
+                                            @if (user.Status != "Approved")
+                                            {
+                                                <li>
+                                                    <form asp-action="ApproveUser" method="post">
+                                                        <input type="hidden" name="id" value="@user.Id" />
+                                                        <button type="submit" class="dropdown-item text-success"><i class="fa fa-check me-2"></i> Approve User</button>
+                                                    </form>
+                                                </li>
+                                            }
+                                            <li>
+                                                <form asp-action="ChangeStatus" method="post">
+                                                    <input type="hidden" name="id" value="@user.Id" />
+                                                    <input type="hidden" name="status" value="Rejected" />
+                                                    <button type="submit" class="dropdown-item text-warning"><i class="fa fa-ban me-2"></i> Suspend/Reject</button>
+                                                </form>
+                                            </li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li>
+                                                <form asp-action="DeleteUser" method="post" onsubmit="return confirm('Delete this user permanently?');">
+                                                    <input type="hidden" name="id" value="@user.Id" />
+                                                    <button type="submit" class="dropdown-item text-danger"><i class="fa fa-trash me-2"></i> Delete Account</button>
+                                                </form>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

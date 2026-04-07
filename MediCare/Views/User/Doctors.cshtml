@@ -1,4 +1,5 @@
-﻿@{
+@model IEnumerable<MediCare.Models.Doctor>
+@{
     ViewData["Title"] = "Doctor";
     Layout = "~/Views/Shared/_UserLayout.cshtml";
 }
@@ -6,95 +7,117 @@
 <style>
     .page-header h2 {
         font-weight: 700;
+        color: #1f2937;
     }
 
     .doctor-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 25px;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
         margin-top: 30px;
     }
 
     .doctor-card {
         background: #ffffff;
         padding: 25px;
-        border-radius: 18px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-        transition: 0.3s;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+        transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid #f3f4f6;
     }
 
         .doctor-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            border-color: #10b981;
         }
 
     .doctor-top {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        margin-bottom: 20px;
     }
 
     .icon-box {
-        width: 55px;
-        height: 55px;
-        background: #e9d5ff;
-        border-radius: 16px;
+        width: 60px;
+        height: 60px;
+        background: #ecfdf5;
+        color: #10b981;
+        border-radius: 18px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 22px;
+        font-size: 24px;
     }
 
     .available-badge {
         background: #d1fae5;
         color: #059669;
-        padding: 5px 12px;
+        padding: 6px 14px;
         border-radius: 20px;
-        font-size: 12px;
+        font-size: 13px;
         font-weight: 600;
     }
 
     .doctor-name {
         font-weight: 700;
-        font-size: 18px;
+        font-size: 20px;
+        color: #111827;
         margin-top: 15px;
     }
 
     .speciality {
-        color: #6b7280;
-        margin-bottom: 10px;
+        color: #3b82f6;
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
     .rating {
-        font-size: 14px;
-        margin-bottom: 15px;
+        font-size: 15px;
+        color: #6b7280;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 
     .price-row {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin: 15px 0;
+        margin: 20px 0;
+        padding-top: 20px;
+        border-top: 1px solid #f3f4f6;
     }
 
     .price {
-        color: #16a34a;
-        font-size: 22px;
-        font-weight: 700;
+        color: #111827;
+        font-size: 24px;
+        font-weight: 800;
     }
 
     .book-btn {
-        background: #16a34a;
+        background: #10b981;
         color: white;
         width: 100%;
-        padding: 10px;
+        padding: 12px;
         border: none;
         border-radius: 12px;
         font-weight: 600;
         transition: 0.3s;
+        text-align: center;
+        display: block;
+        text-decoration: none;
     }
 
         .book-btn:hover {
-            background: #15803d;
+            background: #059669;
+            color: white;
+            box-shadow: 0 10px 15px rgba(16, 185, 129, 0.2);
         }
 
     @@media (max-width: 768px) {
@@ -104,123 +127,92 @@
     }
 </style>
 
-<div class="page-header">
-    <h2>Find a Doctor</h2>
-    <p class="text-muted">Browse our expert doctors</p>
+<div class="page-header mb-5 p-5 text-center bg-white rounded-4 shadow-sm">
+    <h1 class="fw-bold display-5 mb-3">Health Starts with the Right Doctor</h1>
+    <p class="text-muted fs-5 mb-5">Search from our network of high-quality, verified healthcare specialists</p>
+    
+    <div class="search-bar-luxury max-width-700 mx-auto">
+        <div class="row g-2">
+            <div class="col-md-9">
+                <div class="input-group input-group-lg shadow-sm rounded-pill overflow-hidden">
+                    <span class="input-group-text bg-white border-0 ps-4"><i class="fa fa-search text-muted"></i></span>
+                    <input type="text" id="doctorSearch" class="form-control border-0 fs-6 py-3" placeholder="Search by name, specialty or symptoms...">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <button class="btn btn-emerald-luxury w-100 h-100 rounded-pill fw-bold shadow-sm">
+                    Find Now
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
+
+<style>
+    .max-width-700 { max-width: 800px; }
+    .btn-emerald-luxury {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        border: none;
+        transition: 0.3s;
+    }
+    .btn-emerald-luxury:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+        color: white;
+    }
+</style>
 
 <div class="doctor-grid">
 
-    <!-- Doctor Card -->
-    <div class="doctor-card">
-        <div class="doctor-top">
-            <div class="icon-box">
-                🧪
+    @if (Model != null && Model.Any())
+    {
+        @foreach (var doc in Model)
+        {
+            <div class="doctor-card">
+                <div class="doctor-top">
+                    <div class="icon-box">
+                        <i class="fa fa-user-md"></i>
+                    </div>
+                    <span class="available-badge">
+                        <i class="fa fa-circle me-1" style="font-size: 8px;"></i> Available Today
+                    </span>
+                </div>
+
+                <div class="speciality">@doc.Specialty</div>
+                <div class="doctor-name">Dr. @doc.FirstName @doc.LastName</div>
+
+                <div class="rating">
+                   <i class="fa fa-star text-warning"></i> 4.9 · @doc.ExperienceYears Years Exp.
+                </div>
+
+                <div class="price-row">
+                    <div>
+                        <span class="price">₹@doc.ConsultationFee</span>
+                        <span class="text-muted small">/ session</span>
+                    </div>
+                    <div class="text-muted small">
+                        <i class="fa fa-clock-o me-1"></i> 10:00 - 18:00
+                    </div>
+                </div>
+
+                <a asp-controller="User"
+                   asp-action="BookAppointment"
+                   class="book-btn">
+                   Book Appointment
+                </a>
             </div>
-            <span class="available-badge">Available</span>
-        </div>
-
-        <div class="doctor-name">Dr. Sarah Johnson</div>
-        <div class="speciality">Cardiology</div>
-
-        <div class="rating">
-            ⭐ 4.8 (15 years exp.)
-        </div>
-
-        <div class="price-row">
-            <div class="price">$50</div>
-            <div class="text-muted">per visit</div>
-        </div>
-
-        <a asp-controller="User"
-           asp-action="BookAppointment"
-           class="btn book-btn">
-            📅 Book Appointment
-        </a>
-    </div>
-
-    <!-- Doctor 2 -->
-    <div class="doctor-card">
-        <div class="doctor-top">
-            <div class="icon-box">
-                🧪
+        }
+    }
+    else
+    {
+        <div class="col-12 text-center py-5">
+            <div class="mb-3">
+                <i class="fa fa-user-md text-muted" style="font-size: 60px; opacity: 0.3;"></i>
             </div>
-            <span class="available-badge">Available</span>
+            <h4 class="text-muted">No doctors found in our database yet</h4>
+            <p class="text-muted">Please check back later or contact admin</p>
         </div>
-
-        <div class="doctor-name">Dr. Michael Chen</div>
-        <div class="speciality">Pediatrics</div>
-
-        <div class="rating">
-            ⭐ 4.7 (12 years exp.)
-        </div>
-
-        <div class="price-row">
-            <div class="price">$45</div>
-            <div class="text-muted">per visit</div>
-        </div>
-
-        <a asp-controller="User"
-           asp-action="BookAppointment"
-           class="btn book-btn">
-            📅 Book Appointment
-        </a>
-    </div>
-
-    <!-- Doctor 3 -->
-    <div class="doctor-card">
-        <div class="doctor-top">
-            <div class="icon-box">
-                🧪
-            </div>
-            <span class="available-badge">Available</span>
-        </div>
-
-        <div class="doctor-name">Dr. Emily Davis</div>
-        <div class="speciality">Dermatology</div>
-
-        <div class="rating">
-            ⭐ 4.9 (10 years exp.)
-        </div>
-
-        <div class="price-row">
-            <div class="price">$55</div>
-            <div class="text-muted">per visit</div>
-        </div>
-
-        <a asp-controller="User"
-           asp-action="BookAppointment"
-           class="btn book-btn">
-            📅 Book Appointment
-        </a>
-    </div>
-
-    <!-- Doctor 4 -->
-    <div class="doctor-card">
-        <div class="doctor-top">
-            <div class="icon-box">
-                🧪
-            </div>
-            <span class="available-badge">Available</span>
-        </div>
-
-        <div class="doctor-name">Dr. Robert Wilson</div>
-        <div class="speciality">Orthopedics</div>
-
-        <div class="rating">
-            ⭐ 4.6 (18 years exp.)
-        </div>
-
-        <div class="price-row">
-            <div class="price">$60</div>
-            <div class="text-muted">per visit</div>
-        </div>
-
-        <a asp-controller="User"
-           asp-action="BookAppointment"
-           class="btn book-btn">
-            📅 Book Appointment
-        </a>
-    </div>
+    }
 
 </div>

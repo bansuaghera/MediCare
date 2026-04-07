@@ -1,4 +1,5 @@
-﻿@{
+@model MediCare.Models.ViewModels.AdminDashboardViewModel
+@{
     ViewData["Title"] = "Admin Dashboard";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
@@ -6,7 +7,7 @@
 <!-- HEADER -->
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h2 class="fw-bold">Admin Dashboard</h2>
+        <h2 class="fw-bold">Welcome back, @(Context.Session.GetString("UserName") ?? "Admin")! 👋</h2>
         <p class="text-muted">Overview of your clinic operations</p>
     </div>
 </div>
@@ -19,8 +20,7 @@
             <div class="d-flex justify-content-between">
                 <div>
                     <small class="text-muted">Total Patients</small>
-                    <h3 class="fw-bold">2,847</h3>
-                    <small class="text-success">↑ 12.5%</small>
+                    <h3 class="fw-bold">@Model.TotalPatients</h3>
                 </div>
                 <div class="bg-success bg-opacity-25 p-3 rounded-3">
                     <i class="fa-solid fa-users text-success"></i>
@@ -34,8 +34,7 @@
             <div class="d-flex justify-content-between">
                 <div>
                     <small class="text-muted">Appointments Today</small>
-                    <h3 class="fw-bold">64</h3>
-                    <small class="text-success">↑ 5.2%</small>
+                    <h3 class="fw-bold">@Model.AppointmentsToday</h3>
                 </div>
                 <div class="bg-primary bg-opacity-25 p-3 rounded-3">
                     <i class="fa-solid fa-calendar-check text-primary"></i>
@@ -49,7 +48,7 @@
             <div class="d-flex justify-content-between">
                 <div>
                     <small class="text-muted">Active Doctors</small>
-                    <h3 class="fw-bold">18</h3>
+                    <h3 class="fw-bold">@Model.ActiveDoctors</h3>
                 </div>
                 <div class="bg-purple bg-opacity-25 p-3 rounded-3">
                     <i class="fa-solid fa-user-doctor text-warning"></i>
@@ -63,8 +62,7 @@
             <div class="d-flex justify-content-between">
                 <div>
                     <small class="text-muted">Revenue</small>
-                    <h3 class="fw-bold">$12,543</h3>
-                    <small class="text-success">↑ 8.1%</small>
+                    <h3 class="fw-bold">₹@Model.TotalRevenue.ToString("N0")</h3>
                 </div>
                 <div class="bg-warning bg-opacity-25 p-3 rounded-3">
                     <i class="fa-solid fa-dollar-sign text-warning"></i>
@@ -96,31 +94,28 @@
 
 <!-- RECENT ACTIVITIES -->
 <div class="card shadow-sm border-0 rounded-4 p-4">
-    <h5 class="mb-4">Recent Activities</h5>
+    <h5 class="mb-4">Recent Appointments</h5>
 
-    <div class="mb-3">
-        <strong>New patient registered</strong><br />
-        <small class="text-muted">John Smith • 2 minutes ago</small>
-    </div>
-
-    <div class="mb-3">
-        <strong>Appointment booked</strong><br />
-        <small class="text-muted">Dr. Sarah Johnson • 15 minutes ago</small>
-    </div>
-
-    <div class="mb-3">
-        <strong>Prescription created</strong><br />
-        <small class="text-muted">Dr. Michael Chen • 30 minutes ago</small>
-    </div>
-
-    <div class="mb-3">
-        <strong>Lab report updated</strong><br />
-        <small class="text-muted">Patient: Maria Garcia • 1 hour ago</small>
-    </div>
-
-    <div>
-        <strong>Payment received</strong><br />
-        <small class="text-muted">Invoice #INV-2024-001 • 2 hours ago</small>
+    <div class="py-3">
+        @if (Model.RecentAppointments != null && Model.RecentAppointments.Any())
+        {
+            @foreach (var appt in Model.RecentAppointments)
+            {
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-primary bg-opacity-10 p-2 rounded-circle me-3">
+                        <i class="fa-solid fa-calendar-check text-primary"></i>
+                    </div>
+                    <div>
+                        <strong>Appointment:</strong> @(appt.Patient?.FirstName) @(appt.Patient?.LastName) with Dr. @(appt.Doctor?.FirstName) @(appt.Doctor?.LastName)
+                        <div class="text-muted small">@appt.AppointmentDate.ToString("MMM dd, hh:mm tt")</div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <p class="text-muted text-center py-3">No recent activities.</p>
+        }
     </div>
 </div>
 
@@ -132,14 +127,17 @@
     new Chart(document.getElementById('barChart'), {
         type: 'bar',
         data: {
-            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+            labels: @Html.Raw(Json.Serialize(Model.ChartLabels)),
             datasets: [{
-                data: [45, 52, 38, 60, 48, 35],
-                backgroundColor: '#16a34a'
+                label: 'Patients',
+                data: @Html.Raw(Json.Serialize(Model.WeeklyPatients)),
+                backgroundColor: '#16a34a',
+                borderRadius: 8
             }]
         },
         options: {
-            plugins: { legend: { display: false } }
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
         }
     });
 
@@ -147,16 +145,19 @@
     new Chart(document.getElementById('lineChart'), {
         type: 'line',
         data: {
-            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+            labels: @Html.Raw(Json.Serialize(Model.ChartLabels)),
             datasets: [{
-                data: [35, 42, 28, 48, 38, 25],
+                label: 'Appointments',
+                data: @Html.Raw(Json.Serialize(Model.WeeklyAppointments)),
                 borderColor: '#0d6efd',
-                fill: false,
+                backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                fill: true,
                 tension: 0.4
             }]
         },
         options: {
-            plugins: { legend: { display: false } }
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
         }
     });
 </script>

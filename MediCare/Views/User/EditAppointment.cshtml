@@ -1,0 +1,140 @@
+@{
+    ViewData["Title"] = "Edit Appointment";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+}
+
+<style>
+    .page-header {
+        margin-bottom: 20px;
+    }
+
+        .page-header h3 {
+            font-weight: 700;
+        }
+
+    .appointment-card {
+        background: #ffffff;
+        padding: 30px;
+        border-radius: 18px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        max-width: 750px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        margin-bottom: 6px;
+    }
+
+    .form-control, .form-select {
+        border-radius: 12px;
+        padding: 10px 14px;
+        border: 1px solid #e5e7eb;
+    }
+
+        .form-control:focus,
+        .form-select:focus {
+            box-shadow: none;
+            border-color: #16a34a;
+        }
+
+    .btn-book {
+        background: #16a34a;
+        color: white;
+        padding: 12px 25px;
+        border-radius: 12px;
+        border: none;
+        font-weight: 600;
+        min-width: 220px;
+        transition: 0.3s;
+    }
+
+        .btn-book:hover {
+            background: #15803d;
+        }
+
+    .btn-cancel {
+        background: #e5e7eb;
+        padding: 12px 25px;
+        border-radius: 12px;
+        border: none;
+        font-weight: 600;
+        margin-left: 10px;
+    }
+
+    @@media (max-width: 768px) {
+        .appointment-card {
+            padding: 20px;
+        }
+
+        .btn-book,
+        .btn-cancel {
+            width: 100%;
+            margin-top: 10px;
+        }
+    }
+</style>
+
+<div class="page-header">
+    <h3><a asp-action="MyAppointments" class="text-dark text-decoration-none">‹ Edit Appointment</a></h3>
+    <p class="text-muted">Reschedule or update your visit</p>
+</div>
+
+<div class="appointment-card">
+
+    <form method="post" asp-action="EditAppointment">
+
+        <!-- Select Doctor -->
+        <div class="mb-3">
+            <label class="form-label">
+                Select Doctor <span class="text-danger">*</span>
+            </label>
+            <select class="form-select">
+                <option>Choose a doctor</option>
+                <option>Dr. Priya Patel</option>
+                <option>Dr. Amit Kumar</option>
+                <option>Dr. Neha Singh</option>
+                <option>Dr. Vikram Desai</option>
+            </select>
+        </div>
+
+        <!-- Date & Time -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label">
+                    Preferred Date <span class="text-danger">*</span>
+                </label>
+                <input type="date" class="form-control" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">
+                    Preferred Time <span class="text-danger">*</span>
+                </label>
+                <input type="time" class="form-control" />
+            </div>
+        </div>
+
+        <!-- Reason -->
+        <div class="mb-4">
+            <label class="form-label">Reason for Visit</label>
+            <textarea class="form-control"
+                      rows="4"
+                      placeholder="Describe your symptoms or reason for visit..."></textarea>
+        </div>
+
+        <!-- Buttons -->
+        <div>
+            <button type="submit" class="btn-book">
+                <i class="fa fa-save"></i> Save Changes
+            </button>
+
+            <a asp-controller="User"
+               asp-action="MyAppointments"
+               class="btn text-dark text-decoration-none btn-cancel">
+                Cancel
+            </a>
+        </div>
+
+    </form>
+
+</div>

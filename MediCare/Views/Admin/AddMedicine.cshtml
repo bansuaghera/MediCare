@@ -1,4 +1,5 @@
-﻿@{
+@model MediCare.Models.Medicine
+@{
     ViewData["Title"] = "Add New Medicine";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
@@ -23,8 +24,8 @@
     .btn-green {
         background: #16a34a;
         color: white;
-        border-radius: 25px;
-        padding: 8px 22px;
+        border-radius: 10px;
+        padding: 10px 22px;
         border: none;
     }
 
@@ -33,14 +34,18 @@
         }
 
     .btn-outline {
-        border-radius: 25px;
-        padding: 8px 22px;
+        border-radius: 10px;
+        padding: 10px 22px;
+    }
+    
+    .form-control, .form-select {
+        border-radius: 8px;
     }
 </style>
 
 <div class="mb-4">
     <h2 class="fw-bold">
-        <i class="fa fa-pills text-success"></i> Add New Medicine
+        <i class="fa fa-pills text-success cursor-pointer me-2"></i> Add New Medicine
     </h2>
     <small class="text-muted">Add medicine to inventory</small>
 </div>
@@ -50,194 +55,67 @@
     <!-- Basic Information -->
     <div class="card-box">
         <div class="section-title">
-            <i class="fa fa-info-circle text-success"></i> Basic Information
+            <i class="fa fa-info-circle text-success ms-2"></i> Basic Information
         </div>
 
         <div class="row mb-3">
-            <div class="col-md-6">
+            <div class="col-md-6 mb-3">
                 <label>Medicine Name *</label>
-                <input type="text" name="MedicineName" class="form-control" placeholder="Enter medicine name" required />
+                <input type="text" asp-for="MedicineName" class="form-control" placeholder="Enter medicine name" required />
             </div>
 
-            <div class="col-md-6">
-                <label>Generic Name</label>
-                <input type="text" name="GenericName" class="form-control" placeholder="Enter generic name" />
-            </div>
-        </div>
-
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <label>Category</label>
-                <select class="form-select" name="Category">
-                    <option>Select category</option>
-                    <option>Tablet</option>
-                    <option>Syrup</option>
-                    <option>Injection</option>
-                    <option>Capsule</option>
-                    <option>Ointment</option>
+            <div class="col-md-6 mb-3">
+                <label>Category *</label>
+                <select asp-for="Category" class="form-select" required>
+                    <option value="">Select category</option>
+                    <option value="Tablet">Tablet</option>
+                    <option value="Syrup">Syrup</option>
+                    <option value="Injection">Injection</option>
+                    <option value="Capsule">Capsule</option>
+                    <option value="Ointment">Ointment</option>
+                    <option value="Drops">Drops</option>
+                    <option value="Inhaler">Inhaler</option>
+                    <option value="Other">Other</option>
                 </select>
             </div>
-
-            <div class="col-md-6">
-                <label>Dosage Form</label>
-                <select class="form-select" name="DosageForm">
-                    <option>Select form</option>
-                    <option>Oral</option>
-                    <option>Topical</option>
-                    <option>Injectable</option>
-                </select>
+            
+            <div class="col-md-6 mb-3">
+                <label>Company / Manufacturer</label>
+                <input type="text" asp-for="Manufacturer" class="form-control" placeholder="Enter company name" />
             </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-6">
-                <label>Strength / Dosage</label>
-                <input type="text" name="Strength" class="form-control" placeholder="e.g., 500mg" />
+            
+            <div class="col-md-6 mb-3">
+                <label>Stock Quantity *</label>
+                <input type="number" asp-for="Stock" class="form-control" value="0" required />
             </div>
-
-            <div class="col-md-6">
-                <label>Pack Size</label>
-                <input type="text" name="PackSize" class="form-control" placeholder="e.g., 10 tablets" />
-            </div>
-        </div>
-    </div>
-
-    <!-- Manufacturer -->
-    <div class="card-box">
-        <div class="section-title">
-            <i class="fa fa-industry text-primary"></i> Manufacturer & Supplier
-        </div>
-
-        <div class="row">
-            <div class="col-md-6">
-                <label>Manufacturer</label>
-                <input type="text" name="Manufacturer" class="form-control" placeholder="Enter manufacturer name" />
-            </div>
-
-            <div class="col-md-6">
-                <label>Supplier</label>
-                <input type="text" name="Supplier" class="form-control" placeholder="Enter supplier name" />
-            </div>
-        </div>
-    </div>
-
-    <!-- Stock -->
-    <div class="card-box">
-        <div class="section-title">
-            <i class="fa fa-boxes text-warning"></i> Stock & Inventory
-        </div>
-
-        <div class="row">
-            <div class="col-md-4">
-                <label>Current Stock *</label>
-                <input type="number" name="Stock" class="form-control" value="0" required />
-            </div>
-
-            <div class="col-md-4">
-                <label>Reorder Level</label>
-                <input type="number" name="ReorderLevel" class="form-control" />
-            </div>
-
-            <div class="col-md-4">
-                <label>Unit</label>
-                <select class="form-select" name="Unit">
-                    <option>Select unit</option>
-                    <option>Box</option>
-                    <option>Strip</option>
-                    <option>Bottle</option>
-                </select>
-            </div>
-        </div>
-    </div>
-
-    <!-- Pricing -->
-    <div class="card-box">
-        <div class="section-title">
-            <i class="fa fa-dollar-sign text-success"></i> Pricing Information
-        </div>
-
-        <div class="row">
-            <div class="col-md-4">
+            
+            <div class="col-md-4 mb-3">
                 <label>Purchase Price *</label>
-                <input type="number" step="0.01" name="PurchasePrice" class="form-control" required />
+                <input type="number" step="0.01" asp-for="PurchasePrice" class="form-control" required />
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-4 mb-3">
                 <label>Selling Price *</label>
-                <input type="number" step="0.01" name="SellingPrice" class="form-control" required />
+                <input type="number" step="0.01" asp-for="SellingPrice" class="form-control" required />
             </div>
-
-            <div class="col-md-4">
-                <label>Tax (GST %)</label>
-                <input type="number" step="0.01" name="GST" class="form-control" value="0" />
+            
+            <div class="col-md-4 mb-3">
+                <label>Expiry Date *</label>
+                <input type="date" asp-for="ExpDate" class="form-control" required />
             </div>
-        </div>
-    </div>
-
-    <!-- Expiry -->
-    <div class="card-box">
-        <div class="section-title">
-            <i class="fa fa-calendar text-danger"></i> Expiry & Storage
-        </div>
-
-        <div class="row">
-            <div class="col-md-4">
-                <label>Manufacturing Date</label>
-                <input type="date" name="MfgDate" class="form-control" />
-            </div>
-
-            <div class="col-md-4">
-                <label>Expiry Date</label>
-                <input type="date" name="ExpDate" class="form-control" />
-            </div>
-
-            <div class="col-md-4">
-                <label>Storage Conditions</label>
-                <select class="form-select" name="Storage">
-                    <option>Select storage</option>
-                    <option>Room Temperature</option>
-                    <option>Refrigerated</option>
-                    <option>Cool & Dry Place</option>
-                </select>
+            
+            <div class="col-md-12 mb-3">
+                <label>Usage Instructions</label>
+                <textarea asp-for="Usage" class="form-control" rows="3" placeholder="Enter description or notes"></textarea>
             </div>
         </div>
     </div>
 
-    <!-- Additional Info -->
-    <div class="card-box">
-        <div class="section-title">
-            <i class="fa fa-notes-medical text-secondary"></i> Additional Information
-        </div>
-
-        <div class="mb-3">
-            <label>Usage / Indications</label>
-            <textarea class="form-control" rows="3" name="Usage"></textarea>
-        </div>
-
-        <div class="mb-3">
-            <label>Side Effects</label>
-            <textarea class="form-control" rows="3" name="SideEffects"></textarea>
-        </div>
-
-        <div class="mb-3">
-            <label>Special Instructions</label>
-            <textarea class="form-control" rows="3" name="Instructions"></textarea>
-        </div>
-
-        <div>
-            <label>Prescription Required</label>
-            <select class="form-select" name="PrescriptionRequired">
-                <option>Select option</option>
-                <option>Yes</option>
-                <option>No</option>
-            </select>
-        </div>
-    </div>
 
     <!-- Buttons -->
     <div class="mb-4">
         <button type="submit" class="btn btn-green">
-            <i class="fa fa-plus"></i> Add Medicine
+            <i class="fa fa-check me-2"></i> Save Medicine
         </button>
 
         <a asp-action="Medicines" class="btn btn-outline-secondary btn-outline">

@@ -1,158 +1,167 @@
-﻿@{
-    ViewData["Title"] = "Profile";
+@model MediCare.Models.Patient
+@{
+    ViewData["Title"] = "Identity & Preferences";
     Layout = "~/Views/Shared/_UserLayout.cshtml";
 }
 
 <style>
-    .profile-card {
-        background: #ffffff;
-        border-radius: 20px;
-        padding: 30px;
-        box-shadow: 0 4px 25px rgba(0,0,0,0.05);
+    .identity-card {
+        background: white;
+        border-radius: 30px;
+        padding: 40px;
+        border: 1px solid #f1f5f9;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.03);
     }
-
-    .profile-header {
-        display: flex;
-        align-items: center;
-        margin-bottom: 30px;
-    }
-
-    .profile-avatar {
-        width: 80px;
-        height: 80px;
-        border-radius: 20px;
-        background: #10b981;
+    .id-avatar-large {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: #ecfdf5;
+        border: 5px solid #d1fae5;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: white;
-        font-size: 28px;
-        margin-right: 20px;
+        font-size: 42px;
+        font-weight: 800;
+        color: #10b981;
+        margin-bottom: 20px;
     }
-
-    .profile-title h4 {
-        font-weight: 700;
-        margin-bottom: 3px;
+    .id-input-group {
+        background: #f8fafc;
+        border-radius: 18px;
+        border: 1px solid #e2e8f0;
+        padding: 15px 25px;
+        margin-bottom: 20px;
+        transition: 0.3s;
     }
-
-    .form-control,
-    .form-select {
-        border-radius: 12px;
-        padding: 10px 14px;
-        height: 45px;
-        background: #f9fafb;
-        border: 1px solid #e5e7eb;
-    }
-
-    .form-label {
-        font-weight: 500;
-        margin-bottom: 6px;
-    }
-
-    .btn-save {
-        background: #10b981;
-        color: white;
-        border-radius: 12px;
-        padding: 10px 20px;
-        font-weight: 500;
-        border: none;
-    }
-
-        .btn-save:hover {
-            background: #059669;
-        }
-
-    .btn-cancel {
-        border-radius: 12px;
-        padding: 10px 20px;
-    }
-
-    .page-title h3 {
-        font-weight: 700;
+    .id-input-group:focus-within {
+        border-color: #10b981;
+        background: white;
+        box-shadow: 0 0 0 5px rgba(16, 185, 129, 0.1);
     }
 </style>
 
-<div class="page-title mb-4">
-    <h3>Profile Settings</h3>
-    <p class="text-muted">Manage your personal information</p>
+<div class="d-flex justify-content-between align-items-center mb-5">
+    <div>
+        <h1 class="fw-bold m-0 text-slate-800">Your Identity Profile</h1>
+        <p class="text-muted">Manage your personal and clinical preferences</p>
+    </div>
+    <div class="blood-badge">
+        <i class="fa fa-fingerprint me-1"></i> Patient #P-@Model.Id
+    </div>
 </div>
 
-<div class="profile-card">
+<div class="row g-5">
+    <!-- INFO SECTION -->
+    <div class="col-lg-8">
+        <div class="identity-card border mb-4">
+            <div class="d-flex align-items-center gap-4 mb-5 border-bottom pb-4">
+                <div class="id-avatar-large shadow-sm">
+                    @(Model.FirstName[0])@(Model.LastName[0])
+                </div>
+                <div>
+                    <h3 class="fw-bold m-0">@Model.FirstName @Model.LastName</h3>
+                    <div class="text-muted mb-3"><i class="fa fa-envelope me-2"></i> @Model.Email</div>
+                    <div class="d-flex gap-2">
+                        <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2 border">Verified Profile</span>
+                        <span class="badge bg-soft-blue text-blue-600 rounded-pill px-3 py-2 border">Active Account</span>
+                    </div>
+                </div>
+            </div>
 
-    <!-- Profile Header -->
-    <div class="profile-header">
-        <div class="profile-avatar">
-            <i class="fa fa-user"></i>
-        </div>
-        <div class="profile-title">
-            <h4>John Smith</h4>
-            <small class="text-muted">Patient ID: 12345</small>
+            <form action="#" method="post">
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="id-input-group">
+                            <label class="small fw-bold text-muted text-uppercase mb-1 d-block">First Name</label>
+                            <input type="text" value="@Model.FirstName" class="form-control border-0 bg-transparent p-0 fw-bold shadow-none" >
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="id-input-group">
+                            <label class="small fw-bold text-muted text-uppercase mb-1 d-block">Last Name</label>
+                            <input type="text" value="@Model.LastName" class="form-control border-0 bg-transparent p-0 fw-bold shadow-none">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="id-input-group">
+                            <label class="small fw-bold text-muted text-uppercase mb-1 d-block">Phone Contact</label>
+                            <input type="text" value="@Model.Phone" class="form-control border-0 bg-transparent p-0 fw-bold shadow-none">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="id-input-group">
+                            <label class="small fw-bold text-muted text-uppercase mb-1 d-block">Blood Group</label>
+                            <select class="form-select border-0 bg-transparent p-0 fw-bold shadow-none">
+                                <option value="O+">O Positive</option>
+                                <option value="O-">O Negative</option>
+                                <option value="A+">A Positive</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="id-input-group">
+                            <label class="small fw-bold text-muted text-uppercase mb-1 d-block">Full Residential Address</label>
+                            <textarea class="form-control border-0 bg-transparent p-0 fw-bold shadow-none" rows="2">@Model.Address</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-3 mt-4">
+                    <button type="button" class="btn btn-light rounded-pill px-5 py-3 fw-bold border">Reset Changes</button>
+                    <button type="submit" class="btn btn-emerald-luxury rounded-pill px-5 py-3 fw-bold shadow-sm">Update Profile Details</button>
+                </div>
+            </form>
         </div>
     </div>
 
-    <!-- Profile Form -->
-    <form method="post" asp-action="UpdateProfile">
-
-        <div class="row g-4">
-
-            <div class="col-md-6">
-                <label class="form-label">First Name</label>
-                <input type="text" name="FirstName" class="form-control" value="John" />
+    <!-- SIDEBAR SECTION -->
+    <div class="col-lg-4">
+        <div class="identity-card border h-100 shadow-sm">
+            <div class="mb-5">
+                <h5 class="fw-bold mb-4">Account Workspace</h5>
+                <button class="btn btn-outline-secondary w-100 rounded-pill py-3 fw-bold mb-3 border d-flex align-items-center justify-content-between px-4" data-bs-toggle="modal" data-bs-target="#changePassModal">
+                    <div><i class="fa fa-lock me-3"></i> Change Credentials</div>
+                    <i class="fa fa-chevron-right small opacity-50"></i>
+                </button>
+                <button class="btn btn-outline-secondary w-100 rounded-pill py-3 fw-bold mb-3 border d-flex align-items-center justify-content-between px-4">
+                    <div><i class="fa fa-bell me-3"></i> Push Notifications</div>
+                    <i class="fa fa-toggle-on text-success"></i>
+                </button>
+                <button class="btn btn-outline-secondary w-100 rounded-pill py-3 fw-bold mb-3 border d-flex align-items-center justify-content-between px-4">
+                    <div><i class="fa fa-shield-halved me-3"></i> 2FA Activation</div>
+                    <i class="fa fa-toggle-off"></i>
+                </button>
             </div>
 
-            <div class="col-md-6">
-                <label class="form-label">Last Name</label>
-                <input type="text" name="LastName" class="form-control" value="Smith" />
+            <div class="alert bg-danger bg-opacity-10 border-0 rounded-4 p-4 mt-5">
+                <h6 class="text-danger fw-bold m-0"><i class="fa fa-circle-exclamation me-2"></i> Account Control</h6>
+                <p class="text-danger small mt-2 mb-3">Permanently withdraw all clinical data and delete your account profile.</p>
+                <button class="btn btn-danger w-100 rounded-pill fw-bold py-2 shadow-sm" onclick="alert('Contact administrator for account deletion.')">Close Account</button>
             </div>
-
-            <div class="col-md-6">
-                <label class="form-label">Email</label>
-                <input type="email" name="Email" class="form-control" value="john.smith@example.com" />
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label">Phone</label>
-                <input type="text" name="Phone" class="form-control" value="+1 234-567-8900" />
-            </div>
-
-            <div class="col-md-4">
-                <label class="form-label">Date of Birth</label>
-                <input type="date" name="DateOfBirth" class="form-control" value="1979-01-15" />
-            </div>
-
-            <div class="col-md-4">
-                <label class="form-label">Gender</label>
-                <select name="Gender" class="form-select">
-                    <option selected>Male</option>
-                    <option>Female</option>
-                    <option>Other</option>
-                </select>
-            </div>
-
-            <div class="col-md-4">
-                <label class="form-label">Blood Group</label>
-                <select name="BloodGroup" class="form-select">
-                    <option>O+</option>
-                    <option>A+</option>
-                    <option>B+</option>
-                    <option>AB+</option>
-                    <option>O-</option>
-                </select>
-            </div>
-
         </div>
+    </div>
+</div>
 
-        <!-- Buttons -->
-        <div class="mt-4">
-            <button type="submit" class="btn btn-save me-2">
-                <i class="fa fa-save me-2"></i> Save Changes
-            </button>
-
-            <a href="@Url.Action("Dashboard", "User")" class="btn btn-outline-secondary btn-cancel">
-                Cancel
-            </a>
+<!-- CHANGE PASS MODAL -->
+<div class="modal fade" id="changePassModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg p-3" style="border-radius: 24px;">
+            <div class="modal-body">
+                <h4 class="fw-bold mb-4">Security Update</h4>
+                <div class="mb-3">
+                    <label class="small fw-bold text-muted text-uppercase mb-2">Current Credential</label>
+                    <input type="password" class="form-control rounded-pill py-3 px-4 bg-light border-0 shadow-none">
+                </div>
+                <div class="mb-3">
+                    <label class="small fw-bold text-muted text-uppercase mb-2">New Entry Key</label>
+                    <input type="password" class="form-control rounded-pill py-3 px-4 bg-light border-0 shadow-none">
+                </div>
+                <div class="d-flex gap-2 mt-4">
+                    <button class="btn btn-light rounded-pill w-100 py-3 fw-bold" data-bs-dismiss="modal">Discard</button>
+                    <button class="btn btn-emerald-luxury rounded-pill w-100 py-3 fw-bold shadow-sm">Save Security Key</button>
+                </div>
+            </div>
         </div>
-
-    </form>
-
+    </div>
 </div>

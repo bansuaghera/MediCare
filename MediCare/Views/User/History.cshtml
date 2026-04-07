@@ -1,188 +1,203 @@
-﻿@{
-    ViewData["Title"] = "History";
+@model List<MediCare.Models.Appointment>
+@{
+    ViewData["Title"] = "My Health Journey";
     Layout = "~/Views/Shared/_UserLayout.cshtml";
 }
 
 <style>
-    .page-header h2 {
-        font-weight: 700;
+    .timeline {
+        position: relative;
+        padding-left: 50px;
+    }
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 20px;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: #f1f5f9;
+        border-radius: 10px;
     }
 
-    .history-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 25px;
-        margin-top: 30px;
+    .timeline-dot {
+        position: absolute;
+        left: 10px;
+        top: 25px;
+        width: 24px;
+        height: 24px;
+        background: white;
+        border: 4px solid #10b981;
+        border-radius: 50%;
+        z-index: 2;
     }
 
-    .history-card {
-        background: #ffffff;
-        padding: 25px;
-        border-radius: 18px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-        transition: 0.3s;
-    }
-
-        .history-card:hover {
-            transform: translateY(-5px);
-        }
-
-    .history-top {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .icon-box {
-        width: 55px;
-        height: 55px;
-        background: #ede9fe;
-        border-radius: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 22px;
-    }
-
-    .status-badge {
-        padding: 6px 14px;
+    .journey-card {
+        background: white;
         border-radius: 20px;
-        font-size: 12px;
-        font-weight: 600;
+        padding: 30px;
+        border: 1px solid #f1f5f9;
+        margin-bottom: 40px;
+        position: relative;
     }
 
-    .completed {
-        background: #d1fae5;
-        color: #059669;
+    .journey-card:hover {
+        transform: translateX(10px);
+        box-shadow: 0 10px 40px rgba(0,0,0,0.04);
+        border-color: #3b82f633;
     }
 
-    .cancelled {
-        background: #fee2e2;
-        color: #dc2626;
+    .visit-box {
+        background: #f8fafc;
+        border-radius: 15px;
+        padding: 15px 25px;
     }
 
-    .pending {
-        background: #fef3c7;
-        color: #d97706;
-    }
-
-    .visit-title {
-        font-weight: 700;
-        font-size: 18px;
-        margin-top: 15px;
-    }
-
-    .doctor-name {
-        color: #6b7280;
-        margin-bottom: 10px;
-    }
-
-    .visit-info {
-        font-size: 14px;
-        margin-bottom: 15px;
-    }
-
-    .date-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 15px;
-        font-size: 14px;
-        color: #6b7280;
-    }
-
-    @@media (max-width: 768px) {
-        .history-grid {
-            grid-template-columns: 1fr;
-        }
+    .visit-stat {
+        border-left: 3px solid #e2e8f0;
+        padding-left: 20px;
     }
 </style>
 
-<div class="page-header">
-    <h2>Visit History</h2>
-    <p class="text-muted">Your complete medical visit history</p>
+<div class="d-flex justify-content-between align-items-center mb-5 flex-wrap gap-2">
+    <div>
+        <h1 class="fw-bold m-0 text-slate-800">Health Journey History</h1>
+        <p class="text-muted">Tracking your clinical interactions over time</p>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <div class="blood-badge">
+            <i class="fa fa-history me-1"></i> Full Clinical History
+        </div>
+        @if (Model != null && Model.Any())
+        {
+            <button class="btn btn-outline-secondary btn-sm" id="selectAllHist" style="border-radius:10px;">Select All</button>
+            <button class="btn btn-outline-danger btn-sm d-none" id="deleteSelHist" style="border-radius:10px;" onclick="deleteSelectedHistory()">Delete Selected</button>
+        }
+    </div>
 </div>
 
-<div class="history-grid">
+<div class="timeline">
+    @if (Model != null && Model.Any())
+    {
+        @foreach (var app in Model)
+        {
+            <div class="journey-item position-relative" data-id="@app.Id">
+                <div class="timeline-dot"></div>
+                
+                <div class="journey-card border">
+                    <input type="checkbox" class="form-check-input hist-check shadow-none" style="position:absolute; top:20px; left:14px;" />
+                    <div class="d-flex justify-content-between align-items-start mb-4">
+                        <div class="d-flex align-items-center gap-4">
+                            <div class="date-badge text-center p-2 rounded-4 bg-light border" style="min-width: 80px;">
+                                <div class="small fw-bold text-uppercase text-muted">@app.AppointmentDate.ToString("MMM")</div>
+                                <div class="h4 fw-bold m-0">@app.AppointmentDate.ToString("dd")</div>
+                                <div class="small text-muted">@app.AppointmentDate.ToString("yyyy")</div>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold m-0">@(string.IsNullOrEmpty(app.Subject) ? "Clinical Consultation" : app.Subject)</h5>
+                                <div class="text-muted small">Session with Dr. @app.Doctor?.FirstName @app.Doctor?.LastName</div>
+                            </div>
+                        </div>
+                        <span class="badge @(app.Status == "Completed" ? "bg-emerald-luxury" : "bg-light") text-@(app.Status == "Completed" ? "white" : "dark") rounded-pill px-4 py-2 border">
+                            @app.Status
+                        </span>
+                    </div>
 
-    <!-- Visit 1 -->
-    <div class="history-card">
-        <div class="history-top">
-            <div class="icon-box">🩺</div>
-            <span class="status-badge completed">Completed</span>
+                    <div class="visit-box row g-4 mt-2">
+                        <div class="col-md-4">
+                            <div class="visit-stat">
+                                <label class="small fw-bold text-muted text-uppercase mb-1">Time Logged</label>
+                                <div class="fw-bold">@app.TimeSlot</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="visit-stat">
+                                <label class="small fw-bold text-muted text-uppercase mb-1">Token Identifier</label>
+                                <div class="fw-bold">#@app.TokenNumber</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="visit-stat">
+                                <label class="small fw-bold text-muted text-uppercase mb-1">Specialty</label>
+                                <div class="fw-bold">@app.Doctor?.Specialty</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        @if(app.Status == "Completed") {
+                            <a href="/User/Prescriptions" class="btn btn-sm btn-link text-decoration-none fw-bold text-primary">
+                                <i class="fa fa-file-invoice-dollar me-1"></i> View Rx Record
+                            </a>
+                        }
+                        <button class="btn btn-sm btn-link text-decoration-none fw-bold text-danger delete-btn" onclick="deleteHistoryItem(@app.Id)">
+                            <i class="fa fa-trash-can me-1"></i> Discard from Timeline
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <i class="fa-solid fa-hourglass-start fa-3x opacity-25 mb-4"></i>
+            <h4>Your journey is just beginning</h4>
+            <p class="text-muted">Completed consultations will appear as milestones here.</p>
         </div>
-
-        <div class="visit-title">Routine Checkup</div>
-        <div class="doctor-name">Dr. Sarah Johnson</div>
-
-        <div class="visit-info">
-            General health examination and consultation.
-        </div>
-
-        <div class="date-row">
-            <div>📅 10 Feb 2024</div>
-            <div>💰 $50</div>
-        </div>
-    </div>
-
-    <!-- Visit 2 -->
-    <div class="history-card">
-        <div class="history-top">
-            <div class="icon-box">🌡️</div>
-            <span class="status-badge completed">Completed</span>
-        </div>
-
-        <div class="visit-title">Fever Treatment</div>
-        <div class="doctor-name">Dr. Michael Chen</div>
-
-        <div class="visit-info">
-            Diagnosis and medication for viral fever.
-        </div>
-
-        <div class="date-row">
-            <div>📅 25 Jan 2024</div>
-            <div>💰 $45</div>
-        </div>
-    </div>
-
-    <!-- Visit 3 -->
-    <div class="history-card">
-        <div class="history-top">
-            <div class="icon-box">🩸</div>
-            <span class="status-badge completed">Completed</span>
-        </div>
-
-        <div class="visit-title">Blood Pressure Check</div>
-        <div class="doctor-name">Dr. Emily Davis</div>
-
-        <div class="visit-info">
-            Routine blood pressure monitoring and advice.
-        </div>
-
-        <div class="date-row">
-            <div>📅 10 Dec 2023</div>
-            <div>💰 $55</div>
-        </div>
-    </div>
-
-    <!-- Visit 4 -->
-    <div class="history-card">
-        <div class="history-top">
-            <div class="icon-box">🦴</div>
-            <span class="status-badge cancelled">Cancelled</span>
-        </div>
-
-        <div class="visit-title">Orthopedic Consultation</div>
-        <div class="doctor-name">Dr. Robert Wilson</div>
-
-        <div class="visit-info">
-            Consultation for joint pain treatment.
-        </div>
-
-        <div class="date-row">
-            <div>📅 15 Nov 2023</div>
-            <div>💰 $60</div>
-        </div>
-    </div>
-
+    }
 </div>
+
+<script>
+    function deleteHistoryItem(id) {
+        if(confirm("Are you sure you want to remove this visit from your public timeline? The clinical data will remain in your records.")) {
+            $.post('/User/DeleteAppointment', { id: id }, function(res) {
+                if(res.success) {
+                    window.location.reload();
+                } else {
+                    alert("Error discarding item. Please try again.");
+                }
+            });
+        }
+    }
+
+    // bulk history delete
+    const histChecks = document.querySelectorAll('.hist-check');
+    const selectAllHist = document.getElementById('selectAllHist');
+    const deleteSelHist = document.getElementById('deleteSelHist');
+
+    function updateHistUi() {
+        const selected = document.querySelectorAll('.hist-check:checked').length;
+        if (deleteSelHist) deleteSelHist.classList.toggle('d-none', selected === 0);
+        if (selectAllHist) selectAllHist.textContent = selected === histChecks.length ? "Clear All" : "Select All";
+    }
+
+    histChecks.forEach(cb => cb.addEventListener('change', updateHistUi));
+
+    if (selectAllHist) {
+        selectAllHist.addEventListener('click', () => {
+            const allSelected = Array.from(histChecks).every(cb => cb.checked);
+            histChecks.forEach(cb => cb.checked = !allSelected);
+            updateHistUi();
+        });
+    }
+
+    function deleteSelectedHistory() {
+        const ids = Array.from(document.querySelectorAll('.hist-check:checked'))
+            .map(cb => parseInt(cb.closest('.journey-item').getAttribute('data-id')))
+            .filter(id => !Number.isNaN(id));
+        if (ids.length === 0) return;
+        if (!confirm(`Delete ${ids.length} selected timeline item(s)?`)) return;
+
+        $.ajax({
+            url: '/User/DeleteSelectedAppointments',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(ids),
+            success: function(res) {
+                if (res.success) location.reload();
+                else alert("Failed to delete selected items.");
+            }
+        });
+    }
+</script>

@@ -1,198 +1,269 @@
+@model MediCare.Models.Prescription
 @{
-    ViewData["Title"] = "Examination Notes";
+    ViewData["Title"] = "Examination & Prescription";
     Layout = "~/Views/Shared/_DoctorLayout.cshtml";
 }
 
 <style>
-    .page-header {
-        margin-bottom: 30px;
-        display: flex;
-        align-items: center;
-        gap: 16px;
-    }
-
-    .back-btn {
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        background: transparent;
-        border: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #1a1a1a;
-        font-size: 16px;
-        cursor: pointer;
-        transition: 0.2s;
-    }
-
-    .back-btn:hover {
-        background: rgba(0,0,0,0.05);
-    }
-
-    .header-text h3 {
-        font-weight: 700;
-        margin: 0 0 4px 0;
-        color: #1a1a1a;
-        font-size: 24px;
-    }
-
-    .header-text p {
-        color: #6b7280;
-        font-size: 14px;
-        margin: 0;
-    }
-
-    /* Container */
-    .form-card {
-        background: white;
-        border-radius: 16px;
-        padding: 40px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
-    }
-
-    /* Form Layout */
-    .form-grid {
+    .prescribe-container {
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 24px 30px;
+        grid-template-columns: 1fr 350px;
+        gap: 30px;
+        margin-top: 20px;
     }
 
-    .form-group-full {
-        grid-column: 1 / -1;
+    .card-modern {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.02);
+        border: 1px solid #f1f5f9;
     }
 
-    .form-label {
+    .form-label-bold {
+        font-weight: 700;
+        font-size: 14px;
+        color: #1e293b;
+        margin-bottom: 8px;
         display: block;
-        font-size: 13px;
-        font-weight: 600;
-        color: #4b5563;
-        margin-bottom: 10px;
     }
 
-    .form-control {
+    .input-modern {
+        border: 2px solid #f1f5f9;
+        border-radius: 12px;
+        padding: 12px 16px;
+        transition: all 0.2s;
         width: 100%;
-        padding: 14px 16px;
-        border: 1px solid #e5e7eb;
-        border-radius: 10px;
-        background-color: #f9fafb;
-        font-family: inherit;
-        font-size: 14px;
-        color: #1a1a1a;
-        transition: 0.2s;
-        box-sizing: border-box;
     }
 
-    .form-control:focus {
-        outline: none;
+    .input-modern:focus {
         border-color: #10b981;
-        background-color: white;
-        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+        outline: none;
     }
 
-    textarea.form-control {
-        resize: vertical;
-        min-height: 120px;
+    .medicine-search-box {
+        position: relative;
     }
 
-    /* Action Buttons */
-    .action-buttons {
-        display: flex;
-        gap: 16px;
-        margin-top: 40px;
+    #medicine-results {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        z-index: 1000;
+        max-height: 300px;
+        overflow-y: auto;
+        display: none;
+        border: 1px solid #e2e8f0;
     }
 
-    .btn {
-        padding: 12px 24px;
-        border-radius: 10px;
-        font-weight: 600;
-        font-size: 14px;
+    .medicine-item {
+        padding: 12px 16px;
         cursor: pointer;
-        transition: 0.2s;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        font-family: inherit;
+        transition: background 0.2s;
+        border-bottom: 1px solid #f1f5f9;
     }
 
-    .btn-save {
-        background: #10b981;
+    .medicine-item:hover {
+        background: #f8fafc;
+    }
+
+    .prescribed-list {
+        margin-top: 20px;
+    }
+
+    .medicine-row {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        animation: slideIn 0.3s ease-out;
+    }
+
+    @@keyframes slideIn {
+        from { transform: translateX(20px); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+
+    .btn-complete {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         color: white;
         border: none;
+        padding: 14px;
+        border-radius: 12px;
+        font-weight: 700;
+        width: 100%;
+        margin-top: 20px;
+        transition: 0.2s;
     }
 
-    .btn-save:hover {
-        background: #059669;
-    }
-
-    .btn-outline {
-        background: white;
-        color: #4b5563;
-        border: 1px solid #d1d5db;
-    }
-
-    .btn-outline:hover {
-        background: #f9fafb;
-        color: #1a1a1a;
-    }
-
-    @@media (max-width: 768px) {
-        .form-grid {
-            grid-template-columns: 1fr;
-        }
+    .btn-complete:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 15px rgba(16, 185, 129, 0.2);
     }
 </style>
 
-<div class="page-header">
-    <button class="back-btn"><i class="fa-solid fa-chevron-left"></i></button>
-    <div class="header-text">
-        <h3>Examination Notes</h3>
-        <p>Patient ID: #1</p>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold m-0">Patient Examination</h2>
+        <p class="text-muted">Recording clinical notes for @ViewBag.PatientName</p>
+    </div>
+    <div class="badge bg-success bg-opacity-10 text-success p-2 px-3 rounded-pill">
+        <i class="fa-solid fa-clock me-2"></i> Session Active
     </div>
 </div>
 
-<div class="form-card">
-    <div class="form-grid">
-        <div class="form-group">
-            <label class="form-label">Blood Pressure</label>
-            <input type="text" class="form-control" />
-        </div>
-        
-        <div class="form-group">
-            <label class="form-label">Temperature (&deg;F)</label>
-            <input type="text" class="form-control" />
+<form asp-action="Examination" method="post" id="examinationForm">
+    <input type="hidden" asp-for="AppointmentId" />
+    <input type="hidden" asp-for="PatientId" />
+    <input type="hidden" asp-for="DoctorId" />
+    <textarea asp-for="MedicineNotes" id="MedicineNotesHidden" style="display:none"></textarea>
+
+    <div class="prescribe-container">
+        <div class="main-content">
+            <div class="card-modern mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <label class="form-label-bold m-0">Clinical Template</label>
+                    <select id="templatePicker" class="form-select form-select-sm w-50 rounded-pill shadow-sm border-2 border-primary border-opacity-25" onchange="applyTemplate(this.value)">
+                        <option value="">-- Apply Quick Template --</option>
+                        @if(ViewBag.Templates != null) {
+                            foreach(var t in (IEnumerable<MediCare.Models.PrescriptionTemplate>)ViewBag.Templates) {
+                                <option value="@t.Id">@t.Title</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <label class="form-label-bold">Diagnosis & Observation</label>
+                <textarea asp-for="Diagnosis" id="DiagnosisText" class="input-modern" rows="5" placeholder="Enter patient diagnosis, symptoms, and observations..."></textarea>
+            </div>
+
+            <div class="card-modern">
+                <label class="form-label-bold">Prescribe Medicines</label>
+                <div class="medicine-search-box mb-4">
+                    <input type="text" id="medSearch" class="input-modern" placeholder="Search medicines by name..." autocomplete="off">
+                    <div id="medicine-results"></div>
+                </div>
+
+                <div id="selected-medicines" class="prescribed-list">
+                    <!-- Dynamic Rows -->
+                </div>
+            </div>
         </div>
 
-        <div class="form-group">
-            <label class="form-label">Pulse Rate</label>
-            <input type="text" class="form-control" />
-        </div>
+        <div class="side-panel">
+            <div class="card-modern sticky-top" style="top: 20px;">
+                <label class="form-label-bold">Additional Instructions</label>
+                <textarea asp-for="AdditionalNotes" id="AdditionalNotesText" class="input-modern mb-4" rows="4" placeholder="e.g. Bed rest for 2 days, No oily food..."></textarea>
 
-        <div class="form-group">
-            <label class="form-label">Weight (kg)</label>
-            <input type="text" class="form-control" />
-        </div>
+                <div class="mb-4">
+                    <label class="form-label-bold">Follow-up Date</label>
+                    <input type="date" class="input-modern" min="@DateTime.Now.ToString("yyyy-MM-dd")">
+                </div>
 
-        <div class="form-group-full mt-2">
-            <label class="form-label">Symptoms</label>
-            <textarea class="form-control"></textarea>
-        </div>
+                <button type="submit" class="btn-complete" onclick="syncMedicines()">
+                    <i class="fa-solid fa-file-prescription me-2"></i> Save & Print Receipt
+                </button>
 
-        <div class="form-group-full">
-            <label class="form-label">Diagnosis</label>
-            <textarea class="form-control"></textarea>
-        </div>
-
-        <div class="form-group-full">
-            <label class="form-label">Treatment Plan</label>
-            <textarea class="form-control"></textarea>
+                <a asp-action="Appointments" class="btn btn-light w-100 mt-2 rounded-3 py-2 fw-semibold">
+                    Discard & Back
+                </a>
+            </div>
         </div>
     </div>
+</form>
 
-    <div class="action-buttons">
-        <button class="btn btn-save">
-            <i class="fa-solid fa-check"></i> Save Notes
-        </button>
-        <button class="btn btn-outline">Create Prescription</button>
-    </div>
-</div>
+<script>
+    let selectedMeds = [];
+
+    $('#medSearch').on('input', function() {
+        let term = $(this).val();
+        if(term.length < 2) {
+            $('#medicine-results').hide();
+            return;
+        }
+
+        $.get('/Admin/SearchMedicines', { term: term }, function(res) {
+            let html = '';
+            res.forEach(m => {
+                html += `<div class="medicine-item" onclick="addMedicine('${m.medicineName}', '${m.strength}', '${m.dosageForm}')">
+                            <strong>${m.medicineName}</strong> <small class="text-muted">(${m.strength} - ${m.dosageForm})</small>
+                         </div>`;
+            });
+            $('#medicine-results').html(html).show();
+        });
+    });
+
+    function addMedicine(name, strength, form) {
+        let med = { name, strength, form, dosage: '1-0-1', instruction: 'After Meal' };
+        selectedMeds.push(med);
+        renderMeds();
+        $('#medSearch').val('');
+        $('#medicine-results').hide();
+    }
+
+    function removeMed(index) {
+        selectedMeds.splice(index, 1);
+        renderMeds();
+    }
+
+    function renderMeds() {
+        let html = '';
+        selectedMeds.forEach((m, i) => {
+            html += `
+                <div class="medicine-row">
+                    <div>
+                        <strong class="text-primary">${m.name}</strong>
+                        <div class="text-muted small">${m.strength} - ${m.form}</div>
+                    </div>
+                    <div class="d-flex gap-3 align-items-center">
+                        <select class="form-select form-select-sm border-0 bg-white" onchange="updateMed(${i}, 'dosage', this.value)">
+                            <option value="1-0-1">1-0-1</option>
+                            <option value="1-1-1">1-1-1</option>
+                            <option value="1-0-0">1-0-0</option>
+                            <option value="0-0-1">0-0-1</option>
+                        </select>
+                        <select class="form-select form-select-sm border-0 bg-white" onchange="updateMed(${i}, 'instruction', this.value)">
+                            <option value="After Meal">After Meal</option>
+                            <option value="Before Meal">Before Meal</option>
+                        </select>
+                        <button type="button" class="btn btn-sm text-danger" onclick="removeMed(${i})">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+        $('#selected-medicines').html(html);
+    }
+
+    function updateMed(i, field, value) {
+        selectedMeds[i][field] = value;
+    }
+
+    function syncMedicines() {
+        let text = selectedMeds.map(m => `${m.name}|${m.dosage}|${m.instruction}`).join('\n');
+        $('#MedicineNotesHidden').val(text);
+    }
+
+    function applyTemplate(id) {
+        if(!id) return;
+        $.get('/Doctor/GetTemplateDetails', { id: id }, function(res) {
+            $('#DiagnosisText').val(res.diagnosis);
+            $('#AdditionalNotesText').val(res.additionalNotes);
+            
+            // Note: complex medicine syncing would require structured template data
+            // For now populating notes
+            if(res.medicines) {
+                alert("Note: Medicines from template have been added to summary.");
+                $('#MedicineNotesHidden').val(res.medicines);
+            }
+        });
+    }
+</script>

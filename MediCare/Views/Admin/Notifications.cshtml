@@ -1,0 +1,89 @@
+@{
+    ViewData["Title"] = "Platform Governance Alerts";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .admin-notif-card {
+        background: white;
+        border-radius: 20px;
+        padding: 24px;
+        border: 1px solid #f1f5f9;
+        margin-bottom: 20px;
+        display: flex;
+        gap: 20px;
+        align-items: flex-start;
+    }
+    .admin-notif-unread {
+        border-left: 5px solid #6366f1;
+        background: #fbfbff;
+    }
+    .notif-tag {
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        padding: 4px 10px;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        display: inline-block;
+    }
+    .tag-security { background: #fee2e2; color: #dc2626; }
+    .tag-system { background: #e0f2fe; color: #0284c7; }
+    .tag-user { background: #fef3c7; color: #d97706; }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-5">
+    <div>
+        <h1 class="fw-bold m-0"><i class="fa-solid fa-tower-broadcast text-indigo me-2"></i> Platform Alerts</h1>
+        <p class="text-muted">Global infrastructure and governance monitoring</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8 mx-auto">
+        <div class="admin-notif-card admin-notif-unread border">
+            <div class="p-3 bg-red-50 text-red-600 rounded-4">
+                <i class="fa-solid fa-shield-halved fa-xl"></i>
+            </div>
+            <div class="flex-grow-1">
+                <span class="notif-tag tag-security">Security Alert</span>
+                <div class="d-flex justify-content-between">
+                    <h6 class="fw-bold m-0">Failed Login Attempt Spike</h6>
+                    <small class="text-muted">10 mins ago</small>
+                </div>
+                <p class="small text-muted mt-2">Detected 15 failed login attempts from IP 192.168.1.100. Verification protocol engaged.</p>
+            </div>
+        </div>
+
+        <div class="admin-notif-card border">
+            <div class="p-3 bg-blue-50 text-blue-600 rounded-4">
+                <i class="fa-solid fa-database fa-xl"></i>
+            </div>
+            <div class="flex-grow-1">
+                <span class="notif-tag tag-system">Infrastructure</span>
+                <div class="d-flex justify-content-between">
+                    <h6 class="fw-bold m-0">PostgreSQL Backup Successful</h6>
+                    <small class="text-muted">2 hours ago</small>
+                </div>
+                <p class="small text-muted mt-2">Daily automated cloud backup for MediCareDB completed at 02:00 UTC.</p>
+            </div>
+        </div>
+
+        <div class="admin-notif-card border admin-notif-unread">
+            <div class="p-3 bg-amber-50 text-amber-600 rounded-4">
+                <i class="fa-solid fa-user-plus fa-xl"></i>
+            </div>
+            <div class="flex-grow-1">
+                <span class="notif-tag tag-user">Management</span>
+                <div class="d-flex justify-content-between">
+                    <h6 class="fw-bold m-0">New Practitioner Registration</h6>
+                    <small class="text-muted">4 hours ago</small>
+                </div>
+                <p class="small text-muted mt-2">Dr. Alan Turing has requested access to the Doctor Panel. Review pending.</p>
+                <div class="mt-3">
+                    <a href="/Admin/PendingApprovals" class="btn btn-sm btn-primary rounded-pill px-4 shadow-sm">Navigate to Review</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

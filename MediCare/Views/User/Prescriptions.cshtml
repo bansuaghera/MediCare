@@ -1,167 +1,141 @@
-﻿@{
-    ViewData["Title"] = "My Prescriptions";
+@model List<MediCare.Models.Prescription>
+@{
+    ViewData["Title"] = "Digital Health Records";
     Layout = "~/Views/Shared/_UserLayout.cshtml";
 }
 
 <style>
-    .page-header h2 {
-        font-weight: 700;
-    }
-
-    .card-box {
-        background: #ffffff;
-        padding: 30px;
+    .record-card {
+        background: white;
         border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-        margin-top: 25px;
-    }
-
-    .search-box {
-        max-width: 400px;
+        padding: 25px;
+        border: 1px solid #f1f5f9;
+        transition: 0.3s;
         margin-bottom: 20px;
-        position: relative;
     }
-
-        .search-box input {
-            width: 100%;
-            padding: 10px 15px 10px 35px;
-            border-radius: 10px;
-            border: 1px solid #e5e7eb;
-        }
-
-        .search-box i {
-            position: absolute;
-            left: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #9ca3af;
-        }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
+    .record-card:hover {
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        border-color: #10b981;
     }
-
-    thead {
-        color: #6b7280;
-        font-size: 13px;
+    .status-pill {
+        font-size: 11px;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-weight: 700;
         text-transform: uppercase;
     }
-
-    th, td {
-        padding: 14px 10px;
-        text-align: left;
-        border-bottom: 1px solid #f1f1f1;
+    .med-list {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 15px;
+        margin-top: 15px;
     }
-
-    tbody tr:hover {
-        background: #f9fafb;
-    }
-
-    .action-icons i {
-        margin-right: 15px;
-        cursor: pointer;
-        color: #6b7280;
-        transition: 0.2s;
-    }
-
-        .action-icons i:hover {
-            color: #16a34a;
-        }
-
-    .pagination-box {
+    .med-item {
         display: flex;
         justify-content: space-between;
-        align-items: center;
-        margin-top: 20px;
-        color: #6b7280;
-        font-size: 14px;
+        padding: 8px 0;
+        border-bottom: 1px dashed #e2e8f0;
     }
-
-        .pagination-box button {
-            padding: 6px 14px;
-            border-radius: 8px;
-            border: 1px solid #e5e7eb;
-            background: white;
-            margin-left: 8px;
-        }
-
-    @@media (max-width: 768px) {
-        table {
-            font-size: 13px;
-        }
-
-        .search-box {
-            max-width: 100%;
-        }
-    }
+    .med-item:last-child { border-bottom: none; }
 </style>
 
-<div class="page-header">
-    <h2>My Prescriptions</h2>
-    <p class="text-muted">View your prescription history</p>
-</div>
-
-<div class="card-box">
-
-    <div class="search-box">
-        <i class="fa fa-search"></i>
-        <input type="text" placeholder="Search prescriptions..." />
+<div class="d-flex justify-content-between align-items-center mb-5">
+    <div>
+        <h1 class="fw-bold m-0 text-slate-800">Prescription Archive</h1>
+        <p class="text-muted">Manage and download your clinical records</p>
     </div>
-
-    <table>
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Doctor</th>
-                <th>Diagnosis</th>
-                <th>Medicines</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            <tr>
-                <td>2024-02-12</td>
-                <td>Dr. Sarah Johnson</td>
-                <td>Hypertension</td>
-                <td>3</td>
-                <td class="action-icons">
-                    <i class="fa fa-eye"></i>
-                    <i class="fa fa-download"></i>
-                </td>
-            </tr>
-
-            <tr>
-                <td>2024-02-11</td>
-                <td>Dr. Michael Chen</td>
-                <td>Fever</td>
-                <td>2</td>
-                <td class="action-icons">
-                    <i class="fa fa-eye"></i>
-                    <i class="fa fa-download"></i>
-                </td>
-            </tr>
-
-            <tr>
-                <td>2024-02-10</td>
-                <td>Dr. Emily Davis</td>
-                <td>Diabetes Check</td>
-                <td>4</td>
-                <td class="action-icons">
-                    <i class="fa fa-eye"></i>
-                    <i class="fa fa-download"></i>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-
-    <div class="pagination-box">
-        <div>Showing 3 results</div>
-        <div>
-            <button>Previous</button>
-            <button>Next</button>
+    <div class="d-flex gap-2">
+        <div class="input-group" style="width: 250px;">
+            <span class="input-group-text bg-white border-end-0 rounded-start-pill"><i class="fa fa-search text-muted"></i></span>
+            <input type="text" class="form-control border-start-0 rounded-end-pill" id="searchRecords" placeholder="Search diagnosis...">
         </div>
     </div>
-
 </div>
+
+<div class="row" id="archiveGrid">
+    @if (Model != null && Model.Any())
+    {
+        @foreach (var pres in Model)
+        {
+            <div class="col-md-6 record-item" data-search="@pres.Diagnosis?.ToLower()">
+                <div class="record-card">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="bg-soft-success text-success rounded-circle p-2" style="width: 45px; height: 45px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fa-solid fa-file-prescription fa-lg"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold m-0">@pres.Diagnosis</h6>
+                                <small class="text-muted">Issued by Dr. @pres.Doctor?.FirstName @pres.Doctor?.LastName</small>
+                            </div>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-link text-muted p-0" data-bs-toggle="dropdown">
+                                <i class="fa fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg p-2" style="border-radius: 12px;">
+                                <li><a class="dropdown-item rounded-3" href="/Doctor/PrintPrescription/@pres.Id" target="_blank"><i class="fa fa-print me-2 text-primary"></i> Print Copy</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><button class="dropdown-item rounded-3 text-danger" onclick="archiveRecord(@pres.Id)"><i class="fa fa-archive me-2"></i> Archive Record</button></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="med-list">
+                        <label class="small fw-bold text-muted text-uppercase mb-2 d-block">Medications</label>
+                        @if (!string.IsNullOrEmpty(pres.MedicineNotes))
+                        {
+                            var meds = pres.MedicineNotes.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+                            foreach (var m in meds.Take(2))
+                            {
+                                <div class="med-item">
+                                    <span class="small fw-semibold">@m.Split('|')[0]</span>
+                                    <span class="badge bg-white text-dark border small">@(m.Split('|').Length > 1 ? m.Split('|')[1] : "N/A")</span>
+                                </div>
+                            }
+                            if(meds.Length > 2) {
+                                <div class="text-center mt-2">
+                                    <small class="text-muted">+ @(meds.Length - 2) more items</small>
+                                </div>
+                            }
+                        }
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+                        <span class="text-muted small"><i class="fa fa-calendar-alt me-2"></i> @pres.DateIssued.ToString("MMM dd, yyyy")</span>
+                        <a href="/Doctor/PrintPrescription/@pres.Id" target="_blank" class="btn btn-sm btn-outline-success rounded-pill px-3">
+                            <i class="fa fa-eye me-1"></i> View Full Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-12 text-center py-5">
+            <div class="empty-placeholder">
+                <i class="fa fa-inbox fa-3x mb-3 opacity-25"></i>
+                <h5>No archived records found</h5>
+                <p class="text-muted">Your medical prescriptions will appear here once issued by a doctor.</p>
+            </div>
+        </div>
+    }
+</div>
+
+<script>
+    $('#searchRecords').on('input', function() {
+        const term = $(this).val().toLowerCase();
+        $('.record-item').each(function() {
+            const match = $(this).data('search').includes(term);
+            $(this).toggle(match);
+        });
+    });
+
+    function archiveRecord(id) {
+        if(confirm("Are you sure you want to archive this record? It will be removed from your active view.")) {
+            // Note: In real app, toggle 'IsArchived' bit in DB
+            window.location.reload();
+        }
+    }
+</script>

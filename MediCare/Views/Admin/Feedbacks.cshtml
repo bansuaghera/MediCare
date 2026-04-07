@@ -1,0 +1,121 @@
+@model IEnumerable<MediCare.Models.Feedback>
+@{
+    ViewData["Title"] = "Patient Feedbacks";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .feedback-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 24px;
+        margin-top: 30px;
+    }
+
+    .feedback-card {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        border: 1px solid #f1f5f9;
+        transition: 0.3s;
+        position: relative;
+    }
+
+    .feedback-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.05);
+    }
+
+    .rating-stars {
+        color: #fbbf24;
+        font-size: 18px;
+        margin-bottom: 15px;
+    }
+
+    .feedback-content {
+        color: #475569;
+        font-style: italic;
+        line-height: 1.6;
+        margin-bottom: 20px;
+        font-size: 15px;
+    }
+
+    .feedback-footer {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        border-top: 1px solid #f1f5f9;
+        padding-top: 15px;
+    }
+
+    .patient-avatar {
+        width: 40px;
+        height: 40px;
+        background: #eff6ff;
+        color: #3b82f6;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+    }
+
+    .feedback-date {
+        font-size: 12px;
+        color: #94a3b8;
+        position: absolute;
+        top: 30px;
+        right: 30px;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 100px 0;
+        opacity: 0.5;
+    }
+</style>
+
+<div class="d-flex justify-content-between align-items-center">
+    <div>
+        <h2 class="fw-bold m-0">Patient Feedbacks</h2>
+        <p class="text-muted">Listen to what your patients have to say</p>
+    </div>
+</div>
+
+@if (Model != null && Model.Any())
+{
+    <div class="feedback-grid">
+        @foreach (var fb in Model)
+        {
+            <div class="feedback-card shadow-sm">
+                <div class="feedback-date">@fb.SubmittedAt.ToString("MMM dd, yyyy")</div>
+                <div class="rating-stars">
+                    @for (int i = 0; i < 5; i++)
+                    {
+                        <i class="fa-@(i < fb.Rating ? "solid" : "regular") fa-star"></i>
+                    }
+                </div>
+                <div class="feedback-content">
+                    "@fb.Comment"
+                </div>
+                <div class="feedback-footer">
+                    <div class="patient-avatar">
+                        @(fb.Patient != null ? fb.Patient.FirstName[0].ToString() : fb.PatientName[0].ToString())
+                    </div>
+                    <div>
+                        <div class="fw-bold text-slate-800">@(fb.Patient != null ? fb.Patient.FirstName + " " + fb.Patient.LastName : fb.PatientName)</div>
+                        <div class="text-xs text-slate-500">Verified Patient Review</div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="empty-state">
+        <i class="fa-regular fa-comments fa-4x mb-3"></i>
+        <h4>No feedbacks yet</h4>
+        <p>Patient reviews will appear here once submitted.</p>
+    </div>
+}

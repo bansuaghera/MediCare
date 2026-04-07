@@ -1,24 +1,10 @@
-﻿@{
+@model IEnumerable<MediCare.Models.Doctor>
+@{
     ViewData["Title"] = "Doctors";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
 <style>
-    .topbar {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 20px;
-    }
-
-        .topbar input {
-            width: 50%;
-            padding: 8px;
-            border-radius: 6px;
-            border: 1px solid #ddd;
-        }
-
-    .profile {
-        background: #17b978;
         color: white;
         width: 35px;
         height: 35px;
@@ -104,9 +90,9 @@
         color: #b38f00;
     }
 
-    .actions span {
-        cursor: pointer;
-        margin-right: 8px;
+    .actions {
+        display: flex;
+        gap: 10px;
     }
 
     .pagination {
@@ -144,7 +130,12 @@
 <!-- TABLE CARD -->
 <div class="card-box">
 
-    <input class="table-search" type="text" placeholder="Search doctors..." />
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <input class="table-search" type="text" placeholder="Search doctors..." style="margin-bottom: 0;" />
+        <form asp-action="DeleteAllDoctors" method="post" onsubmit="return confirm('WARNING: Are you sure you want to delete ALL doctors? This cannot be undone.');">
+            <button type="submit" class="btn btn-danger" style="border-radius: 8px; padding: 6px 15px;">Delete All</button>
+        </form>
+    </div>
 
     <table>
         <thead>
@@ -153,70 +144,33 @@
                 <th>Specialty</th>
                 <th>Phone</th>
                 <th>Email</th>
-                <th>Patients</th>
-                <th>Status</th>
+                <th>Experience</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-
-            <tr>
-                <td>
-                    <div class="doctor-name">
-                        <div class="avatar">👩‍⚕</div>
-                        Dr. Sarah Johnson
-                    </div>
-                </td>
-                <td>Cardiology</td>
-                <td>+1234-567-8900</td>
-                <td>sarah.j@hospital.com</td>
-                <td>145</td>
-                <td><span class="badge active-badge">Active</span></td>
-                <td class="actions">
-                    <span>👁</span>
-                    <span>✏</span>
-                    <span>🗑</span>
-                </td>
-            </tr>
-
-            <tr>
-                <td>
-                    <div class="doctor-name">
-                        <div class="avatar">👨‍⚕</div>
-                        Dr. Michael Chen
-                    </div>
-                </td>
-                <td>Pediatrics</td>
-                <td>+1234-567-8901</td>
-                <td>michael.c@hospital.com</td>
-                <td>132</td>
-                <td><span class="badge active-badge">Active</span></td>
-                <td class="actions">
-                    <span>👁</span>
-                    <span>✏</span>
-                    <span>🗑</span>
-                </td>
-            </tr>
-
-            <tr>
-                <td>
-                    <div class="doctor-name">
-                        <div class="avatar">👩‍⚕</div>
-                        Dr. Emily Davis
-                    </div>
-                </td>
-                <td>Dermatology</td>
-                <td>+1234-567-8902</td>
-                <td>emily.d@hospital.com</td>
-                <td>98</td>
-                <td><span class="badge leave-badge">On Leave</span></td>
-                <td class="actions">
-                    <span>👁</span>
-                    <span>✏</span>
-                    <span>🗑</span>
-                </td>
-            </tr>
-
+            @foreach(var doctor in Model)
+            {
+                var initials = (doctor.FirstName.Substring(0,1) + doctor.LastName.Substring(0,1)).ToUpper();
+                <tr>
+                    <td>
+                        <div class="doctor-name">
+                            <div class="avatar">@initials</div>
+                            Dr. @doctor.FirstName @doctor.LastName
+                        </div>
+                    </td>
+                    <td>@doctor.Specialty</td>
+                    <td>@doctor.Phone</td>
+                    <td>@doctor.Email</td>
+                    <td>@doctor.ExperienceYears Years</td>
+                    <td class="actions">
+                        <a asp-action="EditDoctor" asp-route-id="@doctor.Id" style="text-decoration: none;"><span title="Edit">✏️</span></a>
+                        <form asp-action="DeleteDoctor" asp-route-id="@doctor.Id" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this doctor?');">
+                            <button type="submit" style="background:none;border:none;color:red;padding:0;cursor:pointer;" title="Delete">🗑️</button>
+                        </form>
+                    </td>
+                </tr>
+            }
         </tbody>
     </table>
 

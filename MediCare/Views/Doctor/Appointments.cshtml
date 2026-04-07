@@ -1,240 +1,461 @@
+@model IEnumerable<MediCare.Models.Appointment>
 @{
-    ViewData["Title"] = "Appointments";
+    ViewData["Title"] = "Today's Appointments";
     Layout = "~/Views/Shared/_DoctorLayout.cshtml";
 }
 
 <style>
-    .page-header {
-        margin-bottom: 30px;
-    }
-    .page-header h3 {
+    .page-title {
+        font-size: 26px;
         font-weight: 700;
-        margin-bottom: 4px;
-        color: #1a1a1a;
-        font-size: 24px;
-    }
-    .page-header p {
-        color: #6b7280;
-        font-size: 14px;
+        color: #111827;
+        margin-bottom: 2px;
     }
 
-    .table-card {
-        background: white;
-        border-radius: 16px;
-        padding: 30px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+    .page-timestamp {
+        font-size: 14px;
+        color: #6b7280;
+        margin-bottom: 25px;
     }
-    
-    .search-box {
-        background: #f8fafc;
-        border: 1px solid transparent;
-        border-radius: 24px;
-        padding: 12px 20px;
-        display: flex;
+
+    .btn-emergency-red {
+        background-color: #ef4444;
+        color: white !important;
+        border: none;
+        padding: 12px 28px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 14px;
+        display: inline-flex;
         align-items: center;
-        width: 320px;
-        margin-bottom: 30px;
-        transition: 0.3s;
-    }
-    .search-box:focus-within {
-        border-color: #10b981;
-        background: #fff;
-    }
-    .search-box i {
-        color: #9ca3af;
-        margin-right: 12px;
-        font-size: 14px;
-    }
-    .search-box input {
-        border: none;
-        background: transparent;
-        outline: none;
-        width: 100%;
-        color: #1a1a1a;
-        font-size: 14px;
+        gap: 10px;
+        transition: 0.2s;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+        text-decoration: none;
     }
 
-    .table {
-        margin-bottom: 0;
-        width: 100%;
-        border-collapse: collapse;
+    .btn-emergency-red:hover {
+        background-color: #dc2626;
+        transform: translateY(-1px);
     }
     
-    .table thead {
-        background-color: #f8fafc;
-    }
-
-    .table th {
-        color: #6b7280;
+    .btn-white-action {
+        background-color: white;
+        color: #374151;
+        border: 1px solid #e5e7eb;
+        padding: 12px 20px;
+        border-radius: 12px;
         font-weight: 600;
-        font-size: 11px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        border: none;
-        padding: 16px 20px;
-        text-align: left;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: 0.2s;
     }
-    
-    .table th:first-child { border-top-left-radius: 8px; border-bottom-left-radius: 8px; }
-    .table th:last-child { border-top-right-radius: 8px; border-bottom-right-radius: 8px; }
+    .btn-white-action:hover {
+        background-color: #f9fafb;
+    }
 
-    .table td {
-        padding: 20px;
-        vertical-align: middle;
+    .stats-card-top {
+        display: flex;
+        gap: 12px;
+    }
+
+    .stat-badge {
+        padding: 8px 18px;
+        border-radius: 100px;
         font-size: 13px;
-        color: #4b5563;
-        border-bottom: 1px solid #f8fafc;
-    }
-    .table tr:last-child td { border-bottom: none; }
-
-    .patient-name {
-        font-weight: 600;
-        color: #1a1a1a;
-        font-size: 14px;
-    }
-    
-    .badge-status {
-        padding: 6px 14px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 500;
-        display: inline-block;
-    }
-    .status-progress { background: #dbeafe; color: #3b82f6; } 
-    .status-waiting { background: #fef3c7; color: #d97706; }
-
-    .action-btn {
-        width: 34px;
-        height: 34px;
-        border-radius: 10px;
-        background: white;
-        color: #6b7280;
-        border: 1px solid #e5e5e5;
+        font-weight: 700;
         display: flex;
         align-items: center;
         justify-content: center;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-    .action-btn:hover {
-        background: #f8fafc;
-        color: #10b981;
-        border-color: #10b981;
+        min-width: 100px;
     }
 
-    .pagination-bar {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-top: 30px;
-        font-size: 13px;
-        color: #6b7280;
-    }
-    
-    .paginate-btn {
+    .badge-waiting { background-color: #ecfdf5; color: #10b981; border: 1px solid #d1fae5; }
+    .badge-done { background-color: #eff6ff; color: #3b82f6; border: 1px solid #dbeafe; }
+
+    .main-white-card {
         background: white;
-        border: 1px solid #e5e5e5;
-        padding: 8px 16px;
-        border-radius: 8px;
-        color: #4b5563;
-        font-weight: 500;
-        margin-left: 8px;
+        border-radius: 16px;
+        padding: 40px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+        margin-top: 35px;
+        width: 100%;
+        border: 1px solid #f1f5f9;
+        min-height: 500px;
+    }
+
+    .table-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 35px;
+    }
+
+    .search-row {
+        position: relative;
+        max-width: 420px;
+        flex-grow: 1;
+    }
+
+    .search-row input {
+        width: 100%;
+        padding: 12px 15px 12px 48px;
+        border-radius: 12px;
+        border: 1px solid #f1f5f9;
+        background-color: #f8fafc;
+        font-size: 14px;
+        outline: none;
+    }
+
+    .search-row i {
+        position: absolute;
+        left: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        font-size: 16px;
+    }
+
+    .bulk-actions {
+        display: none;
+        gap: 10px;
+    }
+
+    .app-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .app-table thead th {
+        text-align: left;
+        padding: 18px 15px;
+        font-size: 11px;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .app-table tbody td {
+        padding: 20px 15px;
+        border-bottom: 1px solid #f8fafc;
+        font-size: 14px;
+        vertical-align: middle;
+        color: #1e293b;
+    }
+
+    .patient-name { font-weight: 700; color: #111827; }
+    .token-id { color: #10b981; font-weight: 700; }
+
+    .status-wait { background: #fff7ed; color: #f97316; padding: 5px 14px; border-radius: 8px; font-weight: 700; font-size: 12px; }
+
+    .action-group {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .act-btn {
+        padding: 8px 14px;
+        border-radius: 10px;
+        font-size: 12px;
+        font-weight: 700;
+        text-decoration: none;
+        border: none;
         transition: 0.2s;
-        font-size: 13px;
-        cursor: pointer;
     }
-    .paginate-btn:hover {
-        background: #f8fafc;
-        color: #1a1a1a;
+
+    .btn-call { background: #eff6ff; color: #3b82f6; }
+    .btn-emg { background: #f1f5f9; color: #475569; }
+    .btn-cancel { background: #fef2f2; color: #ef4444; }
+    .btn-examine { background: #fff7ed; color: #f97316; display: flex; align-items: center; gap: 8px; }
+    
+    .btn-view-icon {
+        color: #94a3b8;
+        font-size: 18px;
+        padding: 0 5px;
+        background: none;
+        border: none;
+        transition: 0.2s;
     }
+    .btn-view-icon:hover { color: #111827; }
+    
+    /* MODAL STYLING */
+    .detail-label { font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+    .detail-value { font-size: 14px; font-weight: 600; color: #1e293b; margin-bottom: 20px; }
 </style>
 
-<div class="page-header">
-    <h3>Today's Appointments</h3>
-    <p>View your appointments</p>
+<div class="d-flex justify-content-between align-items-center">
+    <div>
+        <h2 class="page-title">Today's Appointments</h2>
+        <div class="page-timestamp">@DateTime.Now.ToString("dddd, d MMMM yyyy") — @Model.Count() patient@(Model.Count() != 1 ? "s" : "")</div>
+        <div class="d-flex gap-2">
+            <button class="btn-emergency-red" data-bs-toggle="modal" data-bs-target="#eModal">
+                <i class="fa fa-plus"></i> Add New Emergency Appointment
+            </button>
+            <button class="btn-white-action text-danger" onclick="confirmDeleteAll()">
+                <i class="fa-regular fa-trash-can"></i> Clear All Records
+            </button>
+        </div>
+    </div>
+    <div class="stats-card-top">
+        <div class="stat-badge badge-waiting">Waiting: @(ViewBag.WaitingCount ?? 0)</div>
+        <div class="stat-badge badge-done">Done: @(ViewBag.DoneCount ?? 0)</div>
+    </div>
 </div>
 
-<div class="table-card">
-    <div class="search-box">
-        <i class="fa-solid fa-search"></i>
-        <input type="text" placeholder="Search appointments..." />
+<div class="main-white-card">
+    <div class="table-controls">
+        <div class="search-row">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="pSearch" placeholder="Search patient or reason..." onkeyup="filterTable()">
+        </div>
+        
+        <div class="bulk-actions" id="bulkActions">
+            <span class="text-muted small me-2 my-auto"><span id="selectedCount">0</span> items selected</span>
+            <button class="btn-white-action text-danger" onclick="confirmBulkDelete()">
+                <i class="fa fa-trash-can"></i> Delete Selected
+            </button>
+        </div>
     </div>
 
     <div class="table-responsive">
-        <table class="table">
+        <table class="app-table" id="aTable">
             <thead>
                 <tr>
+                    <th style="width: 40px;"><input type="checkbox" id="selectAll" class="form-check-input shadow-none"></th>
+                    <th>Token</th>
                     <th>Time</th>
                     <th>Patient</th>
-                    <th>Type</th>
-                    <th>Token</th>
+                    <th>Reason</th>
                     <th>Status</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>09:00 AM</td>
-                    <td class="patient-name">John Smith</td>
-                    <td>Checkup</td>
-                    <td>A-045</td>
-                    <td><span class="badge-status status-progress">In Progress</span></td>
-                    <td><button class="action-btn"><i class="fa-regular fa-eye"></i></button></td>
-                </tr>
-                <tr>
-                    <td>09:30 AM</td>
-                    <td class="patient-name">Sarah Johnson</td>
-                    <td>Consultation</td>
-                    <td>A-046</td>
-                    <td><span class="badge-status status-waiting">Waiting</span></td>
-                    <td><button class="action-btn"><i class="fa-regular fa-eye"></i></button></td>
-                </tr>
-                <tr>
-                    <td>10:00 AM</td>
-                    <td class="patient-name">Michael Chen</td>
-                    <td>Follow-up</td>
-                    <td>A-047</td>
-                    <td><span class="badge-status status-waiting">Waiting</span></td>
-                    <td><button class="action-btn"><i class="fa-regular fa-eye"></i></button></td>
-                </tr>
-                <tr>
-                    <td>10:30 AM</td>
-                    <td class="patient-name">Emily Davis</td>
-                    <td>Checkup</td>
-                    <td>A-048</td>
-                    <td><span class="badge-status status-waiting">Waiting</span></td>
-                    <td><button class="action-btn"><i class="fa-regular fa-eye"></i></button></td>
-                </tr>
+                @foreach (var app in Model)
+                {
+                    <tr data-id="@app.Id">
+                        <td><input type="checkbox" class="form-check-input row-checkbox shadow-none"></td>
+                        <td class="token-id">#@app.TokenNumber</td>
+                        <td style="font-weight: 500;">@app.AppointmentDate.ToString("HH:mm:ss")</td>
+                        <td class="patient-name">@app.Patient?.FirstName @app.Patient?.LastName</td>
+                        <td class="text-muted">@(string.IsNullOrEmpty(app.Subject) ? "Consultation" : app.Subject)</td>
+                        <td>
+                            <span class="status-wait">@app.Status</span>
+                        </td>
+                        <td>
+                            <div class="action-group">
+                                @if (app.Status == "In Progress")
+                                {
+                                    <a asp-action="Examination" asp-route-id="@app.Id" class="act-btn btn-examine">
+                                        <i class="fa-solid fa-stethoscope"></i> Examine
+                                    </a>
+                                    <button class="act-btn btn-cancel" onclick="updateS(@app.Id, 'Cancelled')">Cancel</button>
+                                }
+                                else if (app.IsEmergency)
+                                {
+                                    <button class="act-btn btn-call" onclick="updateS(@app.Id, 'In Progress')">Call In</button>
+                                    <button class="act-btn btn-emg text-danger" onclick="toggleE(@app.Id)">Remove Emergency</button>
+                                    <button class="act-btn btn-cancel" onclick="updateS(@app.Id, 'Cancelled')">Cancel</button>
+                                }
+                                else
+                                {
+                                    <button class="act-btn btn-call" onclick="updateS(@app.Id, 'In Progress')">Call In</button>
+                                    <button class="act-btn btn-emg" onclick="toggleE(@app.Id)">Emergency</button>
+                                    <button class="act-btn btn-cancel" onclick="updateS(@app.Id, 'Cancelled')">Cancel</button>
+                                }
+                                <button class="btn-view-icon" onclick="viewDetails(@app.Id)"><i class="fa-regular fa-eye"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                }
             </tbody>
         </table>
     </div>
 
-    <div class="pagination-bar">
-        <span>Showing <span style="color: #1a1a1a; font-weight: 600;" id="resultCount">4</span> results</span>
-        <div>
-            <button class="paginate-btn">Previous</button>
-            <button class="paginate-btn">Next</button>
+    <div class="mt-4 text-muted" style="font-size: 13px; font-weight: 500;">
+        Showing @Model.Count() appointments
+    </div>
+</div>
+
+<!-- Modal: New Emergency -->
+<div class="modal fade" id="eModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg p-3" style="border-radius: 20px;">
+            <form asp-action="AddEmergencyAppointment" method="post">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-bold">Emergency Registration</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="small fw-bold text-muted text-uppercase mb-2">Select Patient</label>
+                        <select name="PatientId" class="form-select rounded-3 border-light py-2 shadow-none" required>
+                             @if (ViewBag.Patients != null) {
+                                foreach (var p in (IEnumerable<MediCare.Models.Patient>)ViewBag.Patients) {
+                                    <option value="@p.Id">@p.FirstName @p.LastName</option>
+                                }
+                             }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="small fw-bold text-muted text-uppercase mb-2">Emergency Description</label>
+                        <textarea name="Subject" class="form-control rounded-3 border-light shadow-none" rows="3" placeholder="Condition details..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="submit" class="btn btn-danger w-100 rounded-3 py-2 fw-bold shadow-sm">Confirm Critical Entry</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: View Details -->
+<div class="modal fade" id="detailModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 24px;">
+            <div class="modal-header border-0 p-4">
+                <h5 class="modal-title fw-bold">Appointment Intelligence</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4 pt-0">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="detail-label">Patient Identity</div>
+                        <div class="detail-value" id="det_name">Loading...</div>
+                        
+                        <div class="detail-label">Contact Email</div>
+                        <div class="detail-value" id="det_email">-</div>
+                        
+                        <div class="detail-label">Phone Reference</div>
+                        <div class="detail-value" id="det_phone">-</div>
+                    </div>
+                    <div class="col-md-6 border-start ps-4">
+                        <div class="detail-label">Session Token</div>
+                        <div class="detail-value text-success" id="det_token">#000</div>
+                        
+                        <div class="detail-label">Scheduled For</div>
+                        <div class="detail-value" id="det_schedule">-</div>
+                        
+                        <div class="detail-label">Current Status</div>
+                        <div class="detail-value" id="det_status">-</div>
+                    </div>
+                </div>
+                <hr class="my-4 opacity-50">
+                <div class="detail-label">Primary Subject / Subject</div>
+                <div class="detail-value h5 fw-bold" id="det_subject">-</div>
+                
+                <div class="detail-label">Clinical Notes</div>
+                <div class="detail-value bg-light p-3 rounded-4" id="det_notes">No additional notes provided.</div>
+            </div>
+            <div class="modal-footer border-0 p-4 pt-0">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Close Insights</button>
+                <button type="button" class="btn btn-danger rounded-pill px-4" onclick="deleteSingleFromModal()">Delete Record</button>
+            </div>
         </div>
     </div>
 </div>
 
 @section Scripts {
     <script>
-        document.querySelector('.search-box input').addEventListener('keyup', function (e) {
-            var searchTerm = e.target.value.toLowerCase();
-            var rows = document.querySelectorAll('tbody tr');
-            var count = 0;
+        let currentViewingId = null;
 
-            rows.forEach(function (row) {
-                var text = row.textContent.toLowerCase();
-                if (text.includes(searchTerm)) {
-                    row.style.display = '';
-                    count++;
-                } else {
-                    row.style.display = 'none';
-                }
+        function filterTable() {
+            var input = document.getElementById("pSearch");
+            var filter = input.value.toLowerCase();
+            var table = document.getElementById("aTable");
+            var tr = table.getElementsByTagName("tr");
+            for (var i = 1; i < tr.length; i++) {
+                var txt = tr[i].innerText.toLowerCase();
+                tr[i].style.display = txt.indexOf(filter) > -1 ? "" : "none";
+            }
+        }
+
+        function updateS(id, status) {
+            $.post('/Doctor/UpdateStatus', { id: id, status: status }, function(res) {
+                if(res.success) location.reload();
             });
-            document.getElementById('resultCount').textContent = count;
+        }
+
+        function toggleE(id) {
+            $.post('/Doctor/ToggleEmergency', { id: id }, function(res) {
+                if(res.success) location.reload();
+            });
+        }
+
+        // --- Bulk Selection ---
+        $('#selectAll').on('change', function() {
+            $('.row-checkbox').prop('checked', this.checked);
+            toggleBulkActions();
         });
+
+        $(document).on('change', '.row-checkbox', function() {
+            toggleBulkActions();
+        });
+
+        function toggleBulkActions() {
+            let selected = $('.row-checkbox:checked').length;
+            $('#selectedCount').text(selected);
+            if(selected > 0) $('#bulkActions').css('display', 'flex');
+            else $('#bulkActions').css('display', 'none');
+        }
+
+        function confirmBulkDelete() {
+            if(confirm("Are you sure you want to delete the selected clinical records? This cannot be undone.")) {
+                let ids = [];
+                $('.row-checkbox:checked').each(function() {
+                    ids.push($(this).closest('tr').data('id'));
+                });
+
+                $.ajax({
+                    url: '/Doctor/BulkDeleteAppointments',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(ids),
+                    success: function(res) {
+                        if(res.success) location.reload();
+                        else alert("Error deleting selection.");
+                    }
+                });
+            }
+        }
+
+        function confirmDeleteAll() {
+            if(confirm("DANGER: This will permanently delete ALL appointments in your panel today. Proceed?")) {
+                $.post('/Doctor/DeleteAllAppointments', function(res) {
+                    if(res.success) location.reload();
+                });
+            }
+        }
+
+        // --- View Details ---
+        function viewDetails(id) {
+            currentViewingId = id;
+            $('#detailModal').modal('show');
+            $.get('/Doctor/GetAppointmentDetails/' + id, function(data) {
+                $('#det_name').text(data.patientName);
+                $('#det_email').text(data.email || 'N/A');
+                $('#det_phone').text(data.phone || 'N/A');
+                $('#det_token').text('#' + data.token);
+                $('#det_schedule').text(data.date + ' at ' + data.time);
+                $('#det_status').text(data.status);
+                $('#det_subject').text(data.subject || 'Consultation');
+                $('#det_notes').text(data.notes || 'No additional notes provided.');
+            });
+        }
+
+        function deleteSingleFromModal() {
+            if(confirm("Delete this specific appointment record?")) {
+                $.post('/Doctor/DeleteAppointment/' + currentViewingId, function(res) {
+                    if(res.success) location.reload();
+                });
+            }
+        }
     </script>
 }

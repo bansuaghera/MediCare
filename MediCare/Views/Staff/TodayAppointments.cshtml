@@ -1,4 +1,5 @@
-﻿@{
+@model IEnumerable<MediCare.Models.Appointment>
+@{
     ViewData["Title"] = "Today's Appointments";
     Layout = "~/Views/Shared/_StaffLayout.cshtml";
 }
@@ -45,6 +46,32 @@
         color: #9ca3af;
     }
 
+    .nav-tabs {
+        border-bottom: 2px solid #f0f0f0;
+        margin-bottom: 20px;
+        gap: 10px;
+    }
+
+        .nav-tabs .nav-link {
+            border: none;
+            color: #6b7280;
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 12px;
+            transition: 0.3s;
+        }
+
+            .nav-tabs .nav-link:hover {
+                background: #f3f4f6;
+                border: none;
+            }
+
+            .nav-tabs .nav-link.active {
+                background: #16a34a;
+                color: white;
+                border: none;
+            }
+
     table {
         width: 100%;
         border-collapse: separate;
@@ -84,17 +111,15 @@
         border-radius: 20px;
         font-size: 12px;
         font-weight: 600;
+        border: none;
+        cursor: pointer;
     }
 
-    .in-progress {
-        background: #dbeafe;
-        color: #2563eb;
-    }
-
-    .waiting {
-        background: #fef3c7;
-        color: #d97706;
-    }
+    .status-in-progress { background: #dbeafe; color: #2563eb; }
+    .status-waiting { background: #fef3c7; color: #d97706; }
+    .status-completed { background: #dcfce7; color: #16a34a; }
+    .status-cancelled { background: #fee2e2; color: #dc2626; }
+    .status-no-show { background: #f3f4f6; color: #6b7280; }
 
     .action-btn {
         background: #ffffff;
@@ -131,99 +156,91 @@
 
 <div class="main-card">
 
+    <ul class="nav nav-tabs" id="appointmentTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab" onclick="filterByStatus('All')">All</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="waiting-tab" data-bs-toggle="tab" data-bs-target="#waiting" type="button" role="tab" onclick="filterByStatus('Waiting')">Waiting</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="in-progress-tab" data-bs-toggle="tab" data-bs-target="#in-progress" type="button" role="tab" onclick="filterByStatus('In Progress')">In Progress</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="completed-tab" data-bs-toggle="tab" data-bs-target="#completed" type="button" role="tab" onclick="filterByStatus('Completed')">Completed</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="no-show-tab" data-bs-toggle="tab" data-bs-target="#no-show" type="button" role="tab" onclick="filterByStatus('No-Show')">No-Show</button>
+        </li>
+    </ul>
+
     <!-- Search -->
     <div class="position-relative search-box">
         <i class="fa fa-search search-icon"></i>
-        <input type="text" class="form-control" placeholder="Search appointments..." />
+        <input type="text" class="form-control" placeholder="Search appointments..." id="searchInput" onkeyup="filterTable()" />
     </div>
 
     <!-- Table -->
-    <table>
+    <table id="appointmentsTable">
         <thead>
             <tr>
-                <th>Time</th>
+                <th>Time/Date</th>
                 <th>Patient</th>
-                <th>Type</th>
-                <th>Token</th>
+                <th>Doctor</th>
                 <th>Status</th>
                 <th class="text-end">Actions</th>
             </tr>
         </thead>
 
         <tbody>
-            <tr>
-                <td>09:00 AM</td>
-                <td><strong>John Smith</strong></td>
-                <td>Checkup</td>
-                <td>A-045</td>
-                <td>
-                    <span class="badge-status in-progress">
-                        In Progress
-                    </span>
-                </td>
-                <td class="text-end">
-                    <div class="action-btn">
-                        <i class="fa fa-eye text-muted"></i>
-                    </div>
-                </td>
-            </tr>
-
-            <tr>
-                <td>09:30 AM</td>
-                <td><strong>Sarah Johnson</strong></td>
-                <td>Consultation</td>
-                <td>A-046</td>
-                <td>
-                    <span class="badge-status waiting">
-                        Waiting
-                    </span>
-                </td>
-                <td class="text-end">
-                    <div class="action-btn">
-                        <i class="fa fa-eye text-muted"></i>
-                    </div>
-                </td>
-            </tr>
-
-            <tr>
-                <td>10:00 AM</td>
-                <td><strong>Michael Chen</strong></td>
-                <td>Follow-up</td>
-                <td>A-047</td>
-                <td>
-                    <span class="badge-status waiting">
-                        Waiting
-                    </span>
-                </td>
-                <td class="text-end">
-                    <div class="action-btn">
-                        <i class="fa fa-eye text-muted"></i>
-                    </div>
-                </td>
-            </tr>
-
-            <tr>
-                <td>10:30 AM</td>
-                <td><strong>Emily Davis</strong></td>
-                <td>Checkup</td>
-                <td>A-048</td>
-                <td>
-                    <span class="badge-status waiting">
-                        Waiting
-                    </span>
-                </td>
-                <td class="text-end">
-                    <div class="action-btn">
-                        <i class="fa fa-eye text-muted"></i>
-                    </div>
-                </td>
-            </tr>
+            @foreach (var app in Model)
+            {
+                <tr data-status="@app.Status">
+                    <td>
+                        <strong>@app.AppointmentDate.ToString("hh:mm tt")</strong> <br />
+                        <small class="text-muted">@app.AppointmentDate.ToString("dd MMM")</small>
+                    </td>
+                    <td>
+                        <strong>@(app.Patient?.FirstName + " " + app.Patient?.LastName ?? "Unknown")</strong> <br />
+                        <small class="text-muted">ID: #PT-@app.PatientId.ToString("D3")</small>
+                    </td>
+                    <td>Dr. @(app.Doctor?.FirstName + " " + app.Doctor?.LastName ?? "N/A")</td>
+                    <td>
+                        <select class="badge-status @GetStatusClass(app.Status)" onchange="updateStatus(@app.Id, this)" style="border:none; cursor:pointer;" aria-label="Status">
+                            <option value="Waiting" selected="@(app.Status == "Waiting")">Waiting</option>
+                            <option value="In Progress" selected="@(app.Status == "In Progress")">In Progress</option>
+                            <option value="Completed" selected="@(app.Status == "Completed")">Completed</option>
+                            <option value="Cancelled" selected="@(app.Status == "Cancelled")">Cancelled</option>
+                            <option value="No-Show" selected="@(app.Status == "No-Show")">No-Show</option>
+                        </select>
+                    </td>
+                    <td class="text-end">
+                        <div class="d-flex justify-content-end gap-2">
+                             @if(app.Status == "In Progress") {
+                                <button class="btn btn-sm btn-success rounded-pill px-3" onclick="approveAppointment(@app.Id)">Approve</button>
+                             }
+                            <div class="action-btn">
+                                <a asp-action="Profile" style="color: inherit;"><i class="fa fa-eye text-muted"></i></a>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            }
+            @if (!Model.Any())
+            {
+                <tr>
+                    <td colspan="5" class="text-center py-5 text-muted">
+                        <i class="fa fa-calendar-times mb-2 fs-2"></i> <br />
+                        No appointments found for today.
+                    </td>
+                </tr>
+            }
         </tbody>
     </table>
 
     <!-- Pagination -->
     <div class="pagination-box">
-        <div>Showing 4 results</div>
+        <div>Showing <span id="recordCount">@Model.Count()</span> results</div>
 
         <div class="pagination-buttons">
             <button>Previous</button>
@@ -232,3 +249,85 @@
     </div>
 
 </div>
+
+@functions {
+    public string GetStatusClass(string status)
+    {
+        return status switch
+        {
+            "In Progress" => "status-in-progress",
+            "Waiting" => "status-waiting",
+            "Scheduled" => "status-waiting",
+            "Completed" => "status-completed",
+            "Cancelled" => "status-cancelled",
+            "No-Show" => "status-no-show",
+            _ => "status-waiting"
+        };
+    }
+}
+
+<script>
+    function filterByStatus(status) {
+        var rows = document.querySelectorAll("#appointmentsTable tbody tr");
+        var count = 0;
+        rows.forEach(function (row) {
+            if (row.children.length === 1) return; // Skip "No records" row
+
+            if (status === 'All' || row.dataset.status === status) {
+                row.style.display = '';
+                count++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        document.getElementById("recordCount").innerText = count;
+    }
+
+    function filterTable() {
+        var searchTerm = document.getElementById("searchInput").value.toLowerCase();
+        var rows = document.querySelectorAll("#appointmentsTable tbody tr");
+        var count = 0;
+        rows.forEach(function (row) {
+            if (row.children.length === 1) return;
+            var text = row.innerText.toLowerCase();
+            if (text.includes(searchTerm)) {
+                row.style.display = '';
+                count++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        document.getElementById("recordCount").innerText = count;
+    }
+
+    function approveAppointment(id) {
+        if(confirm('Approve and complete this appointment?')) {
+            $.post('/Staff/UpdateStatus', { id: id, status: 'Completed' }, function(res) {
+                if(res.success) {
+                    location.reload();
+                } else {
+                    alert('Error updating status.');
+                }
+            });
+        }
+    }
+
+    function updateStatus(id, selectElement) {
+        var status = selectElement.value;
+        $.post('/Staff/UpdateStatus', { id: id, status: status }, function(res) {
+            if(res.success) {
+                var classMap = {
+                    "In Progress": "status-in-progress",
+                    "Waiting": "status-waiting",
+                    "Completed": "status-completed",
+                    "Cancelled": "status-cancelled",
+                    "No-Show": "status-no-show"
+                };
+                selectElement.className = "badge-status " + classMap[status];
+            } else {
+                alert('Error updating status.');
+                location.reload();
+            }
+        });
+    }
+</script>

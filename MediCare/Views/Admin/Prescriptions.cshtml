@@ -1,4 +1,5 @@
-﻿@{
+@model IEnumerable<MediCare.Models.Prescription>
+@{
     ViewData["Title"] = "Prescriptions";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
@@ -28,27 +29,10 @@
         border-collapse: collapse;
     }
 
-        table th, table td {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-            text-align: left;
-        }
-
-    .badge {
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 600;
-    }
-
-    .active-badge {
-        background: #d1f5e0;
-        color: #0f9b6d;
-    }
-
-    .completed-badge {
-        background: #e6e6e6;
-        color: #555;
+    table th, table td {
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+        text-align: left;
     }
 
     .pagination {
@@ -56,13 +40,13 @@
         text-align: right;
     }
 
-        .pagination button {
-            padding: 5px 10px;
-            border-radius: 6px;
-            border: 1px solid #ddd;
-            background: white;
-            cursor: pointer;
-        }
+    .pagination button {
+        padding: 5px 10px;
+        border-radius: 6px;
+        border: 1px solid #ddd;
+        background: white;
+        cursor: pointer;
+    }
 
     .eye-btn {
         cursor: pointer;
@@ -86,52 +70,27 @@
                 <th>Patient</th>
                 <th>Doctor</th>
                 <th>Date</th>
-                <th>Medicines</th>
-                <th>Status</th>
+                <th>Diagnosis</th>
                 <th>Actions</th>
             </tr>
         </thead>
 
         <tbody>
-            <tr>
-                <td>1</td>
-                <td>John Smith</td>
-                <td>Dr. Sarah Johnson</td>
-                <td>2024-02-12</td>
-                <td>3</td>
-                <td><span class="badge active-badge">Active</span></td>
-                <td><i class="fa fa-eye eye-btn"></i></td>
-            </tr>
-
-            <tr>
-                <td>2</td>
-                <td>Sarah Johnson</td>
-                <td>Dr. Michael Chen</td>
-                <td>2024-02-11</td>
-                <td>2</td>
-                <td><span class="badge completed-badge">Completed</span></td>
-                <td><i class="fa fa-eye eye-btn"></i></td>
-            </tr>
-
-            <tr>
-                <td>3</td>
-                <td>Michael Chen</td>
-                <td>Dr. Emily Davis</td>
-                <td>2024-02-10</td>
-                <td>4</td>
-                <td><span class="badge active-badge">Active</span></td>
-                <td><i class="fa fa-eye eye-btn"></i></td>
-            </tr>
-
-            <tr>
-                <td>4</td>
-                <td>Emily Davis</td>
-                <td>Dr. Robert Wilson</td>
-                <td>2024-02-09</td>
-                <td>5</td>
-                <td><span class="badge completed-badge">Completed</span></td>
-                <td><i class="fa fa-eye eye-btn"></i></td>
-            </tr>
+            @foreach(var p in Model)
+            {
+                <tr>
+                    <td>#@p.Id.ToString("D4")</td>
+                    <td>@p.Patient?.FirstName @p.Patient?.LastName</td>
+                    <td>Dr. @p.Doctor?.FirstName @p.Doctor?.LastName</td>
+                    <td>@p.DateIssued.ToString("yyyy-MM-dd")</td>
+                    <td>@p.Diagnosis</td>
+                    <td><a asp-action="PrescriptionDetails" asp-route-id="@p.Id" style="color: inherit;"><i class="fa fa-eye eye-btn"></i></a></td>
+                </tr>
+            }
+            @if(!Model.Any())
+            {
+                <tr><td colspan="6" class="text-center">No prescriptions found.</td></tr>
+            }
         </tbody>
     </table>
 

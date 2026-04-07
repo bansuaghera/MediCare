@@ -1,5 +1,6 @@
+@model IEnumerable<MediCare.Models.Patient>
 @{
-    ViewData["Title"] = "Patient History";
+    ViewData["Title"] = "My Patients";
     Layout = "~/Views/Shared/_DoctorLayout.cshtml";
 }
 
@@ -20,229 +21,145 @@
         font-size: 14px;
     }
 
-    /* Card Containers */
-    .content-card {
+    .table-card {
         background: white;
         border-radius: 16px;
         padding: 30px;
         box-shadow: 0 4px 15px rgba(0,0,0,0.02);
-        margin-bottom: 24px;
     }
-
-    /* Patient Details Card */
-    .patient-profile {
-        display: flex;
-        align-items: flex-start;
-        gap: 24px;
-    }
-
-    .avatar-wrapper {
-        width: 80px;
-        height: 80px;
-        background-color: #dbeafe; /* light blue */
-        border-radius: 16px;
+    
+    .search-box {
+        background: #f8fafc;
+        border: 1px solid transparent;
+        border-radius: 24px;
+        padding: 12px 20px;
         display: flex;
         align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
+        width: 320px;
+        margin-bottom: 30px;
+        transition: 0.3s;
     }
 
-    .avatar-wrapper i {
-        font-size: 32px;
-        color: #3b82f6; /* blue */
+    .search-box:focus-within {
+        border-color: #10b981;
+        background: #fff;
     }
 
-    .profile-info {
-        flex-grow: 1;
-    }
-
-    .profile-info h4 {
-        margin: 0 0 8px 0;
-        font-size: 20px;
-        font-weight: 700;
-        color: #1a1a1a;
-    }
-
-    .meta-details {
+    .search-box i {
+        color: #9ca3af;
+        margin-right: 12px;
         font-size: 14px;
-        color: #6b7280;
-        margin-bottom: 20px;
     }
 
-    .medical-history-label {
-        font-size: 12px;
-        font-weight: 600;
+    .search-box input {
+        border: none;
+        background: transparent;
+        outline: none;
+        width: 100%;
         color: #1a1a1a;
-        text-transform: uppercase;
-        margin-bottom: 4px;
-        letter-spacing: 0.5px;
-    }
-
-    .medical-history-value {
         font-size: 14px;
-        color: #6b7280;
-        margin: 0;
     }
 
-    /* Visit History Section */
-    .visit-history-title {
-        font-size: 18px;
-        font-weight: 700;
-        color: #1a1a1a;
-        margin-top: 0;
-        margin-bottom: 24px;
-    }
-
-    .visit-card {
-        border: 1px solid #f1f5f9;
-        border-radius: 16px;
-        padding: 24px;
-        margin-bottom: 20px;
-    }
-
-    .visit-card:last-child {
+    .table {
         margin-bottom: 0;
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .table thead {
+        background-color: #f8fafc;
     }
 
-    .visit-header {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 24px;
-    }
-
-    .date-icon {
-        width: 36px;
-        height: 36px;
-        background-color: #eff6ff;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .date-icon i {
-        color: #3b82f6;
-        font-size: 16px;
-    }
-
-    .visit-date {
-        font-weight: 600;
-        font-size: 15px;
-        color: #1a1a1a;
-    }
-
-    .visit-details {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-    }
-
-    .detail-group {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-    }
-
-    .detail-label {
-        font-size: 11px;
-        font-weight: 600;
+    .table th {
         color: #6b7280;
+        font-weight: 600;
+        font-size: 11px;
         text-transform: uppercase;
         letter-spacing: 0.5px;
+        border: none;
+        padding: 16px 20px;
+        text-align: left;
+    }
+    
+    .table th:first-child { border-top-left-radius: 8px; border-bottom-left-radius: 8px; }
+    .table th:last-child { border-top-right-radius: 8px; border-bottom-right-radius: 8px; }
+
+    .table td {
+        padding: 20px;
+        vertical-align: middle;
+        font-size: 13px;
+        color: #4b5563;
+        border-bottom: 1px solid #f8fafc;
     }
 
-    .detail-value {
-        font-size: 14px;
-        color: #1a1a1a;
-        margin: 0;
+    .table tr:last-child td { border-bottom: none; }
+
+    .action-btn {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        background: white;
+        color: #6b7280;
+        border: 1px solid #e5e5e5;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .action-btn:hover {
+        background: #f8fafc;
+        color: #10b981;
+        border-color: #10b981;
     }
 </style>
 
 <div class="page-header">
-    <h3>Patient History</h3>
-    <p>Complete medical history</p>
+    <h3>My Patients</h3>
+    <p>View your assigned patients</p>
 </div>
 
-<!-- Patient Details Card -->
-<div class="content-card">
-    <div class="patient-profile">
-        <div class="avatar-wrapper">
-            <i class="fa-regular fa-user"></i>
-        </div>
-        <div class="profile-info">
-            <h4>John Smith</h4>
-            <div class="meta-details">
-                45 years &bull; Male &bull; O+
-            </div>
-            
-            <div class="medical-history">
-                <div class="medical-history-label">Medical History</div>
-                <p class="medical-history-value">Hypertension, Diabetes Type 2</p>
-            </div>
-        </div>
+<div class="table-card">
+    <div class="search-box">
+        <i class="fa-solid fa-search"></i>
+        <input type="text" placeholder="Search patients..." />
     </div>
-</div>
 
-<!-- Visit History Section -->
-<div class="content-card" style="padding-bottom: 40px;">
-    <h4 class="visit-history-title">Visit History</h4>
-    
-    <div class="visit-list">
-        
-        <!-- Visit 1 -->
-        <div class="visit-card">
-            <div class="visit-header">
-                <div class="date-icon">
-                    <i class="fa-regular fa-calendar"></i>
-                </div>
-                <div class="visit-date">2024-02-10</div>
-            </div>
-            
-            <div class="visit-details">
-                <div class="detail-group">
-                    <div class="detail-label">Diagnosis</div>
-                    <div class="detail-value">Routine Checkup</div>
-                </div>
-                
-                <div class="detail-group">
-                    <div class="detail-label">Treatment</div>
-                    <div class="detail-value">Blood pressure monitoring</div>
-                </div>
-                
-                <div class="detail-group">
-                    <div class="detail-label">Prescription</div>
-                    <div class="detail-value">Amlodipine 5mg</div>
-                </div>
-            </div>
-        </div>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Gender</th>
+                    <th>Date of Birth</th>
+                    <th>Phone</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var patient in Model)
+                {
+                    <tr>
+                        <td>#PAT-@(patient.Id.ToString("D3"))</td>
+                        <td style="font-weight: 600; color: #1a1a1a;">@patient.FirstName @patient.LastName</td>
+                        <td>@patient.Gender</td>
+                        <td>@patient.DateOfBirth.ToString("dd MMM yyyy")</td>
+                        <td>@patient.Phone</td>
+                        <td>
+                            <a asp-action="Profile" asp-route-id="@patient.Id" class="action-btn text-decoration-none" title="View Profile"><i class="fa-regular fa-eye"></i></a>
+                        </td>
+                    </tr>
+                }
 
-        <!-- Visit 2 -->
-        <div class="visit-card">
-            <div class="visit-header">
-                <div class="date-icon">
-                    <i class="fa-regular fa-calendar"></i>
-                </div>
-                <div class="visit-date">2024-01-25</div>
-            </div>
-            
-            <div class="visit-details">
-                <div class="detail-group">
-                    <div class="detail-label">Diagnosis</div>
-                    <div class="detail-value">Fever and general fatigue</div>
-                </div>
-                
-                <div class="detail-group">
-                    <div class="detail-label">Treatment</div>
-                    <div class="detail-value">Rest and hydration advised</div>
-                </div>
-                
-                <div class="detail-group">
-                    <div class="detail-label">Prescription</div>
-                    <div class="detail-value">Paracetamol 500mg</div>
-                </div>
-            </div>
-        </div>
-
+                @if(!Model.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="text-center py-4">No patients found.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
 </div>

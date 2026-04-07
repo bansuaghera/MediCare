@@ -1,32 +1,143 @@
-﻿
+@model List<MediCare.Models.Appointment>
+
 @{
-    ViewData["Title"] = "Home";
+    ViewData["Title"] = "Dashboard";
     Layout = "~/Views/Shared/_UserLayout.cshtml";
+    
+    var upcomingCount = Model?.Count(a => a.AppointmentDate.Date >= DateTime.Today) ?? 0;
+    var pastCount = Model?.Count(a => a.AppointmentDate.Date < DateTime.Today) ?? 0;
 }
 
 <style>
-    .page-title h3 {
-        font-weight: 700;
+    :root {
+        --primary-green: #10b981;
+        --soft-green: #ecfdf5;
+        --luxury-indigo: #6366f1;
     }
 
-    .card-custom {
-        background: #ffffff;
-        border-radius: 20px;
-        padding: 20px;
-        box-shadow: 0 4px 25px rgba(0,0,0,0.05);
+    .welcome-section {
+        margin-bottom: 2rem;
     }
 
-    .stat-card {
-        background: #ffffff;
+    .user-name-badge {
+        background: #f3f4f6;
+        padding: 4px 12px;
         border-radius: 20px;
-        padding: 20px;
-        display: flex;
-        justify-content: space-between;
+        font-size: 13px;
+        font-weight: 600;
+        color: #4b5563;
+        display: inline-flex;
         align-items: center;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        gap: 6px;
     }
 
-    .stat-icon {
+    .blood-badge {
+        background: #f5f3ff;
+        color: #7c3aed;
+        padding: 5px 15px;
+        border-radius: 10px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Main Big Banner */
+    .status-banner {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        border-radius: 24px;
+        padding: 40px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(16, 185, 129, 0.15);
+        margin-bottom: 2rem;
+    }
+
+    .status-banner::after {
+        content: '\f21e';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        position: absolute;
+        right: -20px;
+        bottom: -20px;
+        font-size: 180px;
+        opacity: 0.1;
+        transform: rotate(-15deg);
+    }
+
+    .banner-icon-bg {
+        width: 32px;
+        height: 32px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 15px;
+    }
+
+    .banner-title {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        opacity: 0.9;
+        margin-bottom: 5px;
+    }
+
+    .banner-date {
+        font-size: 32px;
+        font-weight: 800;
+        margin-bottom: 10px;
+    }
+
+    .banner-msg {
+        font-size: 14px;
+        opacity: 0.9;
+        max-width: 300px;
+        margin-bottom: 30px;
+    }
+
+    .banner-stats {
+        display: flex;
+        gap: 40px;
+        border-top: 1px solid rgba(255,255,255,0.2);
+        padding-top: 20px;
+    }
+
+    .b-stat-item label {
+        display: block;
+        font-size: 10px;
+        text-transform: uppercase;
+        font-weight: 700;
+        opacity: 0.7;
+        margin-bottom: 4px;
+    }
+
+    .b-stat-item span {
+        font-weight: 700;
+        font-size: 15px;
+    }
+
+    /* Small Stat Cards */
+    .mini-stat-card {
+        background: white;
+        border-radius: 20px;
+        padding: 20px;
+        border: 1px solid #f1f5f9;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        transition: 0.3s;
+    }
+
+    .mini-stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.04);
+    }
+
+    .m-icon {
         width: 45px;
         height: 45px;
         border-radius: 12px;
@@ -36,175 +147,401 @@
         font-size: 18px;
     }
 
-    .icon-green {
-        background: #d1fae5;
-        color: #10b981;
+    .m-icon-gray { background: #f8fafc; color: #64748b; }
+    .m-icon-green { background: #ecfdf5; color: #10b981; }
+    .m-icon-blue { background: #eff6ff; color: #3b82f6; }
+
+    .m-info label {
+        display: block;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        color: #94a3b8;
+        margin-bottom: 2px;
     }
 
-    .icon-blue {
-        background: #dbeafe;
-        color: #3b82f6;
+    .m-info span {
+        font-size: 20px;
+        font-weight: 800;
+        color: #1e293b;
     }
 
-    .icon-purple {
-        background: #ede9fe;
-        color: #8b5cf6;
+    /* Right Side Cards */
+    .premium-card {
+        background: white;
+        border-radius: 20px;
+        padding: 25px;
+        border: 1px solid #f1f5f9;
+        margin-bottom: 1.5rem;
     }
 
-    .icon-orange {
-        background: #fde68a;
-        color: #f59e0b;
+    .p-card-title {
+        font-weight: 700;
+        font-size: 15px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
 
-    .quick-btn {
-        width: 100%;
+    .p-btn-green {
+        background: var(--primary-green);
+        color: white;
+        border: none;
         padding: 12px;
         border-radius: 12px;
-        margin-bottom: 10px;
-        font-weight: 500;
+        width: 100%;
+        font-weight: 600;
+        margin-bottom: 12px;
+        transition: 0.2s;
     }
 
-    .appointment-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background: #f9fafb;
+    .p-btn-green:hover { background: #059669; }
+
+    .p-btn-outline {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        padding: 12px;
+        border-radius: 12px;
+        width: 100%;
+        color: #475569;
+        font-weight: 600;
+        margin-bottom: 12px;
+        transition: 0.2s;
+        text-align: center;
+        text-decoration: none;
+        display: block;
+    }
+
+    .p-btn-outline:hover { background: white; border-color: #cbd5e1; }
+
+    .empty-placeholder {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        color: #94a3b8;
+        font-size: 13px;
+    }
+
+    .hipaa-box {
+        background: #f0fdf4;
+        border: 1px solid #dcfce7;
+        border-radius: 12px;
         padding: 15px;
-        border-radius: 15px;
-        margin-bottom: 10px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
     }
 
-    .doctor-avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: #ede9fe;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #8b5cf6;
-        margin-right: 10px;
-    }
+    .hipaa-box i { color: #22c55e; }
+    .hipaa-box p { margin: 0; font-size: 11px; color: #166534; font-weight: 500; }
 </style>
 
-<div class="page-title mb-4">
-    <h3>Welcome Back, Hardik!</h3>
-    <p class="text-muted">Here's your health dashboard</p>
+<div class="welcome-section d-flex justify-content-between align-items-end">
+    <div>
+        <h1 class="fw-bold mb-1">Hello, @(Context.Session.GetString("UserName") ?? "Patient")!</h1>
+        <p class="text-muted m-0">Discover your personal health dashboard and upcoming visits.</p>
+    </div>
+    <div class="blood-badge">
+        <i class="fa fa-droplet me-1"></i> BLOOD: O+
+    </div>
 </div>
 
-<!-- Stats Row -->
-<div class="row g-4">
+@section Scripts {
+    <script>
+        // bulk helpers for upcoming and past lists on dashboard
+        const upChecks = document.querySelectorAll('.up-check');
+        const pastChecks = document.querySelectorAll('.past-check');
+        const selectUpcomingBtn = document.getElementById('selectUpcoming');
+        const deleteUpcomingBtn = document.getElementById('deleteUpcoming');
 
-    <div class="col-md-3">
-        <div class="stat-card">
-            <div>
-                <small class="text-muted">Upcoming Appointments</small>
-                <h4 class="fw-bold">2</h4>
+        function toggleBtns() {
+            const upSelected = document.querySelectorAll('.up-check:checked').length;
+            if (deleteUpcomingBtn) deleteUpcomingBtn.classList.toggle('d-none', upSelected === 0);
+            if (selectUpcomingBtn) selectUpcomingBtn.textContent = upSelected === upChecks.length && upChecks.length > 0 ? "Clear Upcoming" : "Select All Upcoming";
+        }
+
+        upChecks.forEach(cb => cb.addEventListener('change', toggleBtns));
+
+        if (selectUpcomingBtn) {
+            selectUpcomingBtn.addEventListener('click', () => {
+                const all = Array.from(upChecks).every(c => c.checked);
+                upChecks.forEach(c => c.checked = !all);
+                toggleBtns();
+            });
+        }
+
+        if (deleteUpcomingBtn) {
+            deleteUpcomingBtn.addEventListener('click', () => {
+                const ids = Array.from(document.querySelectorAll('.up-check:checked')).map(c => parseInt(c.closest('[data-id]').getAttribute('data-id'))).filter(n => !Number.isNaN(n));
+                if (ids.length === 0) return;
+                if (!confirm(`Delete ${ids.length} selected upcoming appointment(s)?`)) return;
+                $.ajax({
+                    url: '/User/DeleteSelectedAppointments',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(ids),
+                    success: function(res) { if(res.success) location.reload(); else alert('Failed to delete.'); }
+                });
+            });
+        }
+
+        // Build controls for past list
+        const pastHeader = document.querySelector('.col-md-6:nth-of-type(2) h6');
+        if (pastHeader) {
+            const pastSelectAll = document.createElement('button');
+            pastSelectAll.className = 'btn btn-outline-secondary btn-sm ms-2';
+            pastSelectAll.textContent = 'Select All Past';
+            const pastDelete = document.createElement('button');
+            pastDelete.className = 'btn btn-outline-danger btn-sm ms-2 d-none';
+            pastDelete.textContent = 'Delete Selected';
+            pastHeader.appendChild(pastSelectAll);
+            pastHeader.appendChild(pastDelete);
+
+            function togglePast() {
+                const sel = document.querySelectorAll('.past-check:checked').length;
+                pastDelete.classList.toggle('d-none', sel === 0);
+                pastSelectAll.textContent = sel === pastChecks.length && pastChecks.length > 0 ? 'Clear Past' : 'Select All Past';
+            }
+
+            pastChecks.forEach(cb => cb.addEventListener('change', togglePast));
+
+            pastSelectAll.addEventListener('click', () => {
+                const all = Array.from(pastChecks).every(c => c.checked);
+                pastChecks.forEach(c => c.checked = !all);
+                togglePast();
+            });
+
+            pastDelete.addEventListener('click', () => {
+                const ids = Array.from(document.querySelectorAll('.past-check:checked')).map(c => parseInt(c.closest('[data-id]').getAttribute('data-id'))).filter(n => !Number.isNaN(n));
+                if (ids.length === 0) return;
+                if (!confirm(`Delete ${ids.length} selected past appointment(s)?`)) return;
+                $.ajax({
+                    url: '/User/DeleteSelectedAppointments',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(ids),
+                    success: function(res) { if(res.success) location.reload(); else alert('Failed to delete.'); }
+                });
+            });
+
+            togglePast();
+        }
+
+        toggleBtns();
+    </script>
+}
+
+<div class="row">
+    <!-- LEFT CONTENT -->
+    <div class="col-lg-8">
+        
+        <!-- Status Banner -->
+        <div class="status-banner">
+            <div class="banner-icon-bg">
+                <i class="fa-regular fa-clock" style="font-size: 14px;"></i>
             </div>
-            <div class="stat-icon icon-green">
-                <i class="fa fa-calendar"></i>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-3">
-        <div class="stat-card">
-            <div>
-                <small class="text-muted">Total Visits</small>
-                <h4 class="fw-bold">12</h4>
-            </div>
-            <div class="stat-icon icon-blue">
-                <i class="fa fa-user"></i>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-3">
-        <div class="stat-card">
-            <div>
-                <small class="text-muted">Prescriptions</small>
-                <h4 class="fw-bold">8</h4>
-            </div>
-            <div class="stat-icon icon-purple">
-                <i class="fa fa-file-medical"></i>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-3">
-        <div class="stat-card">
-            <div>
-                <small class="text-muted">Last Visit</small>
-                <h4 class="fw-bold">Feb 10</h4>
-            </div>
-            <div class="stat-icon icon-orange">
-                <i class="fa fa-clock"></i>
-            </div>
-        </div>
-    </div>
-
-</div>
-
-<!-- Bottom Section -->
-<div class="row mt-4 g-4">
-
-    <!-- Quick Actions -->
-    <div class="col-md-5">
-        <div class="card-custom">
-            <h5 class="fw-bold mb-3">Quick Actions</h5>
-
-            <button class="btn btn-success quick-btn">
-                <i class="fa fa-calendar-plus me-2"></i> Book Appointment
-            </button>
-
-            <button class="btn btn-outline-secondary quick-btn">
-                <i class="fa fa-user-md me-2"></i> Find Doctor
-            </button>
-
-            <button class="btn btn-outline-secondary quick-btn">
-                <i class="fa fa-ticket me-2"></i> Token Status
-            </button>
-        </div>
-    </div>
-
-    <!-- Upcoming Appointments -->
-    <div class="col-md-7">
-        <div class="card-custom">
-            <h5 class="fw-bold mb-3">Upcoming Appointments</h5>
-
-            <div class="appointment-item">
-                <div class="d-flex align-items-center">
-                    <div class="doctor-avatar">
-                        <i class="fa fa-user-md"></i>
-                    </div>
-                    <div>
-                        <strong>Dr. Sarah Johnson</strong><br />
-                        <small class="text-muted">Cardiology</small>
-                    </div>
+            <div class="banner-title">Clinic Status Today</div>
+            <div class="banner-date">@DateTime.Now.ToString("d MMMM")</div>
+            <p class="banner-msg">Your next checkup is pending. Book now to keep your health on track.</p>
+            
+            <div class="banner-stats">
+                <div class="b-stat-item">
+                    <label>Last Visit</label>
+                    <span>---</span>
                 </div>
-                <div class="text-end">
-                    <strong>2024-02-15</strong><br />
-                    <small class="text-muted">10:00 AM</small>
-                </div>
-            </div>
-
-            <div class="appointment-item">
-                <div class="d-flex align-items-center">
-                    <div class="doctor-avatar" style="background:#dbeafe;color:#3b82f6;">
-                        <i class="fa fa-user-md"></i>
-                    </div>
-                    <div>
-                        <strong>Dr. Michael Chen</strong><br />
-                        <small class="text-muted">Pediatrics</small>
-                    </div>
-                </div>
-                <div class="text-end">
-                    <strong>2024-02-20</strong><br />
-                    <small class="text-muted">02:00 PM</small>
+                <div class="b-stat-item">
+                    <label>Latest Diagnosis</label>
+                    <span>Routine Checkup</span>
                 </div>
             </div>
-
         </div>
+
+        <!-- Mini Stats Row -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-4">
+                <div class="mini-stat-card">
+                    <div class="m-icon m-icon-gray">
+                        <i class="fa-regular fa-calendar"></i>
+                    </div>
+                    <div class="m-info">
+                        <label>Upcoming</label>
+                        <span>@upcomingCount</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="mini-stat-card">
+                    <div class="m-icon m-icon-green">
+                        <i class="fa-regular fa-circle-check"></i>
+                    </div>
+                    <div class="m-info">
+                        <label>Visits</label>
+                        <span>@pastCount</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="mini-stat-card">
+                    <div class="m-icon m-icon-blue">
+                        <i class="fa-solid fa-chart-line"></i>
+                    </div>
+                    <div class="m-info">
+                        <label>RPTS</label>
+                        <span>0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Appointment Card -->
+        <div class="premium-card">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="fw-bold m-0 text-slate-800">Active Appointments</h5>
+                <a asp-action="MyAppointments" class="text-success text-decoration-none small fw-bold">View All Visit History</a>
+            </div>
+
+            @if(Model != null && Model.Any(a => a.AppointmentDate.Date >= DateTime.Today))
+            {
+                <div class="row g-3">
+                @foreach(var app in Model.Where(a => a.AppointmentDate.Date >= DateTime.Today).Take(2))
+                {
+                    <div class="col-md-12">
+                        <div class="p-3 bg-light rounded-4 d-flex justify-content-between align-items-center border">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="bg-white rounded-circle p-2 shadow-sm border" style="width: 45px; height: 45px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fa-solid fa-user-md text-success"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold">Dr. @app.Doctor?.FirstName @app.Doctor?.LastName</div>
+                                    <div class="text-muted small">@app.Doctor?.Specialty | @app.TimeSlot</div>
+                                </div>
+                            </div>
+                            <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2">Confirmed</span>
+                        </div>
+                    </div>
+                }
+                </div>
+            }
+            else
+            {
+                <div class="empty-placeholder py-5">
+                    <p class="mb-3">No upcoming sessions found.</p>
+                    <a asp-action="BookAppointment" class="btn btn-success rounded-pill px-4 fw-bold">Book Appointment</a>
+                </div>
+            }
+        </div>
+
+        <!-- Manage Appointments (CRUD) -->
+        <div class="premium-card mt-4">
+            <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+                <h5 class="fw-bold m-0 text-slate-800">Manage Appointments</h5>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-secondary btn-sm" id="selectUpcoming">Select All Upcoming</button>
+                    <button class="btn btn-outline-danger btn-sm d-none" id="deleteUpcoming">Delete Selected</button>
+                    <button class="btn btn-outline-danger btn-sm" onclick="deleteAllAppointments()">Delete All</button>
+                </div>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <h6 class="fw-bold mb-2">Upcoming / In-Progress</h6>
+                    @if(Model != null && Model.Any())
+                    {
+                        var upcoming = Model.Where(a => a.AppointmentDate.Date >= DateTime.Today || (a.Status != null && a.Status.Contains("Progress"))).OrderBy(a => a.AppointmentDate).Take(5).ToList();
+                        if (upcoming.Any())
+                        {
+                            foreach (var app in upcoming)
+                            {
+                                <div class="p-3 border rounded-4 mb-2 position-relative" data-id="@app.Id">
+                                    <input type="checkbox" class="form-check-input up-check shadow-none" style="position:absolute; top:10px; left:10px;" />
+                                    <div class="ms-4">
+                                        <div class="fw-bold">Dr. @app.Doctor?.FirstName @app.Doctor?.LastName</div>
+                                        <div class="text-muted small">@app.AppointmentDate:yyyy-MM-dd @app.TimeSlot | @app.Subject</div>
+                                        <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-1">@app.Status</span>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="text-muted small">No upcoming appointments.</div>
+                        }
+                    }
+                </div>
+                <div class="col-md-6">
+                    <h6 class="fw-bold mb-2">Completed / Past</h6>
+                    @if(Model != null && Model.Any())
+                    {
+                        var past = Model.Where(a => a.AppointmentDate.Date < DateTime.Today || (a.Status != null && a.Status.Contains("Completed"))).OrderByDescending(a => a.AppointmentDate).Take(5).ToList();
+                        if (past.Any())
+                        {
+                            foreach (var app in past)
+                            {
+                                <div class="p-3 border rounded-4 mb-2 position-relative" data-id="@app.Id">
+                                    <input type="checkbox" class="form-check-input past-check shadow-none" style="position:absolute; top:10px; left:10px;" />
+                                    <div class="ms-4">
+                                        <div class="fw-bold">Dr. @app.Doctor?.FirstName @app.Doctor?.LastName</div>
+                                        <div class="text-muted small">@app.AppointmentDate:yyyy-MM-dd @app.TimeSlot | @app.Subject</div>
+                                        <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-3 py-1">@app.Status</span>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="text-muted small">No past appointments.</div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+
     </div>
 
+    <!-- RIGHT CONTENT -->
+    <div class="col-lg-4">
+        
+        <!-- Quick Actions -->
+        <div class="premium-card shadow-sm">
+            <div class="p-card-title">Quick Actions</div>
+            <a asp-action="BookAppointment" class="p-btn-green text-center text-white text-decoration-none">
+                <i class="fa fa-plus me-2"></i> Book Appointment
+            </a>
+            <a asp-action="Doctors" class="p-btn-outline">
+                <i class="fa fa-search me-2"></i> Find Doctor
+            </a>
+            <a asp-action="TokenStatus" class="p-btn-outline">
+                <i class="fa-regular fa-clock me-2"></i> Check Token
+            </a>
+        </div>
+
+        <!-- Vitals -->
+        <div class="premium-card shadow-sm">
+            <div class="p-card-title">
+                <i class="fa-solid fa-heart-pulse text-success"></i> Vitals Overview
+            </div>
+            <div class="empty-placeholder">
+                Not recorded yet
+            </div>
+        </div>
+
+        <!-- Medications -->
+        <div class="premium-card shadow-sm">
+            <div class="p-card-title">
+                <i class="fa-solid fa-paperclip text-indigo"></i> Recent Medications
+            </div>
+            <div class="empty-placeholder">
+                No active medications
+            </div>
+        </div>
+
+        <!-- HIPAA -->
+        <div class="hipaa-box">
+            <i class="fa-solid fa-shield-check fa-lg"></i>
+            <p>HIPAA COMPLIANT<br/><span class="opacity-75">Your medical records are encrypted and securely stored.</span></p>
+        </div>
+
+    </div>
 </div>

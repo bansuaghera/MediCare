@@ -1,0 +1,325 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
+
+.register-container {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* LEFT SIDE */
+.left-section {
+  flex: 1.2;
+  background: linear-gradient(135deg, #0fb48c 0%, #089d7d 100%);
+  color: white;
+  padding: 60px 80px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 60px;
+  overflow: hidden;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  z-index: 2;
+  position: absolute;
+  top: 60px;
+  left: 80px;
+}
+
+.brand-icon-box {
+  background: white;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.brand-icon-svg {
+  color: #0fb48c;
+  width: 28px;
+  height: 28px;
+}
+
+.brand-text h3 {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.brand-text span {
+  font-size: 14px;
+  opacity: 0.9;
+  letter-spacing: 0.5px;
+}
+
+.left-content {
+  z-index: 2;
+  margin-top: 60px;
+  /* Added space to prevent brand logo overlap */
+}
+
+.left-content h1 {
+  font-size: 44px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 24px;
+  max-width: 400px;
+}
+
+.left-content p {
+  font-size: 18px;
+  line-height: 1.6;
+  opacity: 0.9;
+  margin-bottom: 40px;
+  max-width: 450px;
+}
+
+.benefits-list {
+  list-style: none;
+}
+
+.benefits-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  font-size: 17px;
+  font-weight: 500;
+}
+
+.check-icon {
+  width: 22px;
+  height: 22px;
+  opacity: 0.8;
+}
+
+/* Decoration */
+.decoration-circle {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
+}
+
+.circle-1 {
+  width: 500px;
+  height: 500px;
+  top: -150px;
+  left: -100px;
+}
+
+.circle-2 {
+  width: 700px;
+  height: 700px;
+  bottom: -300px;
+  right: -200px;
+}
+
+/* RIGHT SIDE */
+.right-section {
+  flex: 1.5;
+  background: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 40px;
+  overflow-y: auto;
+}
+
+.top-logo {
+  margin-bottom: 30px;
+}
+
+.top-logo img {
+  width: 240px;
+  height: auto;
+}
+
+/* CARD */
+.register-card {
+  width: 100%;
+  max-width: 520px;
+  background: white;
+  padding: 40px 50px;
+  border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.02);
+}
+
+.register-card h2 {
+  text-align: center;
+  font-size: 32px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  text-align: center;
+  font-size: 15px;
+  color: #64748b;
+  margin-bottom: 35px;
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.name-row {
+  display: flex;
+  gap: 16px;
+}
+
+.input-with-icon {
+  position: relative;
+  flex: 1;
+}
+
+.input-icon {
+  position: absolute;
+  left: 24px;
+  /* Moved slightly further from the edge */
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
+}
+
+.input-with-icon input {
+  width: 100%;
+  padding: 16px 16px 16px 65px !important;
+  /* Forced padding to prevent overrides */
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: #f1f5f9;
+  font-size: 15px;
+  color: #1e293b;
+  transition: all 0.3s ease;
+}
+
+.input-with-icon input:focus {
+  background: white;
+  border-color: #0fb48c;
+  box-shadow: 0 0 0 4px rgba(15, 180, 140, 0.1);
+  outline: none;
+}
+
+.terms {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.terms input {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #0fb48c;
+}
+
+.terms a {
+  color: #0fb48c;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.register-btn {
+  width: 100%;
+  padding: 16px;
+  border-radius: 12px;
+  border: none;
+  background: #0fb48c;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 10px 20px rgba(15, 180, 140, 0.2);
+  transition: all 0.3s ease;
+  margin-top: 10px;
+}
+
+.register-btn:hover {
+  background: #0d9d7a;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(15, 180, 140, 0.3);
+}
+
+.login-link {
+  text-align: center;
+  margin-top: 25px;
+  font-size: 15px;
+  color: #64748b;
+}
+
+.login-link a {
+  color: #0fb48c;
+  text-decoration: none;
+  font-weight: 700;
+  margin-left: 5px;
+}
+
+/* FOOTER */
+.support-footer {
+  margin-top: 40px;
+  font-size: 14px;
+  color: #64748b;
+  text-align: center;
+}
+
+.support-footer a {
+  color: #0fb48c;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+/* HELP BUTTON */
+.floating-help-btn {
+  position: absolute;
+  bottom: 30px;
+  right: 30px;
+  width: 56px;
+  height: 56px;
+  background: #0fb48c;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 8px 16px rgba(15, 180, 140, 0.3);
+  transition: all 0.3s ease;
+}
+
+.floating-help-btn:hover {
+  transform: scale(1.1);
+  background: #0d9d7a;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .left-section {
+    display: none;
+  }
+}
