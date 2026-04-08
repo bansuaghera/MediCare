@@ -17,6 +17,7 @@ namespace MediCare.Models
         public string MedicineNotes { get; set; }
 
         public string? AdditionalNotes { get; set; }
+        public string EntryType { get; set; } = "Template";
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
     }

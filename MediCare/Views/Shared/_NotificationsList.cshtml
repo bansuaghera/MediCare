@@ -1,0 +1,76 @@
+@model IEnumerable<MediCare.Models.Notification>
+@{
+    var deleteAllUrl = ViewBag.DeleteAllUrl as string ?? "#";
+    var deleteUrl = ViewBag.DeleteUrl as string ?? "#";
+    var markUrl = ViewBag.MarkUrl as string ?? "#";
+}
+<style>
+    .notif-wrapper { background:#f8fafc; border:1px solid #eef2f7; border-radius:16px; padding:14px 18px; display:flex; gap:12px; align-items:center; }
+    .notif-icon { width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:15px; }
+    .type-success { background:#10b981; }
+    .type-info { background:#3b82f6; }
+    .type-warning { background:#f59e0b; }
+    .type-error { background:#ef4444; }
+    .muted { color:#6b7280; font-size:13px; }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <div>
+        <h4 class="fw-bold mb-0">My Notifications</h4>
+        <div class="text-muted">Review and manage your latest activities</div>
+    </div>
+    @if (Model.Any())
+    {
+        <div class="d-flex gap-2 align-items-center">
+            <button class="btn btn-outline-secondary btn-sm" id="selectAllBtn">Select All</button>
+            <button class="btn btn-outline-danger btn-sm" id="deleteSelectedBtn" disabled>Delete Selected</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteAll()">Delete All</button>
+            <button class="btn btn-success btn-sm" onclick="markAll()">Mark All Read</button>
+        </div>
+    }
+</div>
+
+@if (Model.Any())
+{
+    <div class="list-group">
+        @foreach (var n in Model)
+        {
+            var cls = n.Type == "success" ? "type-success" : n.Type == "warning" ? "type-warning" : n.Type == "error" ? "type-error" : "type-info";
+            <div class="list-group-item border-0 mb-2 p-0">
+                <div class="notif-wrapper">
+                    <input type="checkbox" class="form-check-input shadow-none mt-1 row-check" data-id="@n.Id" />
+                    <div class="notif-icon @cls"><i class="fa-solid fa-bell"></i></div>
+                    <div>
+                        <div class="fw-bold">@n.Title</div>
+                        <div class="muted">@n.Message</div>
+                        <div class="text-muted small">@n.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="alert alert-info">No notifications yet.</div>
+}
+
+<script>
+    const checks=()=>Array.from(document.querySelectorAll('.row-check'));
+    const delSel=document.getElementById('deleteSelectedBtn');
+    const selAll=document.getElementById('selectAllBtn');
+    function sync(){
+        const any=checks().some(c=>c.checked);
+        if(delSel) delSel.disabled=!any;
+        if(selAll){
+            const all=checks().every(c=>c.checked);
+            selAll.textContent=all?'Clear All':'Select All';
+        }
+    }
+    checks().forEach(c=>c.addEventListener('change',sync));
+    if(selAll) selAll.onclick=()=>{const all=checks().every(c=>c.checked);checks().forEach(c=>c.checked=!all);sync();};
+    if(delSel) delSel.onclick=()=>{const ids=checks().filter(c=>c.checked).map(c=>parseInt(c.dataset.id));if(ids.length===0)return;if(!confirm(`Delete ${ids.length} notifications?`))return;$.ajax({url:'@deleteUrl',type:'POST',contentType:'application/json',data:JSON.stringify(ids),success:r=>location.reload()});};
+    function deleteAll(){if(!confirm('Delete ALL notifications?'))return;$.post('@deleteAllUrl',r=>location.reload());}
+    function markAll(){ $.post('@markUrl',r=>location.reload()); }
+    sync();
+</script>

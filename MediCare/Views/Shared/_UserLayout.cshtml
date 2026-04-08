@@ -1,6 +1,16 @@
+@inject MediCare.Services.NotificationService NotificationService
+@inject MediCare.Services.LoginSessionService LoginSessionService
 @{
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
     var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+    var userEmail = Context.Session.GetString("UserEmail") ?? string.Empty;
+    var unreadNotificationCount = string.IsNullOrEmpty(userEmail) ? 0 : NotificationService.CountUnread(userEmail);
+    var loginAtRaw = Context.Session.GetString("LoginAt") ?? string.Empty;
+    var loginLabel = "Logged out";
+    if (DateTime.TryParse(loginAtRaw, null, System.Globalization.DateTimeStyles.RoundtripKind, out var loginAt))
+    {
+        loginLabel = loginAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss");
+    }
 }
 
 <!DOCTYPE html>
@@ -176,6 +186,17 @@
             font-weight: 600;
         }
 
+        .session-time {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 10px;
+            line-height: 1.45;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 8px 10px;
+        }
+
         @@media (max-width: 992px) {
             .sidebar {
                 display: none;
@@ -211,6 +232,10 @@
                 </div>
                 <h6 class="mb-0 fw-bold" style="color: #333;">@(Context.Session.GetString("UserName") ?? "Patient User")</h6>
                 <small class="text-muted" style="font-size: 12px;">@(Context.Session.GetString("UserEmail") ?? "patient@medicare.com")</small>
+                <div class="session-time">
+                    <div><i class="fa-regular fa-clock me-1"></i> Login: <span id="loginTimeText">@loginLabel</span></div>
+                    <div><i class="fa-solid fa-hourglass-half me-1"></i> Live: <span id="sessionLiveText">--:--:--</span></div>
+                </div>
             </div>
 
             <div class="menu">
@@ -247,6 +272,10 @@
 
                 <a asp-action="Notifications" class="@(currentAction == "Notifications" ? "active" : "")">
                     <i class="fa-regular fa-bell"></i> Notifications
+                    @if (unreadNotificationCount > 0)
+                    {
+                        <span class="ms-auto rounded-circle bg-danger d-inline-block" style="width:8px;height:8px;"></span>
+                    }
                 </a>
                 
                 <a asp-controller="User" asp-action="History"
@@ -258,13 +287,13 @@
                     <i class="fa-regular fa-comment-dots"></i> Feedback
                 </a>
 
+                <a asp-action="Analytics" class="@(currentAction == "Analytics" ? "active" : "")">
+                    <i class="fa-solid fa-chart-pie"></i> Analytics
+                </a>
+
                 <a asp-controller="User" asp-action="Profile"
                    class="@(currentAction == "Profile" ? "active" : "")">
                     <i class="fa-regular fa-user"></i> Profile
-                </a>
-
-                <a asp-action="Settings" class="@(currentAction == "Settings" ? "active" : "")">
-                    <i class="fa-solid fa-gear"></i> Settings
                 </a>
 
             </div>
@@ -283,14 +312,16 @@
 
                 <div class="search-box">
                     <i class="fa fa-search"></i>
-                    <input type="text" placeholder="Search for anything..." class="border-0 shadow-none bg-transparent" />
+                    <input type="text" id="pageSearchInput" placeholder="Search for anything..." class="border-0 shadow-none bg-transparent" />
                 </div>
 
                 <div class="profile-area">
-                    <button class="btn btn-link text-muted p-2 shadow-none"><i class="fa-regular fa-moon"></i></button>
                     <a asp-action="Notifications" class="btn btn-link text-muted p-2 shadow-none position-relative text-decoration-none">
                         <i class="fa-regular fa-bell"></i>
-                        <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle" style="width: 8px; height: 8px;"></span>
+                        @if (unreadNotificationCount > 0)
+                        {
+                            <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle" style="width: 8px; height: 8px;"></span>
+                        }
                     </a>
                     
                     <div style="display: flex; align-items: center; gap: 10px; border-left: 1px solid #e5e7eb; padding-left: 15px; margin-left: 5px;">
@@ -313,6 +344,69 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     @RenderSection("Scripts", required: false)
+    <script>
+        (function () {
+            const raw = '@loginAtRaw';
+            if (!raw) return;
+            const start = new Date(raw);
+            if (isNaN(start.getTime())) return;
+            const tick = () => {
+                const diff = Math.max(0, Date.now() - start.getTime());
+                const sec = Math.floor(diff / 1000);
+                const h = String(Math.floor(sec / 3600)).padStart(2, '0');
+                const m = String(Math.floor((sec % 3600) / 60)).padStart(2, '0');
+                const s = String(sec % 60).padStart(2, '0');
+                const el = document.getElementById('sessionLiveText');
+                if (el) el.textContent = `${h}:${m}:${s}`;
+            };
+            tick();
+            setInterval(tick, 1000);
+        })();
+
+        (function () {
+            const input = document.getElementById('pageSearchInput');
+            if (!input) return;
+            const root = document.querySelector('.main') || document.body;
+            const selectors = [
+                'tbody tr',
+                '.appointment-card',
+                '.queue-item',
+                '.row-card',
+                '.card-box',
+                '.notification-item',
+                '.notification-card',
+                '.feedback-card',
+                '.history-item',
+                '.patient-card',
+                '.doctor-card',
+                '.prescription-card',
+                '.list-group-item',
+                '.searchable-item'
+            ];
+            const filter = () => {
+                const term = input.value.trim().toLowerCase();
+                const items = Array.from(root.querySelectorAll(selectors.join(',')));
+                const seen = new Set();
+                items.forEach(item => {
+                    if (seen.has(item)) return;
+                    seen.add(item);
+                    const text = (item.dataset.search || item.innerText || '').toLowerCase();
+                    item.style.display = !term || text.includes(term) ? '' : 'none';
+                });
+            };
+            input.addEventListener('input', filter);
+        })();
+    </script>
+    @if(TempData["ToastMessage"] != null){
+        <div class="toast align-items-center text-bg-@(TempData["ToastType"] ?? "success") position-fixed top-0 end-0 m-3 show" role="alert" aria-live="assertive" aria-atomic="true" style="z-index:2000;">
+            <div class="d-flex">
+                <div class="toast-body">
+                    @TempData["ToastMessage"]
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    }
 
 </body>
 </html>

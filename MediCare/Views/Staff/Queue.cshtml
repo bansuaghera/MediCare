@@ -1,213 +1,229 @@
+@model IEnumerable<MediCare.Models.Appointment>
 @{
-    ViewData["Title"] = "Queue Monitor";
+    ViewData["Title"] = "Token Queue";
     Layout = "~/Views/Shared/_StaffLayout.cshtml";
 }
 
 <style>
-    .page-header h3 {
-        font-weight: 700;
-        margin-bottom: 5px;
-    }
-
-    .stat-card {
-        background: #ffffff;
-        border-radius: 18px;
-        padding: 20px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.04);
-    }
-
-        .stat-card h4 {
-            font-weight: 700;
-            margin-top: 8px;
-        }
-
-    .card-custom {
-        background: #ffffff;
-        border-radius: 20px;
-        padding: 25px;
-        margin-top: 25px;
-        box-shadow: 0 4px 25px rgba(0,0,0,0.05);
-    }
-
-    .queue-item {
-        background: #f9fafb;
-        border-radius: 16px;
-        padding: 18px 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 15px;
-        border: 1px solid #f0f0f0;
-    }
-
-    .token-badge {
-        background: #bbf7d0;
-        color: #047857;
-        font-weight: 700;
-        padding: 14px 18px;
-        border-radius: 14px;
-        margin-right: 15px;
-        min-width: 85px;
-        text-align: center;
-    }
-
-    .patient-info h6 {
-        margin-bottom: 3px;
-        font-weight: 600;
-    }
-
-    .wait-info {
-        text-align: right;
-    }
-
-    .status-waiting {
-        color: #d97706;
-        font-weight: 600;
-    }
-
-    .status-progress {
-        color: #6366f1;
-        font-weight: 600;
-    }
+    .page-header h3 { font-weight:700; margin-bottom:4px; }
+    .stat-card { background:#fff; border-radius:18px; padding:20px; box-shadow:0 4px 20px rgba(0,0,0,0.04); display:flex; justify-content:space-between; align-items:center; }
+    .stat-icon { width:45px; height:45px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:18px; }
+    .icon-orange{background:#fff7ed; color:#f97316;} .icon-blue{background:#eff6ff; color:#3b82f6;} .icon-green{background:#ecfdf3; color:#22c55e;} .icon-slate{background:#e2e8f0; color:#0f172a;}
+    .card-custom{background:#fff; border-radius:20px; padding:25px; margin-top:20px; box-shadow:0 4px 25px rgba(0,0,0,0.05);}    
+    .search-box{background:#f8fafc; border:1px solid #e5e7eb; border-radius:12px; padding:10px 14px; display:flex; align-items:center; gap:10px;}
+    .search-box input{border:none; outline:none; background:transparent; width:100%; font-size:14px;}
+    .queue-item{background:#f9fafb; border-radius:16px; padding:16px 18px; display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border:1px solid #eef2f7;}
+    .token-badge{background:#d1fae5; color:#0f9a5f; font-weight:700; padding:10px 14px; border-radius:12px; min-width:70px; text-align:center;}
+    .badge-emg{background:#fee2e2!important; color:#b91c1c!important;}
 </style>
 
-<div class="page-header">
-    <h3>Queue Monitor</h3>
-    <p class="text-muted">Live queue status</p>
+<div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div>
+        <h3>Token Management</h3>
+        <p class="text-muted">Re-prioritize queue, call in, and finish tokens</p>
+    </div>
+    <div class="d-flex gap-2">
+        <button class="btn btn-outline-secondary" onclick="location.reload()"><i class="fa fa-rotate"></i> Refresh</button>
+        <a asp-action="GenerateToken" class="btn btn-success"><i class="fa fa-plus me-1"></i> Generate Token</a>
+    </div>
 </div>
 
-<!-- Stats -->
-<div class="row g-4 mt-3">
-
-    <div class="col-md-3">
-        <div class="stat-card">
-            <small class="text-muted">Waiting</small>
-            <h4>12</h4>
-        </div>
-    </div>
-
-    <div class="col-md-3">
-        <div class="stat-card">
-            <small class="text-muted">In Progress</small>
-            <h4>4</h4>
-        </div>
-    </div>
-
-    <div class="col-md-3">
-        <div class="stat-card">
-            <small class="text-muted">Completed</small>
-            <h4>31</h4>
-        </div>
-    </div>
-
-    <div class="col-md-3">
-        <div class="stat-card">
-            <small class="text-muted">Total</small>
-            <h4>47</h4>
-        </div>
-    </div>
-
+<div class="row g-3 mt-2">
+    <div class="col-md-3"><div class="stat-card"><div><div class="text-muted small">Waiting</div><div class="h4 fw-bold">@ViewBag.WaitingCount</div></div><div class="stat-icon icon-orange"><i class="fa fa-clock"></i></div></div></div>
+    <div class="col-md-3"><div class="stat-card"><div><div class="text-muted small">In Progress</div><div class="h4 fw-bold">@ViewBag.InProgressCount</div></div><div class="stat-icon icon-blue"><i class="fa fa-play"></i></div></div></div>
+    <div class="col-md-3"><div class="stat-card"><div><div class="text-muted small">Completed</div><div class="h4 fw-bold">@ViewBag.CompletedCount</div></div><div class="stat-icon icon-green"><i class="fa fa-check"></i></div></div></div>
+    <div class="col-md-3"><div class="stat-card"><div><div class="text-muted small">Total</div><div class="h4 fw-bold">@ViewBag.TotalToday</div></div><div class="stat-icon icon-slate"><i class="fa fa-users"></i></div></div></div>
 </div>
 
-<!-- Live Queue -->
 <div class="card-custom">
-
-    <h5 class="fw-bold mb-4">Live Queue</h5>
-
-    <!-- Queue Item -->
-    <div class="queue-item">
-        <div class="d-flex align-items-center">
-            <div class="token-badge">A-045</div>
-            <div class="patient-info">
-                <h6>Rahul Sharma</h6>
-                <small class="text-muted">Dr. Priya Patel</small>
-            </div>
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <div class="d-flex align-items-center gap-2">
+            <input type="checkbox" id="selectAll" class="form-check-input shadow-none">
+            <button class="btn btn-outline-danger btn-sm" id="deleteSelectedBtn" disabled>Delete Selected</button>
+            <button class="btn btn-outline-danger btn-sm" onclick="deleteAll()">Delete All</button>
         </div>
-
-        <div class="wait-info">
-            <small class="text-muted">Wait Time</small><br />
-            <strong>5 min</strong><br />
-            <select class="status-progress" onchange="this.className = this.value" style="border:none; cursor:pointer; text-align:right; outline:none; font-weight:600; background:transparent;">
-                <option value="status-progress" selected>In Progress</option>
-                <option value="status-waiting">Waiting</option>
-            </select>
+        <div style="width:280px;">
+            <div class="search-box">
+                <i class="fa-solid fa-search"></i>
+                <input type="text" id="searchBox" placeholder="Search tokens, patients..." onkeyup="filterList()" />
+            </div>
         </div>
     </div>
 
-    <div class="queue-item">
-        <div class="d-flex align-items-center">
-            <div class="token-badge">A-046</div>
-            <div class="patient-info">
-                <h6>Priya Patel</h6>
-                <small class="text-muted">Dr. Amit Kumar</small>
+    <div id="queueList">
+        @foreach (var app in Model)
+        {
+            <div class="queue-item" draggable="true" data-id="@app.Id" data-search="@($"{app.TokenNumber} {app.Patient?.FirstName} {app.Patient?.LastName} {app.Doctor?.FirstName} {app.Doctor?.LastName} {app.Status}")">
+                <div class="d-flex align-items-center gap-3">
+                    <input type="checkbox" class="form-check-input row-check shadow-none" />
+                    <div class="token-badge @(app.IsEmergency ? "badge-emg" : "")">@(string.IsNullOrEmpty(app.TokenNumber) ? "#" + app.Id : app.TokenNumber)</div>
+                    <div class="patient-info">
+                        <h6 class="mb-1">@app.Patient?.FirstName @app.Patient?.LastName</h6>
+                        <small class="text-muted">Dr. @app.Doctor?.FirstName @app.Doctor?.LastName</small><br />
+                        <small class="text-muted">@app.AppointmentDate.ToString("HH:mm")</small>
+                        @if(app.IsEmergency){<span class="badge bg-danger ms-2">Emergency</span>}
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <span class="badge @(app.Status == "In Progress" || app.Status == "In-Progress" ? "bg-primary" : app.Status == "Completed" ? "bg-success" : "bg-warning text-dark")">@app.Status</span>
+                    @if (app.Status == "In Progress" || app.Status == "In-Progress")
+                    {
+                        <button class="btn btn-sm btn-success" onclick="updateStatus(@app.Id, 'Completed')">Complete</button>
+                    }
+                    else if (app.Status != "Completed")
+                    {
+                        <button class="btn btn-sm btn-outline-secondary" onclick="updateStatus(@app.Id, 'In Progress')">Call In</button>
+                    }
+                    <button class="btn btn-sm btn-outline-info" onclick="viewDetails(@app.Id)"><i class="fa-regular fa-eye"></i></button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteSingle(@app.Id)"><i class="fa-regular fa-trash-can"></i></button>
+                </div>
             </div>
-        </div>
+        }
 
-        <div class="wait-info">
-            <small class="text-muted">Wait Time</small><br />
-            <strong>15 min</strong><br />
-            <select class="status-waiting" onchange="this.className = this.value" style="border:none; cursor:pointer; text-align:right; outline:none; font-weight:600; background:transparent;">
-                <option value="status-progress">In Progress</option>
-                <option value="status-waiting" selected>Waiting</option>
-            </select>
-        </div>
+        @if (!Model.Any())
+        {
+            <div class="text-muted">No tokens for today.</div>
+        }
     </div>
-
-    <div class="queue-item">
-        <div class="d-flex align-items-center">
-            <div class="token-badge">A-047</div>
-            <div class="patient-info">
-                <h6>Amit Kumar</h6>
-                <small class="text-muted">Dr. Neha Singh</small>
-            </div>
-        </div>
-
-        <div class="wait-info">
-            <small class="text-muted">Wait Time</small><br />
-            <strong>22 min</strong><br />
-            <select class="status-waiting" onchange="this.className = this.value" style="border:none; cursor:pointer; text-align:right; outline:none; font-weight:600; background:transparent;">
-                <option value="status-progress">In Progress</option>
-                <option value="status-waiting" selected>Waiting</option>
-            </select>
-        </div>
-    </div>
-
-    <div class="queue-item">
-        <div class="d-flex align-items-center">
-            <div class="token-badge">A-048</div>
-            <div class="patient-info">
-                <h6>Neha Singh</h6>
-                <small class="text-muted">Dr. Vikram Desai</small>
-            </div>
-        </div>
-
-        <div class="wait-info">
-            <small class="text-muted">Wait Time</small><br />
-            <strong>30 min</strong><br />
-            <select class="status-waiting" onchange="this.className = this.value" style="border:none; cursor:pointer; text-align:right; outline:none; font-weight:600; background:transparent;">
-                <option value="status-progress">In Progress</option>
-                <option value="status-waiting" selected>Waiting</option>
-            </select>
-        </div>
-    </div>
-
-    <div class="queue-item">
-        <div class="d-flex align-items-center">
-            <div class="token-badge">A-049</div>
-            <div class="patient-info">
-                <h6>Vikram Desai</h6>
-                <small class="text-muted">Dr. Anjali Gupta</small>
-            </div>
-        </div>
-
-        <div class="wait-info">
-            <small class="text-muted">Wait Time</small><br />
-            <strong>35 min</strong><br />
-            <select class="status-waiting" onchange="this.className = this.value" style="border:none; cursor:pointer; text-align:right; outline:none; font-weight:600; background:transparent;">
-                <option value="status-progress">In Progress</option>
-                <option value="status-waiting" selected>Waiting</option>
-            </select>
-        </div>
-    </div>
-
 </div>
+
+<!-- Detail Modal -->
+<div class="modal fade" id="detailModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-0">
+                <h5 class="modal-title">Token Detail</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="detailBody">Loading...</div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        const rowChecks = document.querySelectorAll('.row-check');
+        const selectAll = document.getElementById('selectAll');
+        const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+
+        function syncBulk() {
+            const selected = document.querySelectorAll('.row-check:checked').length;
+            deleteSelectedBtn.disabled = selected === 0;
+            if (selectAll) selectAll.checked = selected === rowChecks.length && rowChecks.length > 0;
+        }
+
+        rowChecks.forEach(cb => cb.addEventListener('change', syncBulk));
+        if (selectAll) selectAll.addEventListener('change', () => {
+            rowChecks.forEach(cb => cb.checked = selectAll.checked);
+            syncBulk();
+        });
+
+        function deleteSelected() {
+            const ids = Array.from(document.querySelectorAll('.row-check:checked')).map(cb => parseInt(cb.closest('.queue-item').dataset.id));
+            if (ids.length === 0) return;
+            if (!confirm(`Delete ${ids.length} token(s)?`)) return;
+            $.ajax({
+                url: '/Staff/BulkDeleteAppointments',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(ids),
+                success: function(res){
+                    if(res.success){
+                        ids.forEach(id => document.querySelector(`.queue-item[data-id="${id}"]`)?.remove());
+                        syncBulk();
+                    } else alert('Failed to delete.');
+                }
+            });
+        }
+        deleteSelectedBtn.addEventListener('click', deleteSelected);
+
+        function deleteAll(){
+            if(!confirm("Delete ALL tokens for today?")) return;
+            $.post('/Staff/DeleteAllAppointments', function(res){
+                if(res.success){
+                    document.getElementById('queueList').innerHTML = '<div class="text-muted">No tokens for today.</div>';
+                    syncBulk();
+                }
+            });
+        }
+
+        function updateStatus(id, status){
+            $.post('/Staff/UpdateStatus', { id: id, status: status }, function(res){
+                if(res.success) location.reload();
+            });
+        }
+
+        function deleteSingle(id){
+            if(!confirm("Delete this token?")) return;
+            $.post('/Staff/DeleteAppointment', { id: id }, function(res){
+                if(res.success){
+                    document.querySelector(`.queue-item[data-id="${id}"]`)?.remove();
+                    syncBulk();
+                }
+            });
+        }
+
+        function filterList(){
+            const q = document.getElementById('searchBox').value.toLowerCase();
+            document.querySelectorAll('#queueList .queue-item').forEach(item => {
+                item.style.display = item.dataset.search.toLowerCase().includes(q) ? '' : 'none';
+            });
+        }
+
+        function viewDetails(id){
+            $.get('/Doctor/GetAppointmentDetails/' + id, function(data){
+                const html = `
+                    <div><strong>Token:</strong> ${data.token || ''}</div>
+                    <div><strong>Patient:</strong> ${data.patientName}</div>
+                    <div><strong>Doctor:</strong> ${data.doctorName}</div>
+                    <div><strong>Date:</strong> ${data.date} ${data.time}</div>
+                    <div><strong>Status:</strong> ${data.status}</div>
+                    <div><strong>Subject:</strong> ${data.subject || 'N/A'}</div>
+                    <div><strong>Notes:</strong> ${data.notes || 'N/A'}</div>
+                `;
+                document.getElementById('detailBody').innerHTML = html;
+                $('#detailModal').modal('show');
+            });
+        }
+
+        // Drag & drop reordering
+        let dragEl = null;
+        document.querySelectorAll('.queue-item').forEach(item => {
+            item.addEventListener('dragstart', e => {
+                dragEl = item;
+                item.classList.add('opacity-50');
+            });
+            item.addEventListener('dragend', e => {
+                item.classList.remove('opacity-50');
+                dragEl = null;
+            });
+            item.addEventListener('dragover', e => {
+                e.preventDefault();
+                const after = e.clientY < item.getBoundingClientRect().top + item.offsetHeight / 2;
+                const list = document.getElementById('queueList');
+                if (dragEl && dragEl !== item) {
+                    if (after) list.insertBefore(dragEl, item);
+                    else list.insertBefore(dragEl, item.nextSibling);
+                }
+            });
+        });
+
+        function saveOrder() {
+            const ids = Array.from(document.querySelectorAll('#queueList .queue-item')).map(el => parseInt(el.dataset.id));
+            $.ajax({
+                url: '/Staff/UpdateOrder',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(ids),
+                success: function(res){ if(!res.success) alert('Failed to save order'); }
+            });
+        }
+
+        // Save order after drop ends
+        document.getElementById('queueList').addEventListener('drop', () => saveOrder());
+        document.getElementById('queueList').addEventListener('dragend', () => saveOrder());
+
+        syncBulk();
+    </script>
+}

@@ -1,7 +1,9 @@
 @model List<MediCare.Models.Appointment>
+@using MediCare.Models
 @{
     ViewData["Title"] = "My Health Journey";
     Layout = "~/Views/Shared/_UserLayout.cshtml";
+    var activityHistory = ViewBag.ActivityHistory as IEnumerable<Notification> ?? new List<Notification>();
 }
 
 <style>
@@ -74,6 +76,10 @@
             <button class="btn btn-outline-danger btn-sm d-none" id="deleteSelHist" style="border-radius:10px;" onclick="deleteSelectedHistory()">Delete Selected</button>
         }
     </div>
+</div>
+
+<div class="mt-5">
+    <partial name="~/Views/Shared/_ActivityList.cshtml" model="activityHistory" />
 </div>
 
 <div class="timeline">

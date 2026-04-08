@@ -16,6 +16,18 @@ namespace MediCare.Services
 
         public void AddNotification(Notification notification)
         {
+            if (string.IsNullOrWhiteSpace(notification.UserEmail))
+            {
+                return;
+            }
+
+            var email = notification.UserEmail.Trim().ToLower();
+            var pref = _context.UserPreferences.FirstOrDefault(p => p.UserEmail.ToLower() == email);
+            if (pref != null && !pref.PushNotificationsEnabled)
+            {
+                return;
+            }
+
             _context.Notifications.Add(notification);
             _context.SaveChanges();
         }
@@ -26,6 +38,14 @@ namespace MediCare.Services
                 .Where(n => n.UserEmail.ToLower() == email.ToLower())
                 .OrderByDescending(n => n.CreatedAt)
                 .Take(take)
+                .ToList();
+        }
+
+        public List<Notification> GetAllNotificationsForUser(string email)
+        {
+            return _context.Notifications
+                .Where(n => n.UserEmail.ToLower() == email.ToLower())
+                .OrderByDescending(n => n.CreatedAt)
                 .ToList();
         }
 
@@ -54,6 +74,12 @@ namespace MediCare.Services
                 n.IsRead = true;
             }
             _context.SaveChanges();
+        }
+
+        public int CountUnread(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email)) return 0;
+            return _context.Notifications.Count(n => n.UserEmail.ToLower() == email.ToLower() && !n.IsRead);
         }
     }
 }

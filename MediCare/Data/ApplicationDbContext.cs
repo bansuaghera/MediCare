@@ -19,7 +19,10 @@ namespace MediCare.Data
         public DbSet<OPDSchedule> OPDSchedules { get; set; }
         public DbSet<Feedback> Feedbacks { get; set; }
         public DbSet<PrescriptionTemplate> PrescriptionTemplates { get; set; }
+        public DbSet<ClinicBranch> ClinicBranches { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+        public DbSet<UserPreference> UserPreferences { get; set; }
+        public DbSet<LoginSessionRecord> LoginSessionRecords { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -42,6 +45,10 @@ namespace MediCare.Data
                 .WithMany()
                 .HasForeignKey(p => p.AppointmentId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<UserPreference>()
+                .HasIndex(p => p.UserEmail)
+                .IsUnique();
         }
     }
 }

@@ -1,121 +1,150 @@
 @model IEnumerable<MediCare.Models.Feedback>
 @{
-    ViewData["Title"] = "Patient Feedbacks";
+    ViewData["Title"] = "Feedback Management";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
 <style>
+    .feedback-shell {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 24px;
+        box-shadow: 0 20px 50px rgba(15,23,42,.04);
+        padding: 22px;
+    }
     .feedback-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-        gap: 24px;
-        margin-top: 30px;
+        grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+        gap: 18px;
+        margin-top: 20px;
     }
-
     .feedback-card {
-        background: white;
+        background: #f8fafc;
         border-radius: 20px;
-        padding: 30px;
-        border: 1px solid #f1f5f9;
-        transition: 0.3s;
+        padding: 22px;
+        border: 1px solid #e5e7eb;
+        transition: 0.25s ease;
         position: relative;
     }
-
     .feedback-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 30px rgba(0,0,0,0.05);
+        transform: translateY(-3px);
+        box-shadow: 0 12px 25px rgba(0,0,0,0.04);
     }
-
-    .rating-stars {
-        color: #fbbf24;
-        font-size: 18px;
-        margin-bottom: 15px;
-    }
-
-    .feedback-content {
-        color: #475569;
-        font-style: italic;
-        line-height: 1.6;
-        margin-bottom: 20px;
-        font-size: 15px;
-    }
-
+    .rating-stars { color: #fbbf24; font-size: 16px; margin-bottom: 12px; }
+    .feedback-content { color: #475569; line-height: 1.6; margin-bottom: 16px; font-size: 14px; }
     .feedback-footer {
         display: flex;
         align-items: center;
         gap: 12px;
-        border-top: 1px solid #f1f5f9;
-        padding-top: 15px;
+        border-top: 1px solid #e5e7eb;
+        padding-top: 14px;
     }
-
     .patient-avatar {
         width: 40px;
         height: 40px;
-        background: #eff6ff;
-        color: #3b82f6;
+        background: #ecfdf5;
+        color: #10b981;
+        border: 1px solid #bbf7d0;
         border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-weight: 700;
+        font-weight: 800;
     }
-
     .feedback-date {
         font-size: 12px;
         color: #94a3b8;
         position: absolute;
-        top: 30px;
-        right: 30px;
+        top: 18px;
+        right: 18px;
     }
-
     .empty-state {
         text-align: center;
         padding: 100px 0;
-        opacity: 0.5;
+        opacity: 0.55;
+    }
+    .feedback-topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
     }
 </style>
 
-<div class="d-flex justify-content-between align-items-center">
-    <div>
-        <h2 class="fw-bold m-0">Patient Feedbacks</h2>
-        <p class="text-muted">Listen to what your patients have to say</p>
+<div class="feedback-shell">
+    <div class="feedback-topbar">
+        <div>
+            <h2 class="fw-bold m-0">Feedback Management</h2>
+            <p class="text-muted mb-0">Review, manage, and remove feedback from all panels.</p>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+            <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3" id="selectAllFeedback">Select All</button>
+            <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3" id="deleteSelectedFeedback">Delete Selected</button>
+            <button type="button" class="btn btn-danger btn-sm rounded-pill px-3" id="deleteAllFeedback">Delete All</button>
+        </div>
     </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="feedback-grid">
+            @foreach (var fb in Model)
+            {
+                var initials = string.IsNullOrWhiteSpace(fb.PatientName) ? "F" : string.Join("", fb.PatientName.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(x => x[0])).ToUpper();
+                <div class="feedback-card">
+                    <input type="checkbox" class="feedback-check position-absolute top-0 start-0 m-3" data-id="@fb.Id" />
+                    <div class="feedback-date">@fb.SubmittedAt.ToString("MMM dd, yyyy")</div>
+                    <div class="mb-2 d-flex align-items-center gap-2">
+                        <span class="badge bg-primary bg-opacity-10 text-primary border rounded-pill px-3 py-2">Review</span>
+                        <span class="badge bg-success bg-opacity-10 text-success border rounded-pill px-3 py-2">@fb.Rating/5</span>
+                        <span class="badge bg-light text-dark border rounded-pill px-3 py-2">@((fb.Patient != null) ? "Patient" : "User")</span>
+                    </div>
+                    <div class="rating-stars">
+                        @for (int i = 0; i < 5; i++)
+                        {
+                            <i class="fa-@(i < fb.Rating ? "solid" : "regular") fa-star"></i>
+                        }
+                    </div>
+                    <div class="feedback-content">
+                        @fb.Comment
+                    </div>
+                    <div class="feedback-footer">
+                        <div class="patient-avatar">@initials</div>
+                        <div class="flex-grow-1">
+                            <div class="fw-bold text-slate-800">@(fb.Patient != null ? fb.Patient.FirstName + " " + fb.Patient.LastName : fb.PatientName)</div>
+                            <div class="text-xs text-slate-500">Verified feedback review</div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+            <i class="fa-regular fa-comments fa-4x mb-3"></i>
+            <h4>No feedbacks yet</h4>
+            <p>Patient, staff, and user reviews will appear here once submitted.</p>
+        </div>
+    }
 </div>
 
-@if (Model != null && Model.Any())
-{
-    <div class="feedback-grid">
-        @foreach (var fb in Model)
-        {
-            <div class="feedback-card shadow-sm">
-                <div class="feedback-date">@fb.SubmittedAt.ToString("MMM dd, yyyy")</div>
-                <div class="rating-stars">
-                    @for (int i = 0; i < 5; i++)
-                    {
-                        <i class="fa-@(i < fb.Rating ? "solid" : "regular") fa-star"></i>
-                    }
-                </div>
-                <div class="feedback-content">
-                    "@fb.Comment"
-                </div>
-                <div class="feedback-footer">
-                    <div class="patient-avatar">
-                        @(fb.Patient != null ? fb.Patient.FirstName[0].ToString() : fb.PatientName[0].ToString())
-                    </div>
-                    <div>
-                        <div class="fw-bold text-slate-800">@(fb.Patient != null ? fb.Patient.FirstName + " " + fb.Patient.LastName : fb.PatientName)</div>
-                        <div class="text-xs text-slate-500">Verified Patient Review</div>
-                    </div>
-                </div>
-            </div>
-        }
-    </div>
-}
-else
-{
-    <div class="empty-state">
-        <i class="fa-regular fa-comments fa-4x mb-3"></i>
-        <h4>No feedbacks yet</h4>
-        <p>Patient reviews will appear here once submitted.</p>
-    </div>
+@section Scripts {
+<script>
+    const checks = () => Array.from(document.querySelectorAll('.feedback-check'));
+    document.getElementById('selectAllFeedback')?.addEventListener('click', () => {
+        const next = !checks().every(c => c.checked);
+        checks().forEach(c => c.checked = next);
+    });
+    document.getElementById('deleteSelectedFeedback')?.addEventListener('click', () => {
+        const ids = checks().filter(c => c.checked).map(c => parseInt(c.dataset.id));
+        if(ids.length === 0) return;
+        if(!confirm(`Delete ${ids.length} feedback item(s)?`)) return;
+        $.ajax({ url: '/Admin/DeleteSelectedFeedbacks', type: 'POST', contentType: 'application/json', data: JSON.stringify(ids), success: r => r.success && location.reload() });
+    });
+    document.getElementById('deleteAllFeedback')?.addEventListener('click', () => {
+        if(!confirm('Delete all feedback history?')) return;
+        $.post('/Admin/DeleteAllFeedbacks', {}, r => r.success && location.reload());
+    });
+</script>
 }

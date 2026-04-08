@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MediCare.Models;
 using MediCare.Services;
+using MediCare.Utilities;
 
 namespace MediCare.Controllers
 {
@@ -12,8 +13,10 @@ namespace MediCare.Controllers
         private readonly UserService _userService;
         private readonly PrescriptionService _prescriptionService;
         private readonly FeedbackService _feedbackService;
+        private readonly NotificationService _notificationService;
+        private readonly UserPreferenceService _userPreferenceService;
 
-        public UserController(AppointmentService appointmentService, PatientService patientService, DoctorService doctorService, UserService userService, PrescriptionService prescriptionService, FeedbackService feedbackService)
+        public UserController(AppointmentService appointmentService, PatientService patientService, DoctorService doctorService, UserService userService, PrescriptionService prescriptionService, FeedbackService feedbackService, NotificationService notificationService, UserPreferenceService userPreferenceService)
         {
             _appointmentService = appointmentService;
             _patientService = patientService;
@@ -21,6 +24,8 @@ namespace MediCare.Controllers
             _userService = userService;
             _prescriptionService = prescriptionService;
             _feedbackService = feedbackService;
+            _notificationService = notificationService;
+            _userPreferenceService = userPreferenceService;
         }
 
         public IActionResult Dashboard()
@@ -61,7 +66,44 @@ namespace MediCare.Controllers
                     .ToList();
             }
 
+            var dailyTrend = AnalyticsHelper.BuildDailyAppointmentTrend(appointments, 7);
+            var statusCounts = AnalyticsHelper.BuildStatusCounts(appointments);
+            ViewBag.ChartLabels = dailyTrend.Labels;
+            ViewBag.ChartData = dailyTrend.Counts;
+            ViewBag.StatusLabels = statusCounts.Labels;
+            ViewBag.StatusData = statusCounts.Counts;
+
             return View(appointments);
+        }
+
+        public IActionResult Analytics()
+        {
+            string email = HttpContext.Session.GetString("UserEmail") ?? string.Empty;
+            if (string.IsNullOrEmpty(email)) return RedirectToAction("Login", "Login");
+
+            var patient = _patientService.GetAllPatients().FirstOrDefault(p => p.Email != null && p.Email.ToLower() == email.ToLower())
+                ?? _patientService.GetAllPatients().FirstOrDefault();
+
+            var appointments = new List<MediCare.Models.Appointment>();
+            if (patient != null)
+            {
+                appointments = _appointmentService.GetAllAppointments()
+                    .Where(a => a.PatientId == patient.Id)
+                    .OrderBy(a => a.AppointmentDate)
+                    .ToList();
+            }
+
+            var dailyTrend = AnalyticsHelper.BuildDailyAppointmentTrend(appointments, 14);
+            var statusCounts = AnalyticsHelper.BuildStatusCounts(appointments);
+            ViewBag.ChartLabels = dailyTrend.Labels;
+            ViewBag.ChartData = dailyTrend.Counts;
+            ViewBag.StatusLabels = statusCounts.Labels;
+            ViewBag.StatusData = statusCounts.Counts;
+            ViewBag.TotalAppointments = appointments.Count;
+            ViewBag.UpcomingAppointments = appointments.Count(a => a.AppointmentDate.Date >= DateTime.Today);
+            ViewBag.PastAppointments = appointments.Count(a => a.AppointmentDate.Date < DateTime.Today);
+            ViewBag.RecentAppointments = appointments.OrderByDescending(a => a.AppointmentDate).Take(8).ToList();
+            return View();
         }
         public IActionResult Doctors()
         {
@@ -113,19 +155,23 @@ namespace MediCare.Controllers
             {
                 appointment.PatientId = patient.Id;
                 appointment.Status = "Scheduled";
-                
-                // Auto-generate a Token Number if not provided
-                if (string.IsNullOrEmpty(appointment.TokenNumber))
-                {
-                    int totalToday = _appointmentService.GetAllAppointments()
-                        .Count(a => a.DoctorId == appointment.DoctorId && a.AppointmentDate.Date == appointment.AppointmentDate.Date);
-                    appointment.TokenNumber = "TN-" + (100 + totalToday + 1);
-                }
+
+                // If emergency, flag it so queue floats it to the top
+                // appointment.IsEmergency is already bound from checkbox; ensure boolean defaults to false
+                appointment.IsEmergency = appointment.IsEmergency;
 
                 // Ensure the date is UTC for PostgreSQL
                 appointment.AppointmentDate = DateTime.SpecifyKind(appointment.AppointmentDate, DateTimeKind.Utc);
                 
                 _appointmentService.AddAppointment(appointment);
+                _notificationService.AddNotification(new Notification
+                {
+                    UserEmail = email,
+                    Title = "Appointment Booked",
+                    Message = $"Appointment booked on {appointment.AppointmentDate:yyyy-MM-dd} at {appointment.TimeSlot}",
+                    Type = appointment.IsEmergency ? "warning" : "info",
+                    CreatedAt = DateTime.UtcNow
+                });
                 return RedirectToAction("MyAppointments");
             }
             
@@ -166,25 +212,76 @@ namespace MediCare.Controllers
             var patients = _patientService.GetAllPatients();
             var patient = patients.FirstOrDefault(p => p.Email != null && p.Email.ToLower() == email.ToLower());
 
-            MediCare.Models.Appointment? appointment = null;
+            var appointments = new List<MediCare.Models.Appointment>();
             if (patient != null)
             {
-                // Get the most recent upcoming appointment for today
-                appointment = _appointmentService.GetAllAppointments()
-                    .Where(a => a.PatientId == patient.Id && a.AppointmentDate.Date == DateTime.Today && (a.Status == "Waiting" || a.Status == "Scheduled" || a.Status == "In Progress"))
+                appointments = _appointmentService.GetAllAppointments()
+                    .Where(a => a.PatientId == patient.Id && (
+                        a.Status == "Waiting" ||
+                        a.Status == "Scheduled" ||
+                        a.Status == "Awaiting Confirmation" ||
+                        a.Status == "In Progress"))
                     .OrderBy(a => a.AppointmentDate)
-                    .FirstOrDefault();
-                
-                if (appointment != null && appointment.Status == "Waiting")
-                {
-                    // Count patients ahead of this one for the same doctor today
-                    var ahead = _appointmentService.GetAllAppointments()
-                        .Count(a => a.DoctorId == appointment.DoctorId && a.AppointmentDate.Date == DateTime.Today && a.Status == "Waiting" && a.Id < appointment.Id);
-                    ViewBag.PatientsAhead = ahead;
-                }
+                    .ToList();
             }
 
-            return View(appointment);
+            return View(appointments);
+        }
+
+        [HttpPost]
+        public IActionResult RespondToToken(int id, string action)
+        {
+            string email = HttpContext.Session.GetString("UserEmail") ?? string.Empty;
+            if (string.IsNullOrEmpty(email)) return Json(new { success = false });
+
+            var patient = _patientService.GetAllPatients().FirstOrDefault(p => p.Email != null && p.Email.ToLower() == email.ToLower());
+            if (patient == null) return Json(new { success = false });
+
+            var appointment = _appointmentService.GetAppointmentById(id);
+            if (appointment == null || appointment.PatientId != patient.Id) return Json(new { success = false });
+
+            action = (action ?? string.Empty).Trim().ToLowerInvariant();
+            if (action == "accept")
+            {
+                appointment.Status = "In Progress";
+                _appointmentService.UpdateAppointment(appointment);
+                _notificationService.AddNotification(new Notification
+                {
+                    UserEmail = email,
+                    Title = "Token Accepted",
+                    Message = $"You accepted token {appointment.TokenNumber}. It is now in progress.",
+                    Type = "success",
+                    CreatedAt = DateTime.UtcNow
+                });
+                return Json(new { success = true, action = "accepted", status = appointment.Status });
+            }
+
+            if (action == "reject")
+            {
+                var queue = _appointmentService.GetAllAppointments()
+                    .Where(a => a.DoctorId == appointment.DoctorId && a.AppointmentDate.Date == appointment.AppointmentDate.Date && a.Status != "Cancelled" && a.Status != "Completed")
+                    .OrderByDescending(a => a.IsEmergency)
+                    .ThenBy(a => a.SortOrder)
+                    .ThenBy(a => a.AppointmentDate)
+                    .ToList();
+
+                var orderedIds = queue.Where(a => a.Id != appointment.Id).Select(a => a.Id).ToList();
+                orderedIds.Add(appointment.Id);
+                _appointmentService.UpdateSortOrder(orderedIds);
+                appointment.Status = "Scheduled";
+                _appointmentService.UpdateAppointment(appointment);
+                _notificationService.AddNotification(new Notification
+                {
+                    UserEmail = email,
+                    Title = "Token Rejected",
+                    Message = $"You rejected token {appointment.TokenNumber}. It was moved back in the queue.",
+                    Type = "warning",
+                    CreatedAt = DateTime.UtcNow
+                });
+                return Json(new { success = true, action = "rejected", status = appointment.Status });
+            }
+
+            return Json(new { success = false });
         }
 
         public IActionResult History()
@@ -203,6 +300,8 @@ namespace MediCare.Controllers
                     .OrderByDescending(a => a.AppointmentDate)
                     .ToList();
             }
+
+            ViewBag.ActivityHistory = _notificationService.GetAllNotificationsForUser(email);
 
             return View(appointments);
         }
@@ -231,7 +330,56 @@ namespace MediCare.Controllers
             if (string.IsNullOrEmpty(email)) return RedirectToAction("Login", "Login");
 
             var patient = _patientService.GetAllPatients().FirstOrDefault(p => p.Email != null && p.Email.ToLower() == email.ToLower());
+            var pref = _userPreferenceService.GetOrCreate(email);
+            ViewBag.PushNotificationsEnabled = pref.PushNotificationsEnabled;
+            ViewBag.TwoFactorEnabled = pref.TwoFactorEnabled;
             return View(patient);
+        }
+
+        [HttpPost]
+        public IActionResult Profile(Patient form, IFormFile? photo)
+        {
+            string email = HttpContext.Session.GetString("UserEmail") ?? string.Empty;
+            if (string.IsNullOrEmpty(email)) return RedirectToAction("Login", "Login");
+
+            var patient = _patientService.GetAllPatients().FirstOrDefault(p => p.Email != null && p.Email.ToLower() == email.ToLower());
+            if (patient == null) return RedirectToAction("Login", "Login");
+
+            patient.FirstName = form.FirstName;
+            patient.LastName = form.LastName;
+            patient.Phone = form.Phone;
+            patient.Address = form.Address;
+            patient.BloodGroup = form.BloodGroup;
+            patient.MedicalHistory = form.MedicalHistory;
+            patient.Gender = form.Gender;
+            patient.DateOfBirth = form.DateOfBirth;
+
+            // Photo upload: save to wwwroot/uploads and stash path in TempData to show; skipped persistence to DB to avoid schema change
+            if (photo != null && photo.Length > 0)
+            {
+                var uploads = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+                if (!Directory.Exists(uploads)) Directory.CreateDirectory(uploads);
+                var fileName = $"patient_{patient.Id}{Path.GetExtension(photo.FileName)}";
+                var path = Path.Combine(uploads, fileName);
+                using (var stream = System.IO.File.Create(path))
+                {
+                    photo.CopyTo(stream);
+                }
+                TempData["ProfilePhoto"] = $"/uploads/{fileName}";
+            }
+
+            _patientService.UpdatePatient(patient);
+            _notificationService.AddNotification(new Notification
+            {
+                UserEmail = email,
+                Title = "Profile Updated",
+                Message = "Your profile details were updated successfully.",
+                Type = "success",
+                CreatedAt = DateTime.UtcNow
+            });
+            TempData["ToastMessage"] = "Profile updated successfully";
+            TempData["ToastType"] = "success";
+            return RedirectToAction("Profile");
         }
         [HttpPost]
         public IActionResult CancelAppointment(int id)
@@ -256,6 +404,14 @@ namespace MediCare.Controllers
             if (appointment != null && patient != null && appointment.PatientId == patient.Id)
             {
                 _appointmentService.DeleteAppointment(id);
+                _notificationService.AddNotification(new Notification
+                {
+                    UserEmail = email,
+                    Title = "Appointment Deleted",
+                    Message = $"Appointment #{id} deleted",
+                    Type = "error",
+                    CreatedAt = DateTime.UtcNow
+                });
                 return Json(new { success = true });
             }
             return Json(new { success = false });
@@ -274,6 +430,14 @@ namespace MediCare.Controllers
                 {
                     _appointmentService.DeleteAppointment(appt.Id);
                 }
+                _notificationService.AddNotification(new Notification
+                {
+                    UserEmail = email ?? "",
+                    Title = "All Appointments Deleted",
+                    Message = "All your appointments were deleted.",
+                    Type = "error",
+                    CreatedAt = DateTime.UtcNow
+                });
                 return Json(new { success = true });
             }
             return Json(new { success = false });
@@ -299,6 +463,14 @@ namespace MediCare.Controllers
                 _appointmentService.DeleteAppointment(appt.Id);
             }
 
+            _notificationService.AddNotification(new Notification
+            {
+                UserEmail = email ?? "",
+                Title = "Appointments Deleted",
+                Message = $"{appointments.Count} selected appointments deleted.",
+                Type = "error",
+                CreatedAt = DateTime.UtcNow
+            });
             return Json(new { success = true });
         }
         [HttpGet]
@@ -319,7 +491,7 @@ namespace MediCare.Controllers
             });
         }
         [HttpPost]
-        public async Task<IActionResult> SubmitFeedback(Feedback feedback)
+        public async Task<IActionResult> SubmitFeedback(Feedback feedback, string? subject)
         {
             string email = HttpContext.Session.GetString("UserEmail") ?? string.Empty;
             var patient = _patientService.GetAllPatients().FirstOrDefault(p => p.Email != null && p.Email.ToLower() == email.ToLower());
@@ -328,20 +500,125 @@ namespace MediCare.Controllers
             if (patient != null)
             {
                 feedback.PatientId = patient.Id;
+                feedback.PatientName = $"{patient.FirstName} {patient.LastName}".Trim();
+            }
+            else
+            {
+                feedback.PatientName = HttpContext.Session.GetString("UserName") ?? "User";
+            }
+
+            if (!string.IsNullOrWhiteSpace(subject))
+            {
+                feedback.Comment = $"[{subject.Trim()}] {feedback.Comment}";
             }
             
             await _feedbackService.AddFeedbackAsync(feedback);
             return Json(new { success = true });
         }
 
-        public IActionResult Notifications()
+        [HttpPost]
+        public async Task<IActionResult> DeleteFeedback(int id)
         {
-            return View();
+            string email = HttpContext.Session.GetString("UserEmail") ?? string.Empty;
+            var patient = _patientService.GetAllPatients().FirstOrDefault(p => p.Email != null && p.Email.ToLower() == email.ToLower());
+            var fb = await _feedbackService.GetFeedbackByIdAsync(id);
+            if (patient == null || fb == null || fb.PatientId != patient.Id) return Json(new { success = false });
+            await _feedbackService.DeleteFeedbackAsync(id);
+            return Json(new { success = true });
         }
 
-        public IActionResult Feedback()
+        [HttpPost]
+        public async Task<IActionResult> DeleteSelectedFeedbacks([FromBody] int[] ids)
         {
-            return View();
+            string email = HttpContext.Session.GetString("UserEmail") ?? string.Empty;
+            var patient = _patientService.GetAllPatients().FirstOrDefault(p => p.Email != null && p.Email.ToLower() == email.ToLower());
+            if (patient == null || ids == null || ids.Length == 0) return Json(new { success = false });
+
+            var feedbacks = await _feedbackService.GetFeedbacksForPatientAsync(patient.Id);
+            var allowedIds = feedbacks.Where(f => ids.Contains(f.Id)).Select(f => f.Id).ToList();
+            if (allowedIds.Count == 0) return Json(new { success = false });
+
+            await _feedbackService.DeleteFeedbacksAsync(allowedIds);
+            return Json(new { success = true });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteAllFeedbacks()
+        {
+            string email = HttpContext.Session.GetString("UserEmail") ?? string.Empty;
+            var patient = _patientService.GetAllPatients().FirstOrDefault(p => p.Email != null && p.Email.ToLower() == email.ToLower());
+            if (patient == null) return Json(new { success = false });
+            await _feedbackService.DeleteAllForPatientAsync(patient.Id);
+            return Json(new { success = true });
+        }
+
+        public IActionResult Notifications()
+        {
+            string email = HttpContext.Session.GetString("UserEmail") ?? string.Empty;
+            var notifications = string.IsNullOrEmpty(email)
+                ? new List<Notification>()
+                : _notificationService.GetNotificationsForUser(email);
+            // Mark all read when opening the page
+            if (!string.IsNullOrEmpty(email)) _notificationService.MarkAllRead(email);
+            return View(notifications);
+        }
+
+        [HttpPost]
+        public IActionResult DeleteAllNotifications()
+        {
+            string email = HttpContext.Session.GetString("UserEmail") ?? string.Empty;
+            if (string.IsNullOrEmpty(email)) return Json(new { success = false });
+            _notificationService.DeleteAllForUser(email);
+            return Json(new { success = true });
+        }
+
+        [HttpPost]
+        public IActionResult DeleteNotifications([FromBody] int[] ids)
+        {
+            string email = HttpContext.Session.GetString("UserEmail") ?? string.Empty;
+            if (string.IsNullOrEmpty(email) || ids == null) return Json(new { success = false });
+            foreach (var id in ids) _notificationService.DeleteNotification(id, email);
+            return Json(new { success = true });
+        }
+
+        [HttpPost]
+        public IActionResult MarkAllNotificationsRead()
+        {
+            string email = HttpContext.Session.GetString("UserEmail") ?? string.Empty;
+            if (string.IsNullOrEmpty(email)) return Json(new { success = false });
+            _notificationService.MarkAllRead(email);
+            return Json(new { success = true });
+        }
+
+        [HttpPost]
+        public IActionResult TogglePushNotifications(bool enabled)
+        {
+            string email = HttpContext.Session.GetString("UserEmail") ?? string.Empty;
+            if (string.IsNullOrEmpty(email)) return Json(new { success = false });
+            _userPreferenceService.SetPushEnabled(email, enabled);
+            return Json(new { success = true });
+        }
+
+        [HttpPost]
+        public IActionResult ToggleTwoFactor(bool enabled)
+        {
+            string email = HttpContext.Session.GetString("UserEmail") ?? string.Empty;
+            if (string.IsNullOrEmpty(email)) return Json(new { success = false });
+            _userPreferenceService.SetTwoFactorEnabled(email, enabled);
+            return Json(new { success = true });
+        }
+
+        public async Task<IActionResult> Feedback()
+        {
+            string email = HttpContext.Session.GetString("UserEmail") ?? string.Empty;
+            if (string.IsNullOrEmpty(email)) return RedirectToAction("Login", "Login");
+
+            var patient = _patientService.GetAllPatients().FirstOrDefault(p => p.Email != null && p.Email.ToLower() == email.ToLower());
+            var history = patient == null
+                ? new List<Feedback>()
+                : await _feedbackService.GetFeedbacksForPatientAsync(patient.Id);
+
+            return View(history);
         }
 
         public IActionResult Settings()

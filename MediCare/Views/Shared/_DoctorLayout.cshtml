@@ -1,6 +1,16 @@
+@inject MediCare.Services.NotificationService NotificationService
+@inject MediCare.Services.LoginSessionService LoginSessionService
 @{
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
     var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+    var userEmail = Context.Session.GetString("UserEmail") ?? string.Empty;
+    var unreadNotificationCount = string.IsNullOrEmpty(userEmail) ? 0 : NotificationService.CountUnread(userEmail);
+    var loginAtRaw = Context.Session.GetString("LoginAt") ?? string.Empty;
+    var loginLabel = "Logged out";
+    if (DateTime.TryParse(loginAtRaw, null, System.Globalization.DateTimeStyles.RoundtripKind, out var loginAt))
+    {
+        loginLabel = loginAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss");
+    }
 }
 
 <!DOCTYPE html>
@@ -51,14 +61,14 @@
         }
 
         .sidebar-header {
-            padding: 30px 24px;
+            padding: 18px 20px 14px;
         }
 
         .logo-box {
             display: flex;
             align-items: center;
             gap: 12px;
-            margin-bottom: 40px;
+            margin-bottom: 18px;
         }
 
         .logo-icon {
@@ -76,8 +86,8 @@
         .profile-card {
             background-color: #f8fafc;
             border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 30px;
+            padding: 16px;
+            margin-bottom: 14px;
             border: 1px solid #f1f5f9;
         }
 
@@ -92,7 +102,7 @@
             justify-content: center;
             font-weight: 700;
             font-size: 18px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         .profile-name {
@@ -109,6 +119,17 @@
             margin-bottom: 8px;
         }
 
+        .session-time {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 10px;
+            line-height: 1.45;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 8px 10px;
+        }
+
         .role-badge {
             background: var(--primary);
             color: white;
@@ -122,7 +143,7 @@
 
         .sidebar-menu {
             flex-grow: 1;
-            padding: 0 16px;
+            padding: 0 12px;
             overflow-y: auto;
             scrollbar-width: thin;
             scrollbar-color: #cbd5e1 transparent;
@@ -178,7 +199,7 @@
         }
 
         .sidebar-footer {
-            padding: 16px;
+            padding: 12px 16px 14px;
             border-top: 1px solid #f1f5f9;
         }
 
@@ -304,6 +325,10 @@
                 <h6 class="profile-name">@(Context.Session.GetString("UserName") ?? "Dhiraj Dabhii")</h6>
                 <div class="profile-email">@(Context.Session.GetString("UserEmail") ?? "dabhidhiraj75@gmail.com")</div>
                 <div class="role-badge">DOCTOR</div>
+                <div class="session-time">
+                    <div><i class="fa-regular fa-clock me-1"></i> Login: <span id="loginTimeText">@loginLabel</span></div>
+                    <div><i class="fa-solid fa-hourglass-half me-1"></i> Live: <span id="sessionLiveText">--:--:--</span></div>
+                </div>
             </div>
         </div>
 
@@ -323,23 +348,36 @@
             <a class="nav-link @(currentAction == "Examination" ? "active" : "")" href="/Doctor/Examination">
                 <i class="fa-solid fa-stethoscope"></i> Examination
             </a>
+            <a class="nav-link @(currentAction == "Medicines" ? "active" : "")" href="/Doctor/Medicines">
+                <i class="fa-solid fa-pills"></i> Medicines
+            </a>
+            <a class="nav-link @(currentAction == "Templates" ? "active" : "")" href="/Doctor/Templates">
+                <i class="fa-solid fa-file-medical"></i> Templates
+            </a>
+            <a class="nav-link @(currentAction == "Branches" ? "active" : "")" href="/Doctor/Branches">
+                <i class="fa-solid fa-building"></i> Branches
+            </a>
             <a class="nav-link @(currentAction == "Prescriptions" ? "active" : "")" href="/Doctor/Prescriptions">
                 <i class="fa-solid fa-file-prescription"></i> Prescriptions
             </a>
+            <a class="nav-link @(currentAction == "History" ? "active" : "")" asp-controller="Doctor" asp-action="History">
+                <i class="fa-solid fa-clock-rotate-left"></i> History
+            </a>
+            <a class="nav-link @(currentAction == "Analytics" ? "active" : "")" asp-controller="Doctor" asp-action="Analytics">
+                <i class="fa-solid fa-chart-pie"></i> Analytics
+            </a>
+            <a class="nav-link @(currentAction == "Profile" ? "active" : "")" asp-controller="Doctor" asp-action="Profile">
+                <i class="fa-regular fa-user"></i> Profile
+            </a>
             <a class="nav-link" href="/Doctor/Notifications">
                 <i class="fa-regular fa-bell"></i> Notifications
-            </a>
-            <a class="nav-link @(currentAction == "Schedule" ? "active" : "")" href="/Doctor/Schedule">
-                <i class="fa-regular fa-calendar-days"></i> Schedule
-            </a>
-            <a class="nav-link @(currentAction == "FollowUps" ? "active" : "")" href="/Doctor/FollowUps">
-                <i class="fa-regular fa-circle-check"></i> Follow-ups
+                @if (unreadNotificationCount > 0)
+                {
+                    <span class="ms-auto rounded-circle bg-danger d-inline-block" style="width:8px;height:8px;"></span>
+                }
             </a>
             <a class="nav-link @(currentAction == "Feedback" ? "active" : "")" href="/Doctor/Feedback">
                 <i class="fa-regular fa-comment-dots"></i> Feedback
-            </a>
-            <a class="nav-link @(currentAction == "Settings" ? "active" : "")" href="/Doctor/Settings">
-                <i class="fa-solid fa-gear"></i> Settings
             </a>
         </div>
 
@@ -354,15 +392,20 @@
         <header class="topbar">
             <div class="top-search">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" placeholder="Search patients, appointments..." />
+                <input type="text" id="pageSearchInput" placeholder="Search patients, appointments..." />
             </div>
 
             <div class="topbar-right">
-                <div class="notif-bell">
+                <a class="notif-bell text-decoration-none" href="/Doctor/Notifications" title="Notifications">
                     <i class="fa-regular fa-bell"></i>
-                    <div class="notif-dot"></div>
-                </div>
-                <div class="user-dd">@(Context.Session.GetString("UserName")?.Substring(0, 2).ToUpper() ?? "DD")</div>
+                    @if (unreadNotificationCount > 0)
+                    {
+                        <div class="notif-dot"></div>
+                    }
+                </a>
+                <a asp-controller="Doctor" asp-action="Profile" class="text-decoration-none">
+                    <div class="user-dd">@(Context.Session.GetString("UserName")?.Substring(0, 2).ToUpper() ?? "DD")</div>
+                </a>
             </div>
         </header>
 
@@ -374,5 +417,68 @@
     @await RenderSectionAsync("Scripts", required: false)
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    @if(TempData["ToastMessage"] != null){
+        <div class="toast align-items-center text-bg-@(TempData["ToastType"] ?? "success") position-fixed top-0 end-0 m-3 show" role="alert" aria-live="assertive" aria-atomic="true" style="z-index:2000;">
+            <div class="d-flex">
+                <div class="toast-body">
+                    @TempData["ToastMessage"]
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    }
+    <script>
+        (function () {
+            const raw = '@loginAtRaw';
+            if (!raw) return;
+            const start = new Date(raw);
+            if (isNaN(start.getTime())) return;
+            const tick = () => {
+                const diff = Math.max(0, Date.now() - start.getTime());
+                const sec = Math.floor(diff / 1000);
+                const h = String(Math.floor(sec / 3600)).padStart(2, '0');
+                const m = String(Math.floor((sec % 3600) / 60)).padStart(2, '0');
+                const s = String(sec % 60).padStart(2, '0');
+                const el = document.getElementById('sessionLiveText');
+                if (el) el.textContent = `${h}:${m}:${s}`;
+            };
+            tick();
+            setInterval(tick, 1000);
+        })();
+
+        (function () {
+            const input = document.getElementById('pageSearchInput');
+            if (!input) return;
+            const root = document.querySelector('.main-body') || document.body;
+            const selectors = [
+                'tbody tr',
+                '.appointment-card',
+                '.queue-item',
+                '.row-card',
+                '.card-box',
+                '.notification-item',
+                '.notification-card',
+                '.feedback-card',
+                '.history-item',
+                '.patient-card',
+                '.doctor-card',
+                '.prescription-card',
+                '.list-group-item',
+                '.searchable-item'
+            ];
+            const filter = () => {
+                const term = input.value.trim().toLowerCase();
+                const items = Array.from(root.querySelectorAll(selectors.join(',')));
+                const seen = new Set();
+                items.forEach(item => {
+                    if (seen.has(item)) return;
+                    seen.add(item);
+                    const text = (item.dataset.search || item.innerText || '').toLowerCase();
+                    item.style.display = !term || text.includes(term) ? '' : 'none';
+                });
+            };
+            input.addEventListener('input', filter);
+        })();
+    </script>
 </body>
 </html>

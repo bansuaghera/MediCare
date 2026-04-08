@@ -5,27 +5,30 @@
 }
 
 <style>
-    .prescribe-container {
+    .exam-shell {
         display: grid;
-        grid-template-columns: 1fr 350px;
-        gap: 30px;
-        margin-top: 20px;
+        grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
+        gap: 24px;
+        margin-top: 18px;
+        align-items: start;
     }
 
     .card-modern {
         background: white;
         border-radius: 20px;
-        padding: 30px;
+        padding: 28px;
         box-shadow: 0 10px 25px rgba(0,0,0,0.02);
         border: 1px solid #f1f5f9;
     }
 
     .form-label-bold {
         font-weight: 700;
-        font-size: 14px;
+        font-size: 13px;
         color: #1e293b;
         margin-bottom: 8px;
         display: block;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
     }
 
     .input-modern {
@@ -34,6 +37,7 @@
         padding: 12px 16px;
         transition: all 0.2s;
         width: 100%;
+        background: #fff;
     }
 
     .input-modern:focus {
@@ -42,13 +46,45 @@
         outline: none;
     }
 
+    .section-title {
+        font-size: 24px;
+        font-weight: 800;
+        color: #111827;
+        margin-bottom: 4px;
+    }
+
+    .section-sub {
+        color: #6b7280;
+        font-size: 14px;
+        margin-bottom: 0;
+    }
+
+    .appt-meta {
+        margin-top: 10px;
+        font-size: 13px;
+        color: #64748b;
+    }
+
+    .selected-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: #ecfdf5;
+        color: #047857;
+        font-weight: 700;
+        font-size: 13px;
+        margin-top: 12px;
+    }
+
     .medicine-search-box {
         position: relative;
     }
 
     #medicine-results {
         position: absolute;
-        top: 100%;
+        top: calc(100% + 4px);
         left: 0;
         right: 0;
         background: white;
@@ -73,23 +109,37 @@
     }
 
     .prescribed-list {
-        margin-top: 20px;
+        margin-top: 18px;
     }
 
     .medicine-row {
         background: #f8fafc;
-        border-radius: 12px;
+        border-radius: 14px;
         padding: 15px;
         margin-bottom: 12px;
-        display: flex;
-        justify-content: space-between;
+        display: grid;
+        grid-template-columns: minmax(180px, 1.4fr) minmax(0, 1.2fr);
+        gap: 14px;
         align-items: center;
-        animation: slideIn 0.3s ease-out;
+        animation: slideIn 0.25s ease-out;
     }
 
     @@keyframes slideIn {
-        from { transform: translateX(20px); opacity: 0; }
+        from { transform: translateX(18px); opacity: 0; }
         to { transform: translateX(0); opacity: 1; }
+    }
+
+    .medicine-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr)) auto;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .medicine-grid .form-control,
+    .medicine-grid .form-select {
+        border-radius: 10px;
+        font-size: 13px;
     }
 
     .btn-complete {
@@ -108,67 +158,197 @@
         transform: translateY(-2px);
         box-shadow: 0 8px 15px rgba(16, 185, 129, 0.2);
     }
+
+    .protocol-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+
+    .side-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .mini-note {
+        font-size: 12px;
+        color: #64748b;
+    }
+
+    .empty-state {
+        padding: 16px 18px;
+        border: 1px dashed #dbe4f0;
+        border-radius: 14px;
+        color: #64748b;
+        background: #f8fafc;
+        font-size: 13px;
+    }
+
+    .header-inline-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
 </style>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
     <div>
-        <h2 class="fw-bold m-0">Patient Examination</h2>
-        <p class="text-muted">Recording clinical notes for @ViewBag.PatientName</p>
+        <div class="section-title">Clinical Examination</div>
+        <p class="section-sub">Select an active appointment, add findings, and create the prescription.</p>
     </div>
     <div class="badge bg-success bg-opacity-10 text-success p-2 px-3 rounded-pill">
         <i class="fa-solid fa-clock me-2"></i> Session Active
     </div>
 </div>
 
-<form asp-action="Examination" method="post" id="examinationForm">
-    <input type="hidden" asp-for="AppointmentId" />
-    <input type="hidden" asp-for="PatientId" />
-    <input type="hidden" asp-for="DoctorId" />
+<form asp-action="Examination" method="post" id="examinationForm" onsubmit="syncMedicines()">
+    <input type="hidden" asp-for="AppointmentId" id="AppointmentId" />
+    <input type="hidden" asp-for="PatientId" id="PatientId" />
+    <input type="hidden" asp-for="DoctorId" id="DoctorId" />
     <textarea asp-for="MedicineNotes" id="MedicineNotesHidden" style="display:none"></textarea>
 
-    <div class="prescribe-container">
-        <div class="main-content">
-            <div class="card-modern mb-4">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <label class="form-label-bold m-0">Clinical Template</label>
-                    <select id="templatePicker" class="form-select form-select-sm w-50 rounded-pill shadow-sm border-2 border-primary border-opacity-25" onchange="applyTemplate(this.value)">
-                        <option value="">-- Apply Quick Template --</option>
-                        @if(ViewBag.Templates != null) {
-                            foreach(var t in (IEnumerable<MediCare.Models.PrescriptionTemplate>)ViewBag.Templates) {
-                                <option value="@t.Id">@t.Title</option>
+    <div class="exam-shell">
+        <div class="main-content side-stack">
+            <div class="card-modern">
+                <div class="mb-3">
+                    <label class="form-label-bold">Patient Entry Token</label>
+                    <select class="form-select form-select-lg rounded-3 shadow-sm" id="appointmentSelect">
+                        @if (ViewBag.ActiveAppointments != null)
+                        {
+                            foreach (var a in (IEnumerable<MediCare.Models.Appointment>)ViewBag.ActiveAppointments)
+                            {
+                                var label = $"Token {a.TokenNumber} - {a.Patient?.FirstName} {a.Patient?.LastName} ({a.Status})";
+                                var selected = ViewBag.SelectedAppointmentId != null && (int)ViewBag.SelectedAppointmentId == a.Id;
+                                <option value="@a.Id" data-pid="@a.PatientId" data-name="@label" selected="@(selected ? "selected" : null)">@label</option>
                             }
                         }
+                        else
+                        {
+                            <option value="">No active appointment found</option>
+                        }
                     </select>
+                    <div class="appt-meta" id="apptMeta">Choose an appointment to load its clinical data.</div>
+                    <div class="selected-pill" id="apptBadge">
+                        <i class="fa-solid fa-user-doctor"></i>
+                        <span id="apptBadgeText">Waiting for selection</span>
+                    </div>
                 </div>
-                <label class="form-label-bold">Diagnosis & Observation</label>
-                <textarea asp-for="Diagnosis" id="DiagnosisText" class="input-modern" rows="5" placeholder="Enter patient diagnosis, symptoms, and observations..."></textarea>
+
+                <div class="row g-2 mb-3">
+                    <div class="col-md-3"><input class="input-modern" id="bp" placeholder="BP 120/80"></div>
+                    <div class="col-md-3"><input class="input-modern" id="temp" placeholder="Temp 98.6 F"></div>
+                    <div class="col-md-3"><input class="input-modern" id="pulse" placeholder="Pulse 72"></div>
+                    <div class="col-md-3"><input class="input-modern" id="weight" placeholder="Weight 70"></div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+                        <label class="form-label-bold m-0">Clinical Template</label>
+                        <div class="header-inline-actions">
+                            <select id="templatePicker" class="form-select form-select-sm rounded-pill shadow-sm border-2 border-primary border-opacity-25" style="min-width:260px;" onchange="applyTemplate(this.value)">
+                                <option value="">-- Apply Quick Template --</option>
+                                @if (ViewBag.Templates != null)
+                                {
+                                    foreach (var t in (IEnumerable<MediCare.Models.PrescriptionTemplate>)ViewBag.Templates)
+                                    {
+                                        <option value="@t.Id">@t.Title</option>
+                                    }
+                                }
+                            </select>
+                            <button type="button" class="btn btn-outline-success btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#templateModal">
+                                <i class="fa-solid fa-plus me-1"></i> Add Quick Template
+                            </button>
+                        </div>
+                    </div>
+                    <label class="form-label-bold">Diagnosis & Observation</label>
+                    <textarea asp-for="Diagnosis" id="DiagnosisText" class="input-modern" rows="5" placeholder="Enter patient diagnosis, symptoms, and observations..."></textarea>
+                </div>
             </div>
 
             <div class="card-modern">
-                <label class="form-label-bold">Prescribe Medicines</label>
+                <div class="protocol-header">
+                    <div>
+                        <label class="form-label-bold mb-1">Treatment Protocol</label>
+                        <div class="mini-note">Add medicines, choose timing, then create the prescription.</div>
+                    </div>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a href="/Doctor/Medicines#addMedicineForm" class="btn btn-outline-success btn-sm rounded-pill px-3">
+                            <i class="fa-solid fa-pills me-1"></i> Add Medicine
+                        </a>
+                    </div>
+                </div>
+
+                <div class="row g-2 mb-3">
+                    <div class="col-md-8">
+                        <label class="form-label-bold">Select Medicine</label>
+                        <select id="medicinePicker" class="form-select rounded-3 shadow-sm">
+                            <option value="">-- Select a medicine from inventory --</option>
+                            @if (ViewBag.Medicines != null)
+                            {
+                                foreach (var med in (IEnumerable<MediCare.Models.Medicine>)ViewBag.Medicines)
+                                {
+                                    <option value="@med.Id" data-name="@med.MedicineName" data-strength="@med.Strength" data-form="@med.DosageForm">@med.MedicineName @(!string.IsNullOrWhiteSpace(med.Strength) ? $"- {med.Strength}" : "")</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button type="button" class="btn btn-outline-primary w-100 rounded-3" onclick="addSelectedMedicine()">
+                            <i class="fa-solid fa-plus me-1"></i> Add Selected
+                        </button>
+                    </div>
+                </div>
+
                 <div class="medicine-search-box mb-4">
                     <input type="text" id="medSearch" class="input-modern" placeholder="Search medicines by name..." autocomplete="off">
                     <div id="medicine-results"></div>
                 </div>
 
                 <div id="selected-medicines" class="prescribed-list">
-                    <!-- Dynamic Rows -->
+                    <div class="empty-state">No medicines added yet. Search a drug or click <strong>New Drug</strong>.</div>
                 </div>
             </div>
         </div>
 
         <div class="side-panel">
             <div class="card-modern sticky-top" style="top: 20px;">
-                <label class="form-label-bold">Additional Instructions</label>
-                <textarea asp-for="AdditionalNotes" id="AdditionalNotesText" class="input-modern mb-4" rows="4" placeholder="e.g. Bed rest for 2 days, No oily food..."></textarea>
-
-                <div class="mb-4">
-                    <label class="form-label-bold">Follow-up Date</label>
-                    <input type="date" class="input-modern" min="@DateTime.Now.ToString("yyyy-MM-dd")">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <label class="form-label-bold m-0">Clinical Branch</label>
+                    <button type="button" class="btn btn-outline-success btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#branchModal">
+                        <i class="fa-solid fa-plus me-1"></i> Add Branch
+                    </button>
                 </div>
+                <select class="form-select rounded-3 mb-3" id="facility">
+                    @if (ViewBag.Branches != null && ((IEnumerable<MediCare.Models.PrescriptionTemplate>)ViewBag.Branches).Any())
+                    {
+                        foreach (var branch in (IEnumerable<MediCare.Models.PrescriptionTemplate>)ViewBag.Branches)
+                        {
+                            <option value="@branch.Title">@branch.Title</option>
+                        }
+                    }
+                    else
+                    {
+                        <option>Main Branch</option>
+                        <option>Satellite Clinic</option>
+                        <option>Virtual</option>
+                    }
+                </select>
+
+                <label class="form-label-bold">Ref / Clinical Advice</label>
+                <textarea class="input-modern mb-3" rows="4" id="advice" placeholder="General advisory notes..."></textarea>
+
+                <label class="form-label-bold">Planned Follow-up</label>
+                <input type="date" class="input-modern mb-3" id="followDate" min="@DateTime.Now.ToString("yyyy-MM-dd")">
+
+                <label class="form-label-bold">Additional Instructions</label>
+                <textarea asp-for="AdditionalNotes" id="AdditionalNotesText" class="input-modern mb-4" rows="4" placeholder="e.g. Bed rest for 2 days, no oily food..."></textarea>
 
                 <button type="submit" class="btn-complete" onclick="syncMedicines()">
-                    <i class="fa-solid fa-file-prescription me-2"></i> Save & Print Receipt
+                    <i class="fa-solid fa-file-prescription me-2"></i> Create Prescription
                 </button>
 
                 <a asp-action="Appointments" class="btn btn-light w-100 mt-2 rounded-3 py-2 fw-semibold">
@@ -179,33 +359,96 @@
     </div>
 </form>
 
+<div class="modal fade" id="branchModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius:20px;">
+            <form id="branchForm">
+                <div class="modal-header border-0">
+                    <div>
+                        <h5 class="modal-title fw-bold mb-1">Add Branch</h5>
+                        <div class="text-muted small">Create a branch/facility option for this examination flow.</div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body pt-0">
+                    <label class="form-label-bold">Branch Name</label>
+                    <input type="text" class="input-modern mb-3" id="branchName" placeholder="e.g. Main Branch" required />
+                    <label class="form-label-bold">Location</label>
+                    <input type="text" class="input-modern" id="branchLocation" placeholder="e.g. Floor 2, City Clinic" />
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success rounded-pill px-4">Save Branch</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="templateModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg" style="border-radius:20px;">
+            <form id="templateForm">
+                <div class="modal-header border-0">
+                    <div>
+                        <h5 class="modal-title fw-bold mb-1">Add Quick Template</h5>
+                        <div class="text-muted small">Save this diagnosis and medicine set for future consultations.</div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body pt-0">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label-bold">Template Title</label>
+                            <input type="text" class="input-modern" id="templateTitle" placeholder="e.g. Fever Care" required />
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label-bold">Diagnosis</label>
+                            <input type="text" class="input-modern" id="templateDiagnosis" placeholder="e.g. Viral fever with cough" required />
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label-bold">Medicine Notes (JSON / text)</label>
+                            <textarea class="input-modern" id="templateMedicines" rows="4" placeholder='[{\"name\":\"Tab A\",\"dosage\":\"1-0-1\",\"food\":\"After Food\",\"instruction\":\"Morning\",\"duration\":\"5 Days\"}]'></textarea>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label-bold">Additional Notes</label>
+                            <textarea class="input-modern" id="templateExtra" rows="3" placeholder="Follow-up advice or general notes"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success rounded-pill px-4">Save Template</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
     let selectedMeds = [];
-
-    $('#medSearch').on('input', function() {
-        let term = $(this).val();
-        if(term.length < 2) {
-            $('#medicine-results').hide();
-            return;
-        }
-
-        $.get('/Admin/SearchMedicines', { term: term }, function(res) {
-            let html = '';
-            res.forEach(m => {
-                html += `<div class="medicine-item" onclick="addMedicine('${m.medicineName}', '${m.strength}', '${m.dosageForm}')">
-                            <strong>${m.medicineName}</strong> <small class="text-muted">(${m.strength} - ${m.dosageForm})</small>
-                         </div>`;
-            });
-            $('#medicine-results').html(html).show();
-        });
-    });
+    const apptSelect = document.getElementById('appointmentSelect');
+    const meta = document.getElementById('apptMeta');
+    const badgeText = document.getElementById('apptBadgeText');
 
     function addMedicine(name, strength, form) {
-        let med = { name, strength, form, dosage: '1-0-1', instruction: 'After Meal' };
+        let med = { name, strength, form, dosage: '1-0-1', instruction: 'Morning', food: 'After Food', duration: '5 Days' };
         selectedMeds.push(med);
         renderMeds();
         $('#medSearch').val('');
         $('#medicine-results').hide();
+    }
+
+    function addSelectedMedicine() {
+        const picker = document.getElementById('medicinePicker');
+        const opt = picker?.options[picker.selectedIndex];
+        if (!opt || !opt.value) return;
+        addMedicine(opt.dataset.name || opt.textContent, opt.dataset.strength || '', opt.dataset.form || '');
+    }
+
+    function addBlankMedicine() {
+        selectedMeds.push({ name: '', strength: '', form: '', dosage: '1-0-1', instruction: 'Morning', food: 'After Food', duration: '5 Days' });
+        renderMeds();
     }
 
     function removeMed(index) {
@@ -213,26 +456,44 @@
         renderMeds();
     }
 
+    function updateMed(i, field, value) {
+        selectedMeds[i][field] = value;
+    }
+
     function renderMeds() {
+        if (!selectedMeds.length) {
+            $('#selected-medicines').html('<div class="empty-state">No medicines added yet. Search a drug or click <strong>New Drug</strong>.</div>');
+            return;
+        }
+
         let html = '';
         selectedMeds.forEach((m, i) => {
             html += `
                 <div class="medicine-row">
                     <div>
-                        <strong class="text-primary">${m.name}</strong>
-                        <div class="text-muted small">${m.strength} - ${m.form}</div>
+                        <input class="form-control form-control-sm mb-2" value="${m.name || ''}" placeholder="Medicine name" onchange="updateMed(${i}, 'name', this.value)" />
+                        <div class="text-muted small">${m.strength || ''}${m.form ? ' - ' + m.form : ''}</div>
                     </div>
-                    <div class="d-flex gap-3 align-items-center">
+                    <div class="medicine-grid">
                         <select class="form-select form-select-sm border-0 bg-white" onchange="updateMed(${i}, 'dosage', this.value)">
-                            <option value="1-0-1">1-0-1</option>
-                            <option value="1-1-1">1-1-1</option>
-                            <option value="1-0-0">1-0-0</option>
-                            <option value="0-0-1">0-0-1</option>
+                            <option value="1-0-1" ${m.dosage === '1-0-1' ? 'selected' : ''}>1-0-1</option>
+                            <option value="1-1-1" ${m.dosage === '1-1-1' ? 'selected' : ''}>1-1-1</option>
+                            <option value="1-0-0" ${m.dosage === '1-0-0' ? 'selected' : ''}>1-0-0</option>
+                            <option value="0-0-1" ${m.dosage === '0-0-1' ? 'selected' : ''}>0-0-1</option>
+                        </select>
+                        <select class="form-select form-select-sm border-0 bg-white" onchange="updateMed(${i}, 'food', this.value)">
+                            <option value="After Food" ${m.food === 'After Food' ? 'selected' : ''}>After Food</option>
+                            <option value="Before Food" ${m.food === 'Before Food' ? 'selected' : ''}>Before Food</option>
+                            <option value="Empty Stomach" ${m.food === 'Empty Stomach' ? 'selected' : ''}>Empty Stomach</option>
                         </select>
                         <select class="form-select form-select-sm border-0 bg-white" onchange="updateMed(${i}, 'instruction', this.value)">
-                            <option value="After Meal">After Meal</option>
-                            <option value="Before Meal">Before Meal</option>
+                            <option value="Morning" ${m.instruction === 'Morning' ? 'selected' : ''}>Morning</option>
+                            <option value="Afternoon" ${m.instruction === 'Afternoon' ? 'selected' : ''}>Afternoon</option>
+                            <option value="Night" ${m.instruction === 'Night' ? 'selected' : ''}>Night</option>
+                            <option value="As Needed" ${m.instruction === 'As Needed' ? 'selected' : ''}>As Needed</option>
                         </select>
+                        <input class="form-control form-control-sm" value="${m.duration || ''}" placeholder="Duration" onchange="updateMed(${i}, 'duration', this.value)" />
+                        <input class="form-control form-control-sm" value="${m.strength || ''}" placeholder="Strength" onchange="updateMed(${i}, 'strength', this.value)" />
                         <button type="button" class="btn btn-sm text-danger" onclick="removeMed(${i})">
                             <i class="fa-solid fa-trash"></i>
                         </button>
@@ -243,27 +504,143 @@
         $('#selected-medicines').html(html);
     }
 
-    function updateMed(i, field, value) {
-        selectedMeds[i][field] = value;
+    function syncMedicines() {
+        $('#MedicineNotesHidden').val(JSON.stringify(selectedMeds));
+
+        const vitals = `Vitals: BP ${$('#bp').val() || '-'} | Temp ${$('#temp').val() || '-'} | Pulse ${$('#pulse').val() || '-'} | Weight ${$('#weight').val() || '-'}`;
+        const follow = $('#followDate').val() ? `Follow-up: ${$('#followDate').val()}` : '';
+        const advice = $('#advice').val() ? `Advice: ${$('#advice').val()}` : '';
+        const facility = $('#facility').val() ? `Facility: ${$('#facility').val()}` : '';
+        const extra = $('#AdditionalNotesText').val();
+        $('#AdditionalNotesText').val([facility, vitals, advice, follow, extra].filter(x => x).join('\n'));
+
+        const opt = apptSelect.options[apptSelect.selectedIndex];
+        if (opt) {
+            $('#AppointmentId').val(opt.value);
+            $('#PatientId').val(opt.dataset.pid);
+        }
     }
 
-    function syncMedicines() {
-        let text = selectedMeds.map(m => `${m.name}|${m.dosage}|${m.instruction}`).join('\n');
-        $('#MedicineNotesHidden').val(text);
+    function setAppointmentMeta() {
+        const opt = apptSelect.options[apptSelect.selectedIndex];
+        if (!opt) return;
+        $('#AppointmentId').val(opt.value);
+        $('#PatientId').val(opt.dataset.pid);
+        meta.textContent = opt.dataset.name || 'Selected appointment';
+        if (badgeText) badgeText.textContent = opt.dataset.name || 'Selected appointment';
     }
+
+    if (apptSelect) {
+        apptSelect.addEventListener('change', setAppointmentMeta);
+        setAppointmentMeta();
+    }
+
+    $('#medSearch').on('input', function() {
+        let term = $(this).val();
+        if (term.length < 2) {
+            $('#medicine-results').hide();
+            return;
+        }
+
+        $.get('/Doctor/SearchMedicines', { term: term }, function(res) {
+            let html = '';
+            res.forEach(m => {
+                html += `<div class="medicine-item" onclick="addMedicine('${m.medicineName}', '${m.strength}', '${m.dosageForm}')">
+                            <strong>${m.medicineName}</strong> <small class="text-muted">(${m.strength} - ${m.dosageForm})</small>
+                         </div>`;
+            });
+            $('#medicine-results').html(html).show();
+        });
+    });
 
     function applyTemplate(id) {
-        if(!id) return;
+        if (!id) return;
         $.get('/Doctor/GetTemplateDetails', { id: id }, function(res) {
             $('#DiagnosisText').val(res.diagnosis);
             $('#AdditionalNotesText').val(res.additionalNotes);
-            
-            // Note: complex medicine syncing would require structured template data
-            // For now populating notes
-            if(res.medicines) {
-                alert("Note: Medicines from template have been added to summary.");
-                $('#MedicineNotesHidden').val(res.medicines);
+
+            if (res.medicines) {
+                try {
+                    selectedMeds = JSON.parse(res.medicines);
+                    renderMeds();
+                } catch (e) {
+                    alert('Template medicines could not be parsed.');
+                }
             }
         });
     }
+
+    function reloadBranches(selectedName) {
+        return $.get('/Doctor/GetBranches', function (items) {
+            const select = $('#facility');
+            select.empty();
+            if (items && items.length) {
+                items.forEach(item => {
+                    select.append(new Option(item.name, item.name, false, item.name === selectedName));
+                });
+            } else {
+                select.append(new Option('Main Branch', 'Main Branch'));
+                select.append(new Option('Satellite Clinic', 'Satellite Clinic'));
+                select.append(new Option('Virtual', 'Virtual'));
+            }
+            if (selectedName) select.val(selectedName);
+        });
+    }
+
+    function reloadTemplates(selectedId) {
+        return $.get('/Doctor/GetTemplates', function (items) {
+            const select = $('#templatePicker');
+            const first = '-- Apply Quick Template --';
+            select.empty().append(new Option(first, ''));
+            if (items && items.length) {
+                items.forEach(item => {
+                    select.append(new Option(item.title, item.id, false, String(item.id) === String(selectedId)));
+                });
+            }
+            if (selectedId) select.val(String(selectedId));
+        });
+    }
+
+    $('#branchForm').on('submit', function (e) {
+        e.preventDefault();
+        $.post('/Doctor/AddBranch', {
+            name: $('#branchName').val(),
+            location: $('#branchLocation').val()
+        }, function (res) {
+            if (res && res.success) {
+                $('#branchModal').modal('hide');
+                $('#branchName').val('');
+                $('#branchLocation').val('');
+                reloadBranches(res.name);
+            } else {
+                alert('Unable to save branch.');
+            }
+        });
+    });
+
+    $('#templateForm').on('submit', function (e) {
+        e.preventDefault();
+        $.post('/Doctor/AddQuickTemplate', {
+            title: $('#templateTitle').val(),
+            diagnosis: $('#templateDiagnosis').val(),
+            medicineNotes: $('#templateMedicines').val(),
+            additionalNotes: $('#templateExtra').val()
+        }, function (res) {
+            if (res && res.success) {
+                $('#templateModal').modal('hide');
+                $('#templateTitle').val('');
+                $('#templateDiagnosis').val('');
+                $('#templateMedicines').val('');
+                $('#templateExtra').val('');
+                reloadTemplates(res.id);
+            } else {
+                alert('Unable to save template.');
+            }
+        });
+    });
+
+    $(function () {
+        reloadBranches($('#facility').val());
+        reloadTemplates($('#templatePicker').val());
+    });
 </script>

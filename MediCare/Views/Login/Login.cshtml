@@ -61,6 +61,13 @@
           <h2>Welcome Back </h2>
           <p class="subtitle">Please login to your account</p>
 
+          @if (TempData["Success"] != null)
+          {
+              <div style="background-color: #ecfdf5; color: #047857; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; font-weight: 500;">
+                  <i class="fa-solid fa-circle-check" style="margin-right: 8px;"></i> @TempData["Success"]
+              </div>
+          }
+
           @if (ViewBag.Error != null)
           {
               <div style="background-color: #fee2e2; color: #dc2626; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; font-weight: 500;">
@@ -99,6 +106,25 @@
             </button>
 
           </form>
+
+          <div style="margin: 18px 0 16px; display:flex; align-items:center; gap:12px; color:#94a3b8; font-size:13px;">
+            <div style="height:1px; background:#e2e8f0; flex:1;"></div>
+            <span>Or continue with</span>
+            <div style="height:1px; background:#e2e8f0; flex:1;"></div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+            <a asp-action="ExternalLogin" asp-route-provider="Google"
+               style="display:flex; align-items:center; justify-content:center; gap:10px; text-decoration:none; border:1px solid #e2e8f0; border-radius:14px; padding:14px 16px; color:#111827; font-weight:700; background:#fff;">
+              <i class="fa-brands fa-google" style="color:#ea4335; font-size:18px;"></i>
+              <span>Google</span>
+            </a>
+            <a asp-action="ExternalLogin" asp-route-provider="GitHub"
+               style="display:flex; align-items:center; justify-content:center; gap:10px; text-decoration:none; border:1px solid #e2e8f0; border-radius:14px; padding:14px 16px; color:#111827; font-weight:700; background:#fff;">
+              <i class="fa-brands fa-github" style="color:#111827; font-size:18px;"></i>
+              <span>GitHub</span>
+            </a>
+          </div>
 
           <div class="signup-link">
             Don't have an account? <a asp-controller="Login" asp-action="Register">Sign up</a>

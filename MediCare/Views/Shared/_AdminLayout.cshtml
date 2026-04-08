@@ -1,6 +1,16 @@
+@inject MediCare.Services.NotificationService NotificationService
+@inject MediCare.Services.LoginSessionService LoginSessionService
 @{
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
     var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+    var userEmail = Context.Session.GetString("UserEmail") ?? string.Empty;
+    var unreadNotificationCount = string.IsNullOrEmpty(userEmail) ? 0 : NotificationService.CountUnread(userEmail);
+    var loginAtRaw = Context.Session.GetString("LoginAt") ?? string.Empty;
+    var loginLabel = "Logged out";
+    if (DateTime.TryParse(loginAtRaw, null, System.Globalization.DateTimeStyles.RoundtripKind, out var loginAt))
+    {
+        loginLabel = loginAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss");
+    }
 }
 
 <!DOCTYPE html>
@@ -99,6 +109,17 @@
             font-weight: 600;
         }
 
+        .session-time {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 10px;
+            line-height: 1.45;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 8px 10px;
+        }
+
         .nav-link {
             color: #4b5563;
             padding: 12px 20px;
@@ -140,6 +161,32 @@
             padding: 40px;
             min-height: 100vh;
             transition: all 0.3s;
+        }
+
+        .content-toolbar {
+            margin-bottom: 18px;
+        }
+
+        .content-search {
+            width: min(520px, 100%);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 12px 16px;
+            color: #94a3b8;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
+        }
+
+        .content-search input {
+            border: 0;
+            outline: none;
+            background: transparent;
+            width: 100%;
+            font-size: 14px;
+            color: #111827;
         }
 
         /* MOBILE TOPBAR */
@@ -220,12 +267,18 @@
             
             <div class="mt-4 pt-3 border-top text-center pb-2">
                 <div class="mb-2">
-                    <div style="width: 50px; height: 50px; border-radius: 50%; background: #ecfdf5; border: 2px solid #16a34a; display: inline-flex; align-items: center; justify-content: center; font-size: 22px; color: #16a34a; font-weight: bold; text-transform: uppercase;">
-                        @(Context.Session.GetString("UserName")?.Substring(0, 1) ?? "A")
-                    </div>
+                    <a asp-controller="Admin" asp-action="Profile" class="text-decoration-none">
+                        <div style="width: 50px; height: 50px; border-radius: 50%; background: #ecfdf5; border: 2px solid #16a34a; display: inline-flex; align-items: center; justify-content: center; font-size: 22px; color: #16a34a; font-weight: bold; text-transform: uppercase;">
+                            @(Context.Session.GetString("UserName")?.Substring(0, 1) ?? "A")
+                        </div>
+                    </a>
                 </div>
                 <h6 class="mb-0 fw-bold text-dark">@(Context.Session.GetString("UserName") ?? "Admin User")</h6>
                 <small class="text-muted">@(Context.Session.GetString("UserEmail") ?? "admin@medicare.com")</small>
+                <div class="session-time mt-2">
+                    <div><i class="fa-regular fa-clock me-1"></i> Login: <span id="loginTimeText">@loginLabel</span></div>
+                    <div><i class="fa-solid fa-hourglass-half me-1"></i> Live: <span id="sessionLiveText">--:--:--</span></div>
+                </div>
             </div>
         </div>
 
@@ -252,10 +305,6 @@
                     <i class="fa-solid fa-users"></i> Staff
                 </a>
 
-                <a class="nav-link @(currentController == "Admin" && currentAction == "OPDSchedule" ? "active" : "")"
-                   asp-controller="Admin" asp-action="OPDSchedule">
-                    <i class="fa-regular fa-calendar"></i> OPD Schedule
-                </a>
 
                 <a class="nav-link @(currentController == "Admin" && currentAction == "Appointments" ? "active" : "")"
                    asp-controller="Admin" asp-action="Appointments">
@@ -296,10 +345,30 @@
                     <i class="fa-solid fa-user-tie"></i> Profile
                 </a>
 
-                <a class="nav-link @(currentController == "Admin" && currentAction == "Settings" ? "active" : "")"
-                   asp-controller="Admin" asp-action="Settings">
-                    <i class="fa-solid fa-gear"></i> Settings
+                <a class="nav-link @(currentController == "Admin" && currentAction == "Analytics" ? "active" : "")"
+                   asp-controller="Admin" asp-action="Analytics">
+                    <i class="fa-solid fa-chart-pie"></i> Analytics
                 </a>
+
+                <a class="nav-link @(currentController == "Admin" && currentAction == "History" ? "active" : "")"
+                   asp-controller="Admin" asp-action="History">
+                    <i class="fa-solid fa-clock-rotate-left"></i> History
+                </a>
+
+                <a class="nav-link @(currentController == "Admin" && currentAction == "Notifications" ? "active" : "")"
+                   asp-controller="Admin" asp-action="Notifications">
+                    <i class="fa-regular fa-bell"></i> Notifications
+                    @if (unreadNotificationCount > 0)
+                    {
+                        <span class="ms-auto rounded-circle bg-danger d-inline-block" style="width:8px;height:8px;"></span>
+                    }
+                </a>
+
+                <a class="nav-link @(currentController == "Admin" && currentAction == "Feedbacks" ? "active" : "")"
+                   asp-controller="Admin" asp-action="Feedbacks">
+                    <i class="fa-regular fa-comment-dots"></i> Feedback Management
+                </a>
+
 
             </nav>
         </div>
@@ -317,6 +386,12 @@
 
     <!-- CONTENT -->
     <div class="content">
+        <div class="content-toolbar">
+            <div class="content-search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="pageSearchInput" placeholder="Search patients, doctors, appointments..." />
+            </div>
+        </div>
         @RenderBody()
     </div>
 
@@ -338,6 +413,69 @@
         toggleBtn?.addEventListener("click", toggleSidebar);
         backdrop?.addEventListener("click", toggleSidebar);
     </script>
+    <script>
+        (function () {
+            const raw = '@loginAtRaw';
+            if (!raw) return;
+            const start = new Date(raw);
+            if (isNaN(start.getTime())) return;
+            const tick = () => {
+                const diff = Math.max(0, Date.now() - start.getTime());
+                const sec = Math.floor(diff / 1000);
+                const h = String(Math.floor(sec / 3600)).padStart(2, '0');
+                const m = String(Math.floor((sec % 3600) / 60)).padStart(2, '0');
+                const s = String(sec % 60).padStart(2, '0');
+                const el = document.getElementById('sessionLiveText');
+                if (el) el.textContent = `${h}:${m}:${s}`;
+            };
+            tick();
+            setInterval(tick, 1000);
+        })();
+
+        (function () {
+            const input = document.getElementById('pageSearchInput');
+            if (!input) return;
+            const root = document.querySelector('.content') || document.body;
+            const selectors = [
+                'tbody tr',
+                '.appointment-card',
+                '.queue-item',
+                '.row-card',
+                '.card-box',
+                '.notification-item',
+                '.notification-card',
+                '.feedback-card',
+                '.history-item',
+                '.patient-card',
+                '.doctor-card',
+                '.prescription-card',
+                '.list-group-item',
+                '.searchable-item'
+            ];
+            const filter = () => {
+                const term = input.value.trim().toLowerCase();
+                const items = Array.from(root.querySelectorAll(selectors.join(',')));
+                const seen = new Set();
+                items.forEach(item => {
+                    if (seen.has(item)) return;
+                    seen.add(item);
+                    const text = (item.dataset.search || item.innerText || '').toLowerCase();
+                    item.style.display = !term || text.includes(term) ? '' : 'none';
+                });
+            };
+            input.addEventListener('input', filter);
+        })();
+    </script>
+    @if(TempData["ToastMessage"] != null){
+        <div class="toast align-items-center text-bg-@(TempData["ToastType"] ?? "success") position-fixed top-0 end-0 m-3 show" role="alert" aria-live="assertive" aria-atomic="true" style="z-index:2000;">
+            <div class="d-flex">
+                <div class="toast-body">
+                    @TempData["ToastMessage"]
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    }
 
 </body>
 </html>

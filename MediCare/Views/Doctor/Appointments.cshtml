@@ -88,9 +88,17 @@
 
     .table-controls {
         display: flex;
+        flex-direction: column;
+        gap: 16px;
+        margin-bottom: 28px;
+    }
+
+    .table-controls-top {
+        display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 35px;
+        gap: 16px;
+        width: 100%;
     }
 
     .search-row {
@@ -121,6 +129,18 @@
     .bulk-actions {
         display: none;
         gap: 10px;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        padding: 14px 16px;
+        border-radius: 14px;
+        background: #f8fafc;
+    }
+
+    .bulk-actions .bulk-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
     }
 
     .app-table {
@@ -209,19 +229,26 @@
 </div>
 
 <div class="main-white-card">
-    <div class="table-controls">
-        <div class="search-row">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" id="pSearch" placeholder="Search patient or reason..." onkeyup="filterTable()">
-        </div>
-        
+        <div class="table-controls">
+            <div class="table-controls-top">
+                <div class="search-row">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="pSearch" placeholder="Search patient or reason..." onkeyup="filterTable()">
+                </div>
+                <button class="btn-white-action text-danger" onclick="confirmDeleteAll()">
+                    <i class="fa-regular fa-trash-can"></i> Clear All Records
+                </button>
+            </div>
+
         <div class="bulk-actions" id="bulkActions">
-            <span class="text-muted small me-2 my-auto"><span id="selectedCount">0</span> items selected</span>
+            <div class="bulk-left">
+                <span class="text-muted small fw-semibold"><span id="selectedCount">0</span> appointments selected</span>
+            </div>
             <button class="btn-white-action text-danger" onclick="confirmBulkDelete()">
                 <i class="fa fa-trash-can"></i> Delete Selected
             </button>
         </div>
-    </div>
+        </div>
 
     <div class="table-responsive">
         <table class="app-table" id="aTable">
@@ -250,14 +277,7 @@
                         </td>
                         <td>
                             <div class="action-group">
-                                @if (app.Status == "In Progress")
-                                {
-                                    <a asp-action="Examination" asp-route-id="@app.Id" class="act-btn btn-examine">
-                                        <i class="fa-solid fa-stethoscope"></i> Examine
-                                    </a>
-                                    <button class="act-btn btn-cancel" onclick="updateS(@app.Id, 'Cancelled')">Cancel</button>
-                                }
-                                else if (app.IsEmergency)
+                                @if (app.IsEmergency)
                                 {
                                     <button class="act-btn btn-call" onclick="updateS(@app.Id, 'In Progress')">Call In</button>
                                     <button class="act-btn btn-emg text-danger" onclick="toggleE(@app.Id)">Remove Emergency</button>
@@ -269,6 +289,9 @@
                                     <button class="act-btn btn-emg" onclick="toggleE(@app.Id)">Emergency</button>
                                     <button class="act-btn btn-cancel" onclick="updateS(@app.Id, 'Cancelled')">Cancel</button>
                                 }
+                                <a asp-action="Examination" asp-route-id="@app.Id" class="act-btn btn-examine">
+                                    <i class="fa-solid fa-stethoscope"></i> Examine
+                                </a>
                                 <button class="btn-view-icon" onclick="viewDetails(@app.Id)"><i class="fa-regular fa-eye"></i></button>
                             </div>
                         </td>
@@ -356,6 +379,7 @@
             </div>
             <div class="modal-footer border-0 p-4 pt-0">
                 <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Close Insights</button>
+                <a id="modalExamineBtn" class="btn btn-warning rounded-pill px-4 text-white"><i class="fa-solid fa-stethoscope me-1"></i>Examine</a>
                 <button type="button" class="btn btn-danger rounded-pill px-4" onclick="deleteSingleFromModal()">Delete Record</button>
             </div>
         </div>
@@ -396,6 +420,10 @@
         });
 
         $(document).on('change', '.row-checkbox', function() {
+            toggleBulkActions();
+        });
+
+        $(function() {
             toggleBulkActions();
         });
 
@@ -447,13 +475,18 @@
                 $('#det_status').text(data.status);
                 $('#det_subject').text(data.subject || 'Consultation');
                 $('#det_notes').text(data.notes || 'No additional notes provided.');
+                $('#modalExamineBtn').attr('href', '/Doctor/Examination/' + id);
             });
         }
 
         function deleteSingleFromModal() {
             if(confirm("Delete this specific appointment record?")) {
-                $.post('/Doctor/DeleteAppointment/' + currentViewingId, function(res) {
-                    if(res.success) location.reload();
+                $.ajax({
+                    url:'/Doctor/BulkDeleteAppointments',
+                    type:'POST',
+                    contentType:'application/json',
+                    data: JSON.stringify([currentViewingId]),
+                    success: function(res){ if(res.success) location.reload(); }
                 });
             }
         }

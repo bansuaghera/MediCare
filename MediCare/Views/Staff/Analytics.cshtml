@@ -1,0 +1,64 @@
+@{
+    ViewData["Title"] = "Analytics";
+    Layout = "~/Views/Shared/_StaffLayout.cshtml";
+}
+
+<div class="d-flex justify-content-between align-items-end flex-wrap gap-2 mb-4">
+    <div>
+        <h2 class="fw-bold mb-1">Analytics</h2>
+        <p class="text-muted mb-0">Staff queue and appointment operations</p>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3"><div class="card border-0 shadow-sm rounded-4 p-3"><small class="text-muted">Today</small><h3 class="fw-bold mb-0">@ViewBag.TodayCount</h3></div></div>
+    <div class="col-md-3"><div class="card border-0 shadow-sm rounded-4 p-3"><small class="text-muted">Waiting</small><h3 class="fw-bold mb-0">@ViewBag.WaitingCount</h3></div></div>
+    <div class="col-md-3"><div class="card border-0 shadow-sm rounded-4 p-3"><small class="text-muted">In Progress</small><h3 class="fw-bold mb-0">@ViewBag.InProgressCount</h3></div></div>
+    <div class="col-md-3"><div class="card border-0 shadow-sm rounded-4 p-3"><small class="text-muted">Completed</small><h3 class="fw-bold mb-0">@ViewBag.CompletedCount</h3></div></div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-4 p-4">
+            <h5 class="fw-bold mb-3">Queue Trend</h5>
+            <canvas id="staffTrend" height="120"></canvas>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 p-4">
+            <h5 class="fw-bold mb-3">Today Status Mix</h5>
+            <canvas id="staffStatus" height="240"></canvas>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    new Chart(document.getElementById('staffTrend'), {
+        type: 'line',
+        data: {
+            labels: @Html.Raw(Json.Serialize(ViewBag.DailyTrendLabels ?? new List<string>())),
+            datasets: [{
+                label: 'Appointments',
+                data: @Html.Raw(Json.Serialize(ViewBag.DailyTrendData ?? new List<int>())),
+                borderColor: '#10b981',
+                backgroundColor: 'rgba(16,185,129,0.12)',
+                fill: true,
+                tension: 0.35
+            }]
+        },
+        options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+    });
+
+    new Chart(document.getElementById('staffStatus'), {
+        type: 'doughnut',
+        data: {
+            labels: @Html.Raw(Json.Serialize(ViewBag.ChartLabels ?? new List<string>())),
+            datasets: [{
+                data: @Html.Raw(Json.Serialize(ViewBag.ChartData ?? new List<int>())),
+                backgroundColor: ['#f59e0b', '#3b82f6', '#10b981', '#ef4444']
+            }]
+        },
+        options: { plugins: { legend: { position: 'bottom' } } }
+    });
+</script>

@@ -1,137 +1,187 @@
+@model IEnumerable<MediCare.Models.Feedback>
 @{
-    ViewData["Title"] = "Patient Help Center";
+    ViewData["Title"] = "Feedback & Support";
     Layout = "~/Views/Shared/_UserLayout.cshtml";
 }
 
 <style>
-    .help-card {
-        background: white;
-        border-radius: 25px;
-        padding: 40px;
-        border: 1px solid #f1f5f9;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.03);
+    .feedback-wrap { max-width: 1200px; }
+    .feedback-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 20px;
+        padding: 24px;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
     }
-    .satisfaction-btn {
-        width: 100%;
-        padding: 15px;
-        border-radius: 15px;
-        border: 2px solid #f1f5f9;
-        background: white;
-        font-weight: 700;
-        transition: 0.2s;
-        text-align: center;
+    .star-btn {
+        width: 40px;
+        height: 36px;
+        border-radius: 10px;
+        border: 1px solid #f59e0b;
+        background: #fff;
+        color: #f59e0b;
+        font-size: 18px;
+        line-height: 1;
     }
-    .satisfaction-btn:hover, .satisfaction-btn.active {
-        border-color: #10b981;
-        background: #ecfdf5;
-        color: #065f46;
+    .star-btn.active {
+        background: #fef3c7;
+        border-color: #f59e0b;
     }
-    .faq-item {
-        margin-bottom: 20px;
-        padding-bottom: 20px;
-        border-bottom: 1px dashed #f1f5f9;
+    .history-box {
+        min-height: 340px;
+        border: 1px dashed #d1d5db;
+        border-radius: 16px;
+        padding: 14px;
+        background: #fff;
+    }
+    .history-item {
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 12px;
+        margin-bottom: 10px;
+        background: #f9fafb;
+    }
+    .empty-history {
+        min-height: 290px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6b7280;
     }
 </style>
 
-<div class="d-flex justify-content-between align-items-center mb-5">
-    <div>
-        <h1 class="fw-bold m-0"><i class="fa-regular fa-comment-dots text-success me-2"></i> Clinical Help Center</h1>
-        <p class="text-muted">How can we assist you with your health session today?</p>
+<div class="feedback-wrap">
+    <div class="mb-4">
+        <h2 class="fw-bold mb-1">Feedback & Support</h2>
+        <p class="text-muted mb-0">Help us improve MediCare SmartOPD by sharing your experience.</p>
     </div>
-</div>
 
-<div class="row g-5">
-    <!-- Feedback Form -->
-    <div class="col-lg-7">
-        <div class="help-card border">
-            <h4 class="fw-bold mb-4">Submit Experience Report</h4>
-            
-            <form id="mainFeedbackForm">
-                <div class="mb-5 text-center">
-                    <label class="small fw-bold text-muted text-uppercase mb-3 d-block">Overall Satisfaction</label>
-                    <div class="row g-3">
-                        <div class="col-4">
-                            <button type="button" class="satisfaction-btn rounded-pill px-4 py-3 border shadow-sm" onclick="setRating(5, this)">Excellent</button>
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="feedback-card">
+                <h5 class="fw-bold mb-4"><i class="fa-regular fa-message me-2 text-success"></i>Send New Feedback</h5>
+
+                <form id="feedbackForm">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Subject</label>
+                        <input name="subject" class="form-control rounded-3" placeholder="Briefly describe your topic" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Experience Rating</label>
+                        <div class="d-flex gap-2" id="starRow">
+                            <button type="button" class="star-btn" data-rate="1"><i class="fa-solid fa-star"></i></button>
+                            <button type="button" class="star-btn" data-rate="2"><i class="fa-solid fa-star"></i></button>
+                            <button type="button" class="star-btn" data-rate="3"><i class="fa-solid fa-star"></i></button>
+                            <button type="button" class="star-btn" data-rate="4"><i class="fa-solid fa-star"></i></button>
+                            <button type="button" class="star-btn active" data-rate="5"><i class="fa-solid fa-star"></i></button>
                         </div>
-                        <div class="col-4">
-                            <button type="button" class="satisfaction-btn rounded-pill px-4 py-3 border shadow-sm" onclick="setRating(4, this)">Satisfactory</button>
-                        </div>
-                        <div class="col-4">
-                            <button type="button" class="satisfaction-btn rounded-pill px-4 py-3 border shadow-sm" onclick="setRating(3, this)">Neutral</button>
-                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Detail Message</label>
+                        <textarea name="comment" class="form-control rounded-3" rows="5" placeholder="Write your detailed experience here..." required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100 rounded-pill py-2 fw-bold">
+                        <i class="fa-regular fa-paper-plane me-2"></i>Send Feedback
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="feedback-card">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="fw-bold m-0"><i class="fa-regular fa-calendar me-2 text-success"></i>Feedback History</h5>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3" id="selectAllFeedback">Select All</button>
+                        <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3" id="deleteSelectedFeedback">Delete Selected</button>
+                        <button type="button" class="btn btn-danger btn-sm rounded-pill px-3" id="deleteAllFeedback">Delete All</button>
                     </div>
                 </div>
 
-                <div class="mb-4">
-                    <label class="small fw-bold text-muted text-uppercase mb-2 d-block">Detailed Review</label>
-                    <textarea name="Comment" class="form-control rounded-4 border-0 bg-light p-4 shadow-none" rows="6" placeholder="Tell us more about your visit or technical issues..." required></textarea>
+                <div class="history-box">
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var fb in Model)
+                        {
+                            <div class="history-item d-flex gap-3 align-items-start">
+                                <input type="checkbox" class="feedback-check mt-1" data-id="@fb.Id" />
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <strong>@fb.SubmittedAt.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")</strong>
+                                        <span class="text-warning">
+                                            @for (int i = 0; i < fb.Rating; i++)
+                                            {
+                                                <i class="fa-solid fa-star"></i>
+                                            }
+                                        </span>
+                                    </div>
+                                    <div class="text-muted small">@fb.Comment</div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="empty-history">
+                            <div class="text-center">
+                                <i class="fa-regular fa-message fa-2x mb-2 text-muted"></i>
+                                <div>No feedback history found.</div>
+                            </div>
+                        </div>
+                    }
                 </div>
-
-                <div class="alert bg-soft-blue border-0 rounded-4 p-4 d-flex align-items-center gap-3 mb-4">
-                    <i class="fa-solid fa-circle-info text-blue-600 fa-lg"></i>
-                    <p class="m-0 text-start small fw-medium text-blue-800">For emergency medical assistance, please contact the clinic desk directly via phone.</p>
-                </div>
-
-                <button type="submit" class="btn btn-emerald-luxury w-100 rounded-pill py-3 fw-bold shadow-sm">
-                    Submit Diagnostic Report
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <!-- FAQ/Support Sidebar -->
-    <div class="col-lg-5">
-        <div class="help-card border h-100 shadow-sm">
-            <h5 class="fw-bold mb-4">Frequently Asked</h5>
-            
-            <div class="faq-item">
-                <h6 class="fw-bold small opacity-75 m-0 mb-2">How do I access my prescription?</h6>
-                <p class="small text-muted m-0">Navigate to the 'Prescriptions' tab and click on the 'Digital Copy' icon to download your Rx.</p>
-            </div>
-
-            <div class="faq-item">
-                <h6 class="fw-bold small opacity-75 m-0 mb-2">Refunds on cancellation?</h6>
-                <p class="small text-muted m-0">Clinical fees are processed according to the hospital policy. Please contact accounts desk.</p>
-            </div>
-
-            <div class="faq-item">
-                <h6 class="fw-bold small opacity-75 m-0 mb-2">Technical login issue?</h6>
-                <p class="small text-muted m-0">Reset your password or clear your browser cache to resolve technical session conflicts.</p>
-            </div>
-
-            <div class="mt-5 text-center">
-                <small class="text-muted d-block mb-3">Still have questions?</small>
-                <a href="tel:+12345678" class="btn btn-outline-secondary w-100 rounded-pill py-3 fw-bold border mb-2">
-                    <i class="fa fa-phone me-2"></i> Voice Support
-                </a>
-                <a href="mailto:support@medicare.com" class="btn btn-outline-secondary w-100 rounded-pill py-3 fw-bold border">
-                    <i class="fa fa-envelope me-2"></i> Email Inquiry
-                </a>
             </div>
         </div>
     </div>
 </div>
 
+@section Scripts {
 <script>
-    let currentRating = 5;
-    function setRating(val, btn) {
-        currentRating = val;
-        $('.satisfaction-btn').removeClass('active');
-        $(btn).addClass('active');
+    let selectedRating = 5;
+
+    function paintStars(value) {
+        document.querySelectorAll('#starRow .star-btn').forEach(btn => {
+            const rate = parseInt(btn.dataset.rate);
+            btn.classList.toggle('active', rate <= value);
+        });
     }
 
-    $('#mainFeedbackForm').on('submit', function(e) {
-        e.preventDefault();
-        const data = {
-            Rating: currentRating,
-            Comment: $(this).find('textarea').val()
-        };
-
-        $.post('/User/SubmitFeedback', data, function(res) {
-            if(res.success) {
-                alert("Thank you for your clinical feedback!");
-                window.location.reload();
-            }
+    document.querySelectorAll('#starRow .star-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            selectedRating = parseInt(this.dataset.rate);
+            paintStars(selectedRating);
         });
     });
+
+    document.getElementById('feedbackForm').addEventListener('submit', function(e){
+        e.preventDefault();
+        const form = e.target;
+        $.post('/User/SubmitFeedback', {
+            Rating: selectedRating,
+            Comment: form.comment.value,
+            subject: form.subject.value
+        }, function(res){
+            if(res && res.success){ window.location.reload(); }
+        });
+    });
+
+    const checks = () => Array.from(document.querySelectorAll('.feedback-check'));
+    document.getElementById('selectAllFeedback')?.addEventListener('click', () => {
+        const next = !checks().every(c => c.checked);
+        checks().forEach(c => c.checked = next);
+    });
+    document.getElementById('deleteSelectedFeedback')?.addEventListener('click', () => {
+        const ids = checks().filter(c => c.checked).map(c => parseInt(c.dataset.id));
+        if(ids.length === 0) return;
+        if(!confirm(`Delete ${ids.length} feedback item(s)?`)) return;
+        $.ajax({ url: '/User/DeleteSelectedFeedbacks', type: 'POST', contentType: 'application/json', data: JSON.stringify(ids), success: r => r.success && location.reload() });
+    });
+    document.getElementById('deleteAllFeedback')?.addEventListener('click', () => {
+        if(!confirm('Delete all feedback history?')) return;
+        $.post('/User/DeleteAllFeedbacks', {}, r => r.success && location.reload());
+    });
 </script>
+}

@@ -14,6 +14,11 @@ namespace MediCare.Services
             _currentTokens[doctorId] = tokenNumber;
         }
 
+        public void ClearCurrentToken(int doctorId)
+        {
+            _currentTokens.TryRemove(doctorId, out _);
+        }
+
         public string GetCurrentToken(int doctorId)
         {
             return _currentTokens.TryGetValue(doctorId, out var token) ? token : "None";

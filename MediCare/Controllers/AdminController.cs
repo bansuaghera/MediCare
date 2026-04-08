@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using MediCare.Services;
 using MediCare.Models;
 using MediCare.Utilities;
+using System.IO;
 
 namespace MediCare.Controllers
 {
@@ -17,8 +18,10 @@ namespace MediCare.Controllers
         private readonly QueueService _queueService;
         private readonly FeedbackService _feedbackService;
         private readonly OPDScheduleService _opdScheduleService;
+        private readonly NotificationService _notificationService;
+        private readonly UserPreferenceService _userPreferenceService;
 
-        public AdminController(UserService userService, PatientService patientService, DoctorService doctorService, MedicineService medicineService, AppointmentService appointmentService, EmailService emailService, PrescriptionService prescriptionService, QueueService queueService, FeedbackService feedbackService, OPDScheduleService opdScheduleService)
+        public AdminController(UserService userService, PatientService patientService, DoctorService doctorService, MedicineService medicineService, AppointmentService appointmentService, EmailService emailService, PrescriptionService prescriptionService, QueueService queueService, FeedbackService feedbackService, OPDScheduleService opdScheduleService, NotificationService notificationService, UserPreferenceService userPreferenceService)
         {
             _userService = userService;
             _patientService = patientService;
@@ -30,10 +33,29 @@ namespace MediCare.Controllers
             _queueService = queueService;
             _feedbackService = feedbackService;
             _opdScheduleService = opdScheduleService;
+            _notificationService = notificationService;
+            _userPreferenceService = userPreferenceService;
+        }
+
+        private void LogAdminActivity(string title, string message, string type = "info")
+        {
+            var email = HttpContext.Session.GetString("UserEmail") ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(email)) return;
+
+            _notificationService.AddNotification(new Notification
+            {
+                UserEmail = email,
+                Title = title,
+                Message = message,
+                Type = type,
+                CreatedAt = DateTime.UtcNow
+            });
         }
         public IActionResult Dashboard()
         {
             var appointments = _appointmentService.GetAllAppointments();
+            var dailyAppointments = AnalyticsHelper.BuildDailyAppointmentTrend(appointments, 7);
+            var dailyPatients = AnalyticsHelper.BuildDailyUniquePatientTrend(appointments, 7);
             var model = new MediCare.Models.ViewModels.AdminDashboardViewModel
             {
                 TotalPatients = _patientService.GetAllPatients().Count,
@@ -41,13 +63,29 @@ namespace MediCare.Controllers
                 AppointmentsToday = appointments.Count(a => a.AppointmentDate.Date == DateTime.Today),
                 TotalRevenue = _doctorService.GetAllDoctors().Sum(d => d.ConsultationFee),
                 RecentAppointments = appointments.OrderByDescending(a => a.AppointmentDate).Take(5).ToList(),
-                
-                // Mocking weekly chart data for demo functionality
-                ChartLabels = new List<string> { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" },
-                WeeklyPatients = new List<int> { 12, 19, 15, 25, 22, 10, 5 },
-                WeeklyAppointments = new List<int> { 15, 22, 18, 30, 25, 12, 8 }
+                ChartLabels = dailyAppointments.Labels,
+                WeeklyPatients = dailyPatients.Counts,
+                WeeklyAppointments = dailyAppointments.Counts
             };
             return View(model);
+        }
+
+        public IActionResult Analytics()
+        {
+            var appointments = _appointmentService.GetAllAppointments();
+            var appointmentTrend = AnalyticsHelper.BuildDailyAppointmentTrend(appointments, 14);
+            var statusCounts = AnalyticsHelper.BuildStatusCounts(appointments);
+
+            ViewBag.TotalPatients = _patientService.GetAllPatients().Count;
+            ViewBag.ActiveDoctors = _doctorService.GetAllDoctors().Count;
+            ViewBag.TotalAppointments = appointments.Count;
+            ViewBag.EmergencyCount = appointments.Count(a => a.IsEmergency);
+            ViewBag.ChartLabels = appointmentTrend.Labels;
+            ViewBag.ChartData = appointmentTrend.Counts;
+            ViewBag.StatusLabels = statusCounts.Labels;
+            ViewBag.StatusData = statusCounts.Counts;
+            ViewBag.RecentAppointments = appointments.OrderByDescending(a => a.AppointmentDate).Take(8).ToList();
+            return View();
         }
         public IActionResult Patient()
         {
@@ -88,6 +126,7 @@ namespace MediCare.Controllers
             if (ModelState.IsValid)
             {
                 await _opdScheduleService.AddScheduleAsync(schedule);
+                LogAdminActivity("OPD Schedule Added", $"Schedule for Dr. {schedule.DoctorId} added.", "success");
                 return RedirectToAction("OPDSchedule");
             }
             ViewBag.Doctors = _doctorService.GetAllDoctors();
@@ -109,11 +148,20 @@ namespace MediCare.Controllers
         public IActionResult TokenQueue()
         {
             var appointments = _appointmentService.GetAllAppointments()
-                .Where(a => a.AppointmentDate.Date == DateTime.Today && a.Status == "Scheduled")
-                .OrderBy(a => a.AppointmentDate)
+                .Where(a => a.AppointmentDate.Date == DateTime.Today &&
+                            a.Status != "Cancelled" &&
+                            a.Status != "No-Show")
+                .OrderByDescending(a => a.Status == "In Progress" || a.Status == "In-Progress")
+                .ThenByDescending(a => a.IsEmergency)
+                .ThenBy(a => a.SortOrder)
+                .ThenBy(a => a.AppointmentDate)
                 .ToList();
 
             ViewBag.CurrentTokens = _queueService.GetAllCurrentTokens();
+            ViewBag.WaitingCount = appointments.Count(a => a.Status == "Waiting" || a.Status == "Scheduled");
+            ViewBag.InProgressCount = appointments.Count(a => a.Status == "In Progress" || a.Status == "In-Progress");
+            ViewBag.CompletedCount = appointments.Count(a => a.Status == "Completed");
+            ViewBag.TotalToday = appointments.Count;
             return View(appointments);
         }
 
@@ -122,6 +170,93 @@ namespace MediCare.Controllers
         {
             _queueService.SetCurrentToken(doctorId, tokenNumber);
             return Json(new { success = true });
+        }
+
+        [HttpPost]
+        public IActionResult UpdateStatus(int id, string status)
+        {
+            var appointment = _appointmentService.GetAppointmentById(id);
+            if (appointment == null) return Json(new { success = false });
+
+            appointment.Status = status.Replace("-", " ");
+            _appointmentService.UpdateAppointment(appointment);
+            if (string.Equals(appointment.Status, "Completed", StringComparison.OrdinalIgnoreCase))
+            {
+                _queueService.ClearCurrentToken(appointment.DoctorId);
+            }
+            LogAdminActivity("Appointment Status Updated", $"Appointment #{id} status changed to {appointment.Status}.", "info");
+            return Json(new { success = true });
+        }
+
+        [HttpPost]
+        public IActionResult DeleteAppointment(int id)
+        {
+            var app = _appointmentService.GetAppointmentById(id);
+            if (app == null) return Json(new { success = false });
+
+            _appointmentService.DeleteAppointment(id);
+            if (app.DoctorId > 0) _queueService.ClearCurrentToken(app.DoctorId);
+            LogAdminActivity("Appointment Deleted", $"Appointment #{id} deleted.", "error");
+            return Json(new { success = true });
+        }
+
+        [HttpPost]
+        public IActionResult BulkDeleteAppointments([FromBody] int[] ids)
+        {
+            if (ids == null || ids.Length == 0) return Json(new { success = false });
+
+            foreach (var id in ids)
+            {
+                var app = _appointmentService.GetAppointmentById(id);
+                if (app != null)
+                {
+                    if (app.DoctorId > 0) _queueService.ClearCurrentToken(app.DoctorId);
+                    _appointmentService.DeleteAppointment(id);
+                }
+            }
+
+            LogAdminActivity("Appointments Deleted", $"{ids.Length} appointment record(s) deleted.", "error");
+            return Json(new { success = true });
+        }
+
+        [HttpPost]
+        public IActionResult DeleteAllAppointments()
+        {
+            var appointments = _appointmentService.GetAllAppointments();
+            foreach (var app in appointments)
+            {
+                _appointmentService.DeleteAppointment(app.Id);
+                if (app.DoctorId > 0) _queueService.ClearCurrentToken(app.DoctorId);
+            }
+            LogAdminActivity("Appointments Cleared", "All appointments removed.", "error");
+            return Json(new { success = true });
+        }
+
+        [HttpPost]
+        public IActionResult UpdateOrder([FromBody] int[] ids)
+        {
+            if (ids == null || ids.Length == 0) return Json(new { success = false });
+            _appointmentService.UpdateSortOrder(ids.ToList());
+            LogAdminActivity("Queue Reordered", $"Queue order updated for {ids.Length} appointment(s).", "info");
+            return Json(new { success = true });
+        }
+
+        [HttpGet]
+        public IActionResult GetAppointmentDetails(int id)
+        {
+            var app = _appointmentService.GetAppointmentById(id);
+            if (app == null) return NotFound();
+            return Json(new
+            {
+                token = app.TokenNumber,
+                patientName = $"{app.Patient?.FirstName} {app.Patient?.LastName}".Trim(),
+                doctorName = $"Dr. {app.Doctor?.FirstName} {app.Doctor?.LastName}".Trim(),
+                date = app.AppointmentDate.ToString("yyyy-MM-dd"),
+                time = app.TimeSlot ?? app.AppointmentDate.ToString("HH:mm"),
+                status = app.Status,
+                subject = app.Subject,
+                notes = app.Notes
+            });
         }
 
         public IActionResult Settings()
@@ -244,6 +379,20 @@ namespace MediCare.Controllers
         {
             if (ModelState.IsValid)
             {
+                medicine.GenericName ??= string.Empty;
+                medicine.Category ??= string.Empty;
+                medicine.DosageForm ??= string.Empty;
+                medicine.Strength ??= string.Empty;
+                medicine.PackSize ??= string.Empty;
+                medicine.Manufacturer ??= string.Empty;
+                medicine.Supplier ??= string.Empty;
+                medicine.Unit ??= string.Empty;
+                medicine.Storage ??= string.Empty;
+                medicine.Usage ??= string.Empty;
+                medicine.SideEffects ??= string.Empty;
+                medicine.Instructions ??= string.Empty;
+                medicine.PrescriptionRequired ??= string.Empty;
+
                 _medicineService.AddMedicine(medicine);
                 return RedirectToAction("Medicines");
             }
@@ -262,7 +411,22 @@ namespace MediCare.Controllers
         {
             if (ModelState.IsValid)
             {
+                medicine.GenericName ??= string.Empty;
+                medicine.Category ??= string.Empty;
+                medicine.DosageForm ??= string.Empty;
+                medicine.Strength ??= string.Empty;
+                medicine.PackSize ??= string.Empty;
+                medicine.Manufacturer ??= string.Empty;
+                medicine.Supplier ??= string.Empty;
+                medicine.Unit ??= string.Empty;
+                medicine.Storage ??= string.Empty;
+                medicine.Usage ??= string.Empty;
+                medicine.SideEffects ??= string.Empty;
+                medicine.Instructions ??= string.Empty;
+                medicine.PrescriptionRequired ??= string.Empty;
+
                 _medicineService.UpdateMedicine(medicine);
+                LogAdminActivity("Medicine Updated", $"{medicine.MedicineName} updated.", "info");
                 return RedirectToAction("Medicines");
             }
             return View(medicine);
@@ -272,7 +436,22 @@ namespace MediCare.Controllers
         public IActionResult DeleteMedicine(int id)
         {
             _medicineService.DeleteMedicine(id);
+            LogAdminActivity("Medicine Deleted", $"Medicine #{id} removed.", "error");
             return RedirectToAction("Medicines");
+        }
+
+        [HttpPost]
+        public IActionResult DeleteSelectedMedicines([FromBody] int[] ids)
+        {
+            if (ids == null || ids.Length == 0) return Json(new { success = false });
+
+            foreach (var id in ids)
+            {
+                _medicineService.DeleteMedicine(id);
+            }
+
+            LogAdminActivity("Medicines Deleted", $"{ids.Length} medicine record(s) removed.", "error");
+            return Json(new { success = true });
         }
         public IActionResult EditDoctor(int id) 
         { 
@@ -287,6 +466,7 @@ namespace MediCare.Controllers
             if (ModelState.IsValid)
             {
                 _doctorService.UpdateDoctor(doctor);
+                LogAdminActivity("Doctor Updated", $"{doctor.FirstName} {doctor.LastName} updated.", "info");
                 return RedirectToAction("Doctors");
             }
             return View(doctor);
@@ -296,6 +476,7 @@ namespace MediCare.Controllers
         public IActionResult DeleteDoctor(int id)
         {
             _doctorService.DeleteDoctor(id);
+            LogAdminActivity("Doctor Deleted", $"Doctor #{id} removed.", "error");
             return RedirectToAction("Doctors");
         }
         public IActionResult EditPatient(int id) 
@@ -311,6 +492,7 @@ namespace MediCare.Controllers
             if (ModelState.IsValid)
             {
                 _patientService.UpdatePatient(patient);
+                LogAdminActivity("Patient Updated", $"{patient.FirstName} {patient.LastName} updated.", "info");
                 return RedirectToAction("Patient"); // Assuming the list view is called Patient
             }
             return View(patient);
@@ -320,6 +502,7 @@ namespace MediCare.Controllers
         public IActionResult DeletePatient(int id)
         {
             _patientService.DeletePatient(id);
+            LogAdminActivity("Patient Deleted", $"Patient #{id} removed.", "error");
             return RedirectToAction("Patient");
         }
         public IActionResult EditOPDSchedule(int id) { return View(); }
@@ -374,6 +557,7 @@ namespace MediCare.Controllers
         public IActionResult ApproveUser(int id)
         {
             _userService.UpdateUserStatus(id, "Approved");
+            LogAdminActivity("User Approved", $"User #{id} approved.", "success");
             return RedirectToAction("PendingApprovals");
         }
 
@@ -381,6 +565,7 @@ namespace MediCare.Controllers
         public IActionResult RejectUser(int id)
         {
             _userService.UpdateUserStatus(id, "Rejected");
+            LogAdminActivity("User Rejected", $"User #{id} rejected.", "warning");
             return RedirectToAction("PendingApprovals");
         }
 
@@ -394,6 +579,7 @@ namespace MediCare.Controllers
         public IActionResult ChangeRole(int id, string role)
         {
             _userService.UpdateUserRole(id, role);
+            LogAdminActivity("Role Changed", $"User #{id} role updated to {role}.", "info");
             return RedirectToAction("ManageUsers");
         }
 
@@ -401,6 +587,7 @@ namespace MediCare.Controllers
         public IActionResult ChangeStatus(int id, string status)
         {
             _userService.UpdateUserStatus(id, status);
+            LogAdminActivity("Status Changed", $"User #{id} status updated to {status}.", "info");
             return RedirectToAction("ManageUsers");
         }
 
@@ -408,6 +595,7 @@ namespace MediCare.Controllers
         public IActionResult DeleteUser(int id, string returnUrl)
         {
             _userService.RemoveUser(id);
+            LogAdminActivity("User Deleted", $"User #{id} removed.", "error");
             if (!string.IsNullOrEmpty(returnUrl))
             {
                 return Redirect(returnUrl);
@@ -415,25 +603,180 @@ namespace MediCare.Controllers
             return RedirectToAction("ManageUsers");
         }
 
+        [HttpPost]
+        public async Task<IActionResult> DeleteFeedback(int id)
+        {
+            await _feedbackService.DeleteFeedbackAsync(id);
+            LogAdminActivity("Feedback Deleted", $"Feedback #{id} removed.", "error");
+            return Json(new { success = true });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteSelectedFeedbacks([FromBody] int[] ids)
+        {
+            if (ids == null || ids.Length == 0) return Json(new { success = false });
+            await _feedbackService.DeleteFeedbacksAsync(ids);
+            LogAdminActivity("Feedbacks Deleted", $"{ids.Length} feedback item(s) removed.", "error");
+            return Json(new { success = true });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteAllFeedbacks()
+        {
+            var feedbacks = await _feedbackService.GetAllFeedbacksAsync();
+            await _feedbackService.DeleteFeedbacksAsync(feedbacks.Select(f => f.Id));
+            LogAdminActivity("Feedbacks Cleared", "All feedback items removed.", "error");
+            return Json(new { success = true });
+        }
+
         public IActionResult Profile()
         {
-            return View();
+            string email = HttpContext.Session.GetString("UserEmail") ?? string.Empty;
+            var user = _userService.GetUserByEmail(email) ?? new AppUser
+            {
+                FirstName = HttpContext.Session.GetString("UserName")?.Split(' ').FirstOrDefault() ?? "Admin",
+                LastName = string.Join(" ", (HttpContext.Session.GetString("UserName") ?? "Admin").Split(' ').Skip(1)),
+                Email = email,
+                Phone = string.Empty,
+                Role = HttpContext.Session.GetString("UserRole") ?? "Admin",
+                Status = "Approved"
+            };
+            var pref = _userPreferenceService.GetOrCreate(email);
+            ViewBag.PushNotificationsEnabled = pref.PushNotificationsEnabled;
+            ViewBag.TwoFactorEnabled = pref.TwoFactorEnabled;
+            ViewBag.ProfilePhotoUrl = GetAdminPhotoUrl(email);
+            return View(user);
+        }
+
+        [HttpPost]
+        public IActionResult Profile(AppUser form, IFormFile? photo)
+        {
+            string email = HttpContext.Session.GetString("UserEmail") ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(email)) return RedirectToAction("Login", "Login");
+
+            var user = _userService.GetUserByEmail(email);
+            if (user == null) return RedirectToAction("Login", "Login");
+
+            user.FirstName = form.FirstName;
+            user.LastName = form.LastName;
+            user.Phone = form.Phone;
+
+            if (photo != null && photo.Length > 0)
+            {
+                SaveAdminPhoto(email, photo);
+            }
+
+            _notificationService.AddNotification(new Notification
+            {
+                UserEmail = email,
+                Title = "Profile Updated",
+                Message = "Your admin profile was updated successfully.",
+                Type = "success",
+                CreatedAt = DateTime.UtcNow
+            });
+            TempData["ToastMessage"] = "Profile updated successfully";
+            TempData["ToastType"] = "success";
+            return RedirectToAction("Profile");
+        }
+
+        private string? GetAdminPhotoUrl(string email)
+        {
+            var uploads = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+            if (!Directory.Exists(uploads)) return null;
+            var prefix = GetAdminPhotoPrefix(email);
+            var file = Directory.GetFiles(uploads, $"{prefix}.*").FirstOrDefault();
+            return file == null ? null : $"/uploads/{Path.GetFileName(file)}";
+        }
+
+        private void SaveAdminPhoto(string email, IFormFile photo)
+        {
+            var uploads = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+            if (!Directory.Exists(uploads)) Directory.CreateDirectory(uploads);
+
+            var prefix = GetAdminPhotoPrefix(email);
+            foreach (var existing in Directory.GetFiles(uploads, $"{prefix}.*"))
+            {
+                System.IO.File.Delete(existing);
+            }
+
+            var extension = Path.GetExtension(photo.FileName);
+            var fileName = $"{prefix}{extension}";
+            var path = Path.Combine(uploads, fileName);
+            using var stream = System.IO.File.Create(path);
+            photo.CopyTo(stream);
+        }
+
+        private static string GetAdminPhotoPrefix(string email)
+        {
+            var safeEmail = new string((email ?? "admin").Where(char.IsLetterOrDigit).ToArray());
+            if (string.IsNullOrWhiteSpace(safeEmail)) safeEmail = "admin";
+            return $"admin_{safeEmail}";
+        }
+
+        [HttpPost]
+        public IActionResult TogglePushNotifications(bool enabled)
+        {
+            string email = HttpContext.Session.GetString("UserEmail") ?? string.Empty;
+            if (string.IsNullOrEmpty(email)) return Json(new { success = false });
+            _userPreferenceService.SetPushEnabled(email, enabled);
+            return Json(new { success = true });
+        }
+
+        [HttpPost]
+        public IActionResult ToggleTwoFactor(bool enabled)
+        {
+            string email = HttpContext.Session.GetString("UserEmail") ?? string.Empty;
+            if (string.IsNullOrEmpty(email)) return Json(new { success = false });
+            _userPreferenceService.SetTwoFactorEnabled(email, enabled);
+            return Json(new { success = true });
+        }
+
+        public IActionResult History()
+        {
+            string email = HttpContext.Session.GetString("UserEmail") ?? string.Empty;
+            if (string.IsNullOrEmpty(email)) return RedirectToAction("Login", "Login");
+
+            var list = _notificationService.GetAllNotificationsForUser(email);
+            ViewBag.DeleteAllUrl = "/Admin/DeleteAllNotifications";
+            ViewBag.DeleteUrl = "/Admin/DeleteNotifications";
+            ViewBag.TitleText = "Activity History";
+            ViewBag.SubtitleText = "All admin activities stored here";
+            return View(list);
         }
 
         public IActionResult Notifications()
         {
-            return View();
+            string email = HttpContext.Session.GetString("UserEmail") ?? "";
+            var list = string.IsNullOrEmpty(email) ? new List<Notification>() : _notificationService.GetNotificationsForUser(email);
+            if (!string.IsNullOrEmpty(email)) _notificationService.MarkAllRead(email);
+            return View(list);
         }
 
         [HttpPost]
-        public IActionResult DeleteAllAppointments()
+        public IActionResult DeleteAllNotifications()
         {
-            var appointments = _appointmentService.GetAllAppointments();
-            foreach (var app in appointments)
-            {
-                _appointmentService.DeleteAppointment(app.Id);
-            }
-            return RedirectToAction("Appointments");
+            string email = HttpContext.Session.GetString("UserEmail") ?? "";
+            if (string.IsNullOrEmpty(email)) return Json(new { success = false });
+            _notificationService.DeleteAllForUser(email);
+            return Json(new { success = true });
+        }
+
+        [HttpPost]
+        public IActionResult DeleteNotifications([FromBody] int[] ids)
+        {
+            string email = HttpContext.Session.GetString("UserEmail") ?? "";
+            if (string.IsNullOrEmpty(email) || ids == null) return Json(new { success = false });
+            foreach (var id in ids) _notificationService.DeleteNotification(id, email);
+            return Json(new { success = true });
+        }
+
+        [HttpPost]
+        public IActionResult MarkAllNotificationsRead()
+        {
+            string email = HttpContext.Session.GetString("UserEmail") ?? "";
+            if (string.IsNullOrEmpty(email)) return Json(new { success = false });
+            _notificationService.MarkAllRead(email);
+            return Json(new { success = true });
         }
 
         [HttpPost]
@@ -444,6 +787,7 @@ namespace MediCare.Controllers
             {
                 _patientService.DeletePatient(p.Id);
             }
+            LogAdminActivity("Patients Cleared", "All patients removed.", "error");
             return RedirectToAction("Patient"); // The action is named 'Patient'
         }
 
@@ -455,6 +799,7 @@ namespace MediCare.Controllers
             {
                 _doctorService.DeleteDoctor(d.Id);
             }
+            LogAdminActivity("Doctors Cleared", "All doctors removed.", "error");
             return RedirectToAction("Doctors");
         }
 
@@ -466,6 +811,7 @@ namespace MediCare.Controllers
             {
                 _medicineService.DeleteMedicine(m.Id);
             }
+            LogAdminActivity("Medicines Cleared", "All medicines removed.", "error");
             return RedirectToAction("Medicines");
         }
 
@@ -477,6 +823,7 @@ namespace MediCare.Controllers
             {
                 _userService.RemoveUser(s.Id);
             }
+            LogAdminActivity("Staff Cleared", "All staff users removed.", "error");
             return RedirectToAction("Staff");
         }
     }

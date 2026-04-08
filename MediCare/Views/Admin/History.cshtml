@@ -1,0 +1,11 @@
+@model IEnumerable<MediCare.Models.Notification>
+@{
+    ViewData["Title"] = "Activity History";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewBag.DeleteAllUrl = "/Admin/DeleteAllNotifications";
+    ViewBag.DeleteUrl = "/Admin/DeleteNotifications";
+    ViewBag.TitleText = "Activity History";
+    ViewBag.SubtitleText = "All admin activities stored here";
+}
+
+<partial name="~/Views/Shared/_ActivityList.cshtml" model="Model" />

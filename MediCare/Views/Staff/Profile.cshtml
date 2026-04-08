@@ -1,72 +1,221 @@
+﻿@model MediCare.Models.AppUser
 @{
-    ViewData["Title"] = "My Profile";
+    ViewData["Title"] = "Your Identity Profile";
     Layout = "~/Views/Shared/_StaffLayout.cshtml";
+    var userName = Context.Session.GetString("UserName") ?? "Staff";
+    var userEmail = Context.Session.GetString("UserEmail") ?? "staff@medicare.com";
+    var role = Context.Session.GetString("UserRole") ?? "Staff";
+    var pushEnabled = (ViewBag.PushNotificationsEnabled as bool?) ?? true;
+    var twoFactorEnabled = (ViewBag.TwoFactorEnabled as bool?) ?? false;
+    var profilePhotoUrl = ViewBag.ProfilePhotoUrl as string;
+    var fullName = string.IsNullOrWhiteSpace(Model?.FirstName) ? userName : $"{Model.FirstName} {Model.LastName}".Trim();
+    var initials = string.IsNullOrWhiteSpace(fullName) ? "S" : string.Join("", fullName.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(x => x[0])).ToUpper();
 }
 
-<div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px;">
+<style>
+    .profile-shell { display:grid; grid-template-columns:minmax(0,2fr) minmax(320px,1fr); gap:26px; }
+    .profile-panel { background:#fff; border:1px solid #e5e7eb; border-radius:28px; box-shadow:0 20px 50px rgba(15,23,42,.04); }
+    .profile-left, .profile-right { padding:28px; }
+    .avatar-wrap { width:76px; height:76px; border-radius:50%; background:#ecfdf5; border:4px solid #d1fae5; color:#10b981; display:flex; align-items:center; justify-content:center; font-size:26px; font-weight:800; }
+    .field-shell, .workspace-pill, .logged-block { border:1px solid #dbe4ee; border-radius:16px; background:#f8fafc; }
+    .field-shell { padding:12px 14px; min-height:78px; transition:.2s ease; }
+    .field-shell:focus-within { border-color:#10b981; box-shadow:0 0 0 4px rgba(16,185,129,.08); background:#fff; }
+    .field-label { font-size:11px; font-weight:800; text-transform:uppercase; color:#64748b; margin-bottom:4px; }
+    .field-value, .field-value.form-control, .field-value.form-select { border:0 !important; background:transparent !important; padding:0 !important; font-weight:700 !important; color:#0f172a !important; box-shadow:none !important; }
+    .workspace-pill { padding:12px 14px; display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; background:#fff; }
+    .logged-block { margin-top:18px; padding:16px; }
+    .mini-muted { color:#64748b; font-size:13px; }
+    .switch { position:relative; width:46px; height:26px; display:inline-block; }
+    .switch input { display:none; }
+    .slider { position:absolute; inset:0; background:#cbd5e1; border-radius:999px; transition:.2s; cursor:pointer; }
+    .slider:before { content:""; position:absolute; width:20px; height:20px; left:3px; top:3px; border-radius:50%; background:#fff; transition:.2s; }
+    .switch input:checked + .slider { background:#10b981; }
+    .switch input:checked + .slider:before { transform:translateX(20px); }
+    .edit-actions { display:none; }
+    .edit-actions.show { display:flex; }
+</style>
+
+<div class="d-flex justify-content-between align-items-end mb-4 flex-wrap gap-2">
     <div>
-        <h1 style="font-size: 24px; font-weight: 600; margin-bottom: 4px;">My Profile</h1>
-        <p style="color: #666; font-size: 14px; margin: 0;">Manage your personal and professional information</p>
+        <h1 class="fw-bold m-0 text-slate-800">Your Identity Profile</h1>
+        <p class="text-muted mb-0">Manage your personal and work information</p>
     </div>
-    <button type="button" onclick="document.getElementById('profileForm').submit()" style="display: flex; align-items: center; gap: 8px; background: #0fb48c; color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 500; cursor: pointer;">
-        <i class="fa-solid fa-pen-to-square"></i>
-        Save Changes
-    </button>
+    <div class="blood-badge"><i class="fa fa-id-badge me-1"></i> @role</div>
 </div>
 
-<form id="profileForm" method="post" asp-action="UpdateProfile">
-    <div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 24px;">
-
-        <!-- Left Column - Profile Card -->
-        <div style="display: flex; flex-direction: column; gap: 24px;">
-
-            <div style="background: #fff; border-radius: 12px; padding: 32px 24px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); text-align: center; display: flex; flex-direction: column; align-items: center;">
-                <div style="width: 120px; height: 120px; border-radius: 50%; background: #e8fdf5; color: #0fb48c; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; font-size: 48px; font-weight: 700;">
-                    ST
+<div class="profile-shell">
+    <div class="profile-panel profile-left">
+        <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+            <div class="d-flex align-items-center gap-3">
+                <div class="position-relative">
+                    <div class="avatar-wrap shadow-sm" id="photoPreview" style="@(string.IsNullOrWhiteSpace(profilePhotoUrl) ? "" : $"background-image:url('{profilePhotoUrl}'); background-size:cover; background-position:center; color:transparent;")">
+                        @(string.IsNullOrWhiteSpace(profilePhotoUrl) ? initials : "")
+                    </div>
+                    <button id="cameraBtn" type="button" class="btn btn-sm btn-light rounded-circle position-absolute bottom-0 end-0 border" onclick="document.getElementById('photoInput').click()">
+                        <i class="fa fa-camera"></i>
+                    </button>
                 </div>
-                <h2 style="font-size: 22px; font-weight: 700; color: #222; margin-bottom: 4px;">Jane Doe</h2>
-                <p style="color: #0fb48c; font-weight: 500; margin-bottom: 16px;">Receptionist</p>
+                <div>
+                    <h3 class="fw-bold mb-0">@fullName</h3>
+                    <div class="mini-muted"><i class="fa fa-envelope me-1"></i> @(Model?.Email ?? userEmail)</div>
+                    <span class="badge bg-success bg-opacity-10 text-success border rounded-pill px-3 py-2 mt-2">Verified Profile</span>
+                </div>
+            </div>
+            <button id="editProfileBtn" type="button" class="btn btn-outline-success rounded-pill px-4 fw-bold">Edit Profile</button>
+        </div>
 
-                <div style="width: 100%; height: 1px; background: #eee; margin-bottom: 24px;"></div>
+        <form id="profileForm" asp-action="Profile" method="post" enctype="multipart/form-data" class="mt-4">
+            <input type="hidden" asp-for="Id" />
+            <input type="file" name="photo" id="photoInput" accept="image/*" class="d-none editable-field" onchange="previewPhoto(this)" disabled />
 
-                <div style="display: flex; flex-direction: column; gap: 16px; width: 100%; text-align: left;">
-                    <div style="display: flex; align-items: center; gap: 12px; color: #555; font-size: 14px;">
-                        <i class="fa-regular fa-envelope" style="color: #999; width: 18px; text-align: center;"></i> staff@medicare.com
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="field-shell">
+                        <div class="field-label">First Name</div>
+                        <input asp-for="FirstName" class="form-control field-value editable-field" disabled />
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="field-shell">
+                        <div class="field-label">Last Name</div>
+                        <input asp-for="LastName" class="form-control field-value editable-field" disabled />
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="field-shell">
+                        <div class="field-label">Phone Contact</div>
+                        <input asp-for="Phone" class="form-control field-value editable-field" disabled />
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="field-shell">
+                        <div class="field-label">Contact Email</div>
+                        <input asp-for="Email" class="form-control field-value editable-field" disabled />
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="field-shell">
+                        <div class="field-label">Role</div>
+                        <input asp-for="Role" class="form-control field-value editable-field" disabled />
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="field-shell">
+                        <div class="field-label">Status</div>
+                        <input asp-for="Status" class="form-control field-value editable-field" disabled />
                     </div>
                 </div>
             </div>
 
-        </div>
-
-        <!-- Right Column - Details -->
-        <div style="display: flex; flex-direction: column; gap: 24px;">
-
-            <div style="background: #fff; border-radius: 12px; padding: 32px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
-                <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 24px; color: #222; display: flex; align-items: center; gap: 8px;">
-                    <i class="fa-regular fa-user" style="color: #0fb48c;"></i> Profile Information
-                </h3>
-
-                <div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px;">
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <label style="font-size: 13px; color: #888; font-weight: 500;">First Name</label>
-                        <input type="text" name="FirstName" value="Jane" style="padding: 12px; border-radius: 8px; border: 1px solid #eee; background: #fff; color: #333; font-size: 15px; outline: none;" />
-                    </div>
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <label style="font-size: 13px; color: #888; font-weight: 500;">Last Name</label>
-                        <input type="text" name="LastName" value="Doe" style="padding: 12px; border-radius: 8px; border: 1px solid #eee; background: #fff; color: #333; font-size: 15px; outline: none;" />
-                    </div>
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <label style="font-size: 13px; color: #888; font-weight: 500;">Contact Email</label>
-                        <input type="email" name="Email" value="staff@medicare.com" style="padding: 12px; border-radius: 8px; border: 1px solid #eee; background: #fff; color: #333; font-size: 15px; outline: none;" />
-                    </div>
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <label style="font-size: 13px; color: #888; font-weight: 500;">Role</label>
-                        <input type="text" value="Receptionist" disabled style="padding: 12px; border-radius: 8px; border: 1px solid #eee; background: #fcfcfc; color: #888; font-size: 15px; outline: none;" />
-                    </div>
-                </div>
+            <div id="editActions" class="edit-actions justify-content-end gap-3 mt-4">
+                <button id="resetProfileBtn" type="button" class="btn btn-light rounded-pill px-4 fw-bold border">Reset Changes</button>
+                <button type="submit" class="btn btn-success rounded-pill px-4 fw-bold">Save Changes</button>
             </div>
-
-        </div>
-
+        </form>
     </div>
-</form>
+
+    <div class="profile-panel profile-right">
+        <h5 class="fw-bold mb-3">Account Workspace</h5>
+        <div class="workspace-pill">
+            <div><i class="fa fa-bell me-2"></i> Push Notifications</div>
+            <label class="switch m-0">
+                <input id="pushToggle" type="checkbox" @(pushEnabled ? "checked" : "") />
+                <span class="slider"></span>
+            </label>
+        </div>
+        <div class="workspace-pill">
+            <div><i class="fa fa-shield-halved me-2"></i> 2FA Activation</div>
+            <label class="switch m-0">
+                <input id="tfaToggle" type="checkbox" @(twoFactorEnabled ? "checked" : "") />
+                <span class="slider"></span>
+            </label>
+        </div>
+        <div class="logged-block">
+            <h6 class="fw-bold mb-3">Logged Details</h6>
+            <div class="d-flex flex-column gap-2 mini-muted">
+                <div><i class="fa-regular fa-user me-2"></i>@fullName</div>
+                <div><i class="fa-regular fa-envelope me-2"></i>@(Model?.Email ?? userEmail)</div>
+                <div><i class="fa-solid fa-id-badge me-2"></i>@role</div>
+            </div>
+        </div>
+        <div class="alert bg-danger bg-opacity-10 border-0 rounded-4 p-4 mt-4">
+            <h6 class="text-danger fw-bold m-0"><i class="fa fa-circle-exclamation me-2"></i> Account Control</h6>
+            <p class="text-danger small mt-2 mb-3">Permanently withdraw all account data and close the profile.</p>
+            <button class="btn btn-danger w-100 rounded-pill fw-bold py-2 shadow-sm" onclick="alert('Contact administrator for account deletion.')">Close Account</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let originalPreviewBackground = '';
+        let originalPreviewText = '';
+
+        function previewPhoto(inp) {
+            const file = inp.files && inp.files[0];
+            if (!file) return;
+            if (file.size > 2 * 1024 * 1024) { alert('File too large'); inp.value = ''; return; }
+            const url = URL.createObjectURL(file);
+            const ph = document.getElementById('photoPreview');
+            if (ph) { ph.style.backgroundImage = `url(${url})`; ph.textContent = ''; }
+        }
+
+        async function setPref(url, enabled) {
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+                body: `enabled=${enabled}`
+            });
+            if (!res.ok) alert('Unable to save setting. Please try again.');
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('profileForm');
+            const editBtn = document.getElementById('editProfileBtn');
+            const resetBtn = document.getElementById('resetProfileBtn');
+            const editActions = document.getElementById('editActions');
+            const fields = document.querySelectorAll('.editable-field');
+            const cameraBtn = document.getElementById('cameraBtn');
+            const photoPreview = document.getElementById('photoPreview');
+
+            if (photoPreview) {
+                originalPreviewBackground = photoPreview.style.backgroundImage || '';
+                originalPreviewText = photoPreview.textContent || '';
+            }
+
+            function setEditMode(enabled) {
+                fields.forEach(f => { f.disabled = !enabled; });
+                if (cameraBtn) {
+                    cameraBtn.disabled = !enabled;
+                    cameraBtn.style.opacity = enabled ? '1' : '0.5';
+                }
+                const photoInput = document.getElementById('photoInput');
+                if (photoInput) photoInput.disabled = !enabled;
+                if (editActions) editActions.classList.toggle('show', enabled);
+                if (editBtn) editBtn.style.display = enabled ? 'none' : 'inline-block';
+            }
+
+            setEditMode(false);
+            if (editBtn) editBtn.addEventListener('click', function () { setEditMode(true); });
+            if (resetBtn) {
+                resetBtn.addEventListener('click', function () {
+                    form.reset();
+                    const photoInput = document.getElementById('photoInput');
+                    if (photoInput) photoInput.value = '';
+                    if (photoPreview) {
+                        photoPreview.style.backgroundImage = originalPreviewBackground;
+                        photoPreview.textContent = originalPreviewText;
+                    }
+                    setEditMode(false);
+                });
+            }
+
+            document.getElementById('pushToggle')?.addEventListener('change', function () {
+                setPref('/Staff/TogglePushNotifications', this.checked);
+            });
+            document.getElementById('tfaToggle')?.addEventListener('change', function () {
+                setPref('/Staff/ToggleTwoFactor', this.checked);
+            });
+        });
+    </script>
+}

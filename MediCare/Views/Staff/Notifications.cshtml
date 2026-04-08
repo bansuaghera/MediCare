@@ -1,92 +1,9 @@
+@model IEnumerable<MediCare.Models.Notification>
 @{
-    ViewData["Title"] = "Staff Notifications";
+    ViewData["Title"] = "Notifications";
     Layout = "~/Views/Shared/_StaffLayout.cshtml";
+    ViewBag.DeleteAllUrl = "/Staff/DeleteAllNotifications";
+    ViewBag.DeleteUrl = "/Staff/DeleteNotifications";
+    ViewBag.MarkUrl = "/Staff/MarkAllNotificationsRead";
 }
-
-<style>
-    .notif-wrapper {
-        max-width: 900px;
-        margin: 0 auto;
-    }
-    .notif-card {
-        background: white;
-        border-radius: 16px;
-        padding: 20px;
-        margin-bottom: 15px;
-        border: 1px solid #f1f5f9;
-        display: flex;
-        gap: 20px;
-        transition: 0.2s;
-    }
-    .notif-card.unread {
-        border-left: 4px solid #10b981;
-        background: #f0fdf4;
-    }
-    .notif-card:hover {
-        transform: translateX(5px);
-        box-shadow: 0 4px 20px rgba(0,0,0,0.02);
-    }
-    .notif-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-    }
-    .icon-emerald { background: #d1fae5; color: #10b981; }
-    .icon-blue { background: #dbeafe; color: #3b82f6; }
-    .icon-orange { background: #ffedd5; color: #f97316; }
-
-    .notif-content { flex-grow: 1; }
-    .notif-time { font-size: 12px; color: #94a3b8; margin-bottom: 4px; }
-    .notif-title { font-weight: 700; font-size: 15px; color: #111827; margin-bottom: 4px; }
-    .notif-text { font-size: 14px; color: #4b5563; }
-</style>
-
-<div class="notif-wrapper">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="fw-bold m-0">Platform Alerts</h2>
-            <p class="text-muted small">Stay updated with system activities</p>
-        </div>
-        <button class="btn btn-sm btn-light rounded-pill px-3 fw-bold">Mark all as read</button>
-    </div>
-
-    <div class="notif-card unread">
-        <div class="notif-icon icon-emerald"><i class="fa fa-user-plus"></i></div>
-        <div class="notif-content">
-            <div class="notif-time">2 mins ago</div>
-            <div class="notif-title">New Patient Registered</div>
-            <div class="notif-text">Dhiraj Dabhii has been successfully registered by the staff system.</div>
-        </div>
-    </div>
-
-    <div class="notif-card">
-        <div class="notif-icon icon-orange"><i class="fa fa-clock"></i></div>
-        <div class="notif-content">
-            <div class="notif-time">1 hour ago</div>
-            <div class="notif-title">Appointment Rescheduled</div>
-            <div class="notif-text">Patient #104 has moved their appointment to tomorrow at 10:00 AM.</div>
-        </div>
-    </div>
-
-    <div class="notif-card">
-        <div class="notif-icon icon-blue"><i class="fa fa-circle-info"></i></div>
-        <div class="notif-content">
-            <div class="notif-time">Yesterday</div>
-            <div class="notif-title">System Update Complete</div>
-            <div class="notif-text">Platform version 2.4.0 is now live with enhanced charting features.</div>
-        </div>
-    </div>
-
-    <div class="notif-card">
-        <div class="notif-icon icon-emerald"><i class="fa fa-check-double"></i></div>
-        <div class="notif-content">
-            <div class="notif-time">Yesterday</div>
-            <div class="notif-title">Dr. Patel Session Ended</div>
-            <div class="notif-text">The OPD session for Dr. Patel has been closed successfully.</div>
-        </div>
-    </div>
-</div>
+<partial name="~/Views/Shared/_NotificationsList.cshtml" model="Model" />

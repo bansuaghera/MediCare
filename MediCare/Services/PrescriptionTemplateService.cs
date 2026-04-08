@@ -15,12 +15,34 @@ namespace MediCare.Services
 
         public async Task<List<PrescriptionTemplate>> GetAllTemplatesAsync()
         {
-            return await _context.PrescriptionTemplates.OrderByDescending(t => t.Title).ToListAsync();
+            return await _context.PrescriptionTemplates
+                .Where(t => t.EntryType == "Template")
+                .OrderByDescending(t => t.CreatedAt)
+                .ToListAsync();
+        }
+
+        public async Task<List<PrescriptionTemplate>> GetAllBranchesAsync()
+        {
+            return await _context.PrescriptionTemplates
+                .Where(t => t.EntryType == "Branch")
+                .OrderByDescending(t => t.CreatedAt)
+                .ToListAsync();
         }
 
         public async Task AddTemplateAsync(PrescriptionTemplate template)
         {
+            template.EntryType = "Template";
             _context.PrescriptionTemplates.Add(template);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task AddBranchAsync(PrescriptionTemplate branch)
+        {
+            branch.EntryType = "Branch";
+            branch.Diagnosis = branch.Diagnosis ?? string.Empty;
+            branch.MedicineNotes = branch.MedicineNotes ?? string.Empty;
+            branch.AdditionalNotes = branch.AdditionalNotes ?? string.Empty;
+            _context.PrescriptionTemplates.Add(branch);
             await _context.SaveChangesAsync();
         }
 

@@ -25,5 +25,6 @@ namespace MediCare.Models
         public string? Subject { get; set; }
         public string? TokenNumber { get; set; }
         public bool IsEmergency { get; set; }
+        public int SortOrder { get; set; } // lower means higher priority in queue
     }
 }

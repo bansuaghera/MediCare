@@ -4,136 +4,74 @@
     Layout = "~/Views/Shared/_DoctorLayout.cshtml";
 }
 
+@{
+    var lastVisit = ViewBag.PatientLastVisit as Dictionary<int, DateTime> ?? new();
+}
+
 <style>
-    .page-header {
-        margin-bottom: 30px;
-    }
-
-    .page-header h3 {
-        font-weight: 700;
-        margin-bottom: 4px;
-        color: #1a1a1a;
-        font-size: 24px;
-    }
-
-    .page-header p {
-        color: #6b7280;
-        font-size: 14px;
-    }
-
-    .table-card {
-        background: white;
-        border-radius: 16px;
-        padding: 30px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
-    }
-    
-    .search-box {
-        background: #f8fafc;
-        border: 1px solid transparent;
-        border-radius: 24px;
-        padding: 12px 20px;
-        display: flex;
-        align-items: center;
-        width: 320px;
-        margin-bottom: 30px;
-        transition: 0.3s;
-    }
-
-    .search-box:focus-within {
-        border-color: #10b981;
-        background: #fff;
-    }
-
-    .search-box i {
-        color: #9ca3af;
-        margin-right: 12px;
-        font-size: 14px;
-    }
-
-    .search-box input {
-        border: none;
-        background: transparent;
-        outline: none;
-        width: 100%;
-        color: #1a1a1a;
-        font-size: 14px;
-    }
-
-    .table {
-        margin-bottom: 0;
-        width: 100%;
-        border-collapse: collapse;
-    }
-    
-    .table thead {
-        background-color: #f8fafc;
-    }
-
-    .table th {
-        color: #6b7280;
-        font-weight: 600;
-        font-size: 11px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        border: none;
-        padding: 16px 20px;
-        text-align: left;
-    }
-    
+    .page-header { margin-bottom: 30px; }
+    .page-header h3 { font-weight: 700; margin-bottom: 4px; color: #1a1a1a; font-size: 24px; }
+    .page-header p { color: #6b7280; font-size: 14px; }
+    .table-card { background: white; border-radius: 16px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+    .search-box { background: #f8fafc; border: 1px solid transparent; border-radius: 24px; padding: 12px 20px; display: flex; align-items: center; width: 320px; transition: 0.3s; }
+    .search-box:focus-within { border-color: #10b981; background: #fff; }
+    .search-box i { color: #9ca3af; margin-right: 12px; font-size: 14px; }
+    .search-box input { border: none; background: transparent; outline: none; width: 100%; color: #1a1a1a; font-size: 14px; }
+    .filter-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+    .pill { padding: 8px 14px; border-radius: 999px; border: 1px solid #e5e7eb; background:#fff; color:#374151; cursor:pointer; font-size:13px; }
+    .pill.active { background:#e8faf3; border-color:#10b981; color:#0f9c6c; }
+    .table { margin-bottom: 0; width: 100%; border-collapse: collapse; }
+    .table thead { background-color: #f8fafc; }
+    .table th { color: #6b7280; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; border: none; padding: 16px 20px; text-align: left; }
     .table th:first-child { border-top-left-radius: 8px; border-bottom-left-radius: 8px; }
     .table th:last-child { border-top-right-radius: 8px; border-bottom-right-radius: 8px; }
-
-    .table td {
-        padding: 20px;
-        vertical-align: middle;
-        font-size: 13px;
-        color: #4b5563;
-        border-bottom: 1px solid #f8fafc;
-    }
-
+    .table td { padding: 20px; vertical-align: middle; font-size: 13px; color: #4b5563; border-bottom: 1px solid #f8fafc; }
     .table tr:last-child td { border-bottom: none; }
-
-    .action-btn {
-        width: 34px;
-        height: 34px;
-        border-radius: 10px;
-        background: white;
-        color: #6b7280;
-        border: 1px solid #e5e5e5;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-
-    .action-btn:hover {
-        background: #f8fafc;
-        color: #10b981;
-        border-color: #10b981;
-    }
+    .action-btn { width: 34px; height: 34px; border-radius: 10px; background: white; color: #6b7280; border: 1px solid #e5e5e5; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
+    .action-btn:hover { background: #f8fafc; color: #10b981; border-color: #10b981; }
 </style>
 
-<div class="page-header">
-    <h3>My Patients</h3>
-    <p>View your assigned patients</p>
+<div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div>
+        <h3>My Patients</h3>
+        <p>View your assigned patients</p>
+    </div>
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+        <button class="btn btn-outline-secondary btn-sm" id="selectAllBtn">Select All</button>
+        <button class="btn btn-outline-danger btn-sm d-none" id="deleteSelectedBtn" onclick="deleteSelected()">Delete Selected</button>
+    </div>
 </div>
 
 <div class="table-card">
-    <div class="search-box">
-        <i class="fa-solid fa-search"></i>
-        <input type="text" placeholder="Search patients..." />
+    <div class="d-flex flex-wrap gap-3 align-items-center mb-3">
+        <div class="search-box">
+            <i class="fa-solid fa-search"></i>
+            <input id="searchInput" type="text" placeholder="Search patients..." />
+        </div>
+        <div class="filter-pills">
+            <span class="pill active" data-range="all">All</span>
+            <span class="pill" data-range="today">Today</span>
+            <span class="pill" data-range="week">This Week</span>
+            <span class="pill" data-range="month">This Month</span>
+        </div>
+        <div class="d-flex align-items-center gap-2 ms-auto">
+            <input type="date" class="form-control form-control-sm" id="fromDate" />
+            <span class="text-muted">to</span>
+            <input type="date" class="form-control form-control-sm" id="toDate" />
+            <button class="btn btn-sm btn-outline-success" id="applyRange">Apply</button>
+        </div>
     </div>
 
     <div class="table-responsive">
         <table class="table">
             <thead>
                 <tr>
+                    <th style="width:40px;"><input type="checkbox" id="selectAll" class="form-check-input shadow-none" /></th>
                     <th>ID</th>
                     <th>Name</th>
                     <th>Gender</th>
                     <th>Date of Birth</th>
+                    <th>Last Visit</th>
                     <th>Phone</th>
                     <th>Actions</th>
                 </tr>
@@ -141,14 +79,18 @@
             <tbody>
                 @foreach (var patient in Model)
                 {
-                    <tr>
+                    var last = lastVisit.ContainsKey(patient.Id) ? lastVisit[patient.Id] : (DateTime?)null;
+                    <tr data-id="@patient.Id" data-last="@last?.ToString("yyyy-MM-dd")" data-name="@($"{patient.FirstName} {patient.LastName}")">
+                        <td><input type="checkbox" class="form-check-input row-check shadow-none" /></td>
                         <td>#PAT-@(patient.Id.ToString("D3"))</td>
                         <td style="font-weight: 600; color: #1a1a1a;">@patient.FirstName @patient.LastName</td>
                         <td>@patient.Gender</td>
                         <td>@patient.DateOfBirth.ToString("dd MMM yyyy")</td>
+                        <td>@(last.HasValue ? last.Value.ToString("dd MMM yyyy") : "—")</td>
                         <td>@patient.Phone</td>
-                        <td>
+                        <td class="d-flex gap-2">
                             <a asp-action="Profile" asp-route-id="@patient.Id" class="action-btn text-decoration-none" title="View Profile"><i class="fa-regular fa-eye"></i></a>
+                            <button class="action-btn text-danger" title="Delete" onclick="deletePatient(@patient.Id)"><i class="fa-regular fa-trash-can"></i></button>
                         </td>
                     </tr>
                 }
@@ -163,3 +105,116 @@
         </table>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        const selectAll = document.getElementById('selectAll');
+        const selectAllBtn = document.getElementById('selectAllBtn');
+        const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+        const rowChecks = document.querySelectorAll('.row-check');
+        const pills = document.querySelectorAll('.pill');
+        const rows = document.querySelectorAll('tbody tr[data-last]');
+        const searchInput = document.getElementById('searchInput');
+        const fromDate = document.getElementById('fromDate');
+        const toDate = document.getElementById('toDate');
+        const applyRange = document.getElementById('applyRange');
+
+        function toggleBulk() {
+            const sel = document.querySelectorAll('.row-check:checked').length;
+            if (deleteSelectedBtn) deleteSelectedBtn.classList.toggle('d-none', sel === 0);
+            if (selectAllBtn) selectAllBtn.textContent = sel === rowChecks.length && rowChecks.length > 0 ? 'Clear All' : 'Select All';
+        }
+
+        if (selectAll) {
+            selectAll.addEventListener('change', () => {
+                rowChecks.forEach(cb => cb.checked = selectAll.checked);
+                toggleBulk();
+            });
+        }
+        if (selectAllBtn) {
+            selectAllBtn.addEventListener('click', () => {
+                const all = Array.from(rowChecks).every(cb => cb.checked);
+                rowChecks.forEach(cb => cb.checked = !all);
+                if (selectAll) selectAll.checked = !all;
+                toggleBulk();
+            });
+        }
+        rowChecks.forEach(cb => cb.addEventListener('change', toggleBulk));
+
+        function activeRangeDates(range){
+            const now = new Date();
+            const start = new Date(now);
+            const end = new Date(now);
+            if(range === 'today'){ start.setHours(0,0,0,0); end.setHours(23,59,59,999); return [start,end]; }
+            if(range === 'week'){ const day = now.getDay() || 7; start.setDate(now.getDate() - day + 1); start.setHours(0,0,0,0); end.setDate(start.getDate()+6); end.setHours(23,59,59,999); return [start,end]; }
+            if(range === 'month'){ start.setDate(1); start.setHours(0,0,0,0); end.setMonth(start.getMonth()+1); end.setDate(0); end.setHours(23,59,59,999); return [start,end]; }
+            return [null,null];
+        }
+
+        function applyFilters(custom=false){
+            const term = (searchInput?.value || '').toLowerCase();
+            const activePill = document.querySelector('.pill.active')?.dataset.range || 'all';
+            let [start,end] = activeRangeDates(activePill);
+
+            if(custom){
+                start = fromDate.value ? new Date(fromDate.value + 'T00:00:00') : null;
+                end = toDate.value ? new Date(toDate.value + 'T23:59:59') : null;
+                pills.forEach(p=>p.classList.remove('active'));
+            }
+
+            rows.forEach(row=>{
+                const name = row.dataset.name.toLowerCase();
+                const last = row.dataset.last ? new Date(row.dataset.last + 'T00:00:00') : null;
+                let visible = true;
+                if(term && !name.includes(term)) visible = false;
+                if(start && last && last < start) visible = false;
+                if(end && last && last > end) visible = false;
+                if((start || end) && !last) visible = false;
+                row.style.display = visible ? '' : 'none';
+            });
+        }
+
+        pills.forEach(p=>{
+            p.addEventListener('click', ()=>{
+                pills.forEach(x=>x.classList.remove('active'));
+                p.classList.add('active');
+                fromDate.value = '';
+                toDate.value = '';
+                applyFilters();
+            });
+        });
+        if(searchInput) searchInput.addEventListener('input', ()=>applyFilters());
+        if(applyRange) applyRange.addEventListener('click', ()=>applyFilters(true));
+
+        function deletePatient(id) {
+            if (!confirm("Delete this patient?")) return;
+            $.post('/Doctor/DeletePatient', { id: id }, function (res) {
+                if (res.success) {
+                    document.querySelector(`tr[data-id="${id}"]`)?.remove();
+                    toggleBulk();
+                } else alert("Failed to delete.");
+            });
+        }
+
+        function deleteSelected() {
+            const ids = Array.from(document.querySelectorAll('.row-check:checked')).map(cb => parseInt(cb.closest('tr').getAttribute('data-id'))).filter(n => !Number.isNaN(n));
+            if (ids.length === 0) return;
+            if (!confirm(`Delete ${ids.length} selected patient(s)?`)) return;
+            $.ajax({
+                url: '/Doctor/BulkDeletePatients',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(ids),
+                success: function (res) {
+                    if (res.success) {
+                        ids.forEach(id => document.querySelector(`tr[data-id="${id}"]`)?.remove());
+                        toggleBulk();
+                    } else alert("Failed to delete.");
+                }
+            });
+        }
+
+        toggleBulk();
+        applyFilters();
+    </script>
+}

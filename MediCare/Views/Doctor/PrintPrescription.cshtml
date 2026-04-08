@@ -2,6 +2,7 @@
 @{
     Layout = null;
 }
+@using System.Text.Json
 
 <!DOCTYPE html>
 <html lang="en">
@@ -234,16 +235,66 @@
                 </tr>
             </thead>
             <tbody>
-                @if (!string.IsNullOrEmpty(Model.MedicineNotes))
-                {
-                    var medicines = Model.MedicineNotes.Split('\n', StringSplitOptions.RemoveEmptyEntries);
-                    foreach(var med in medicines)
+                @{
+                    var medicineRows = new List<(string Name, string Dosage, string Timing)>();
+                    var rawMedicines = Model.MedicineNotes ?? string.Empty;
+
+                    if (!string.IsNullOrWhiteSpace(rawMedicines))
                     {
-                        var parts = med.Split('|');
+                        var trimmed = rawMedicines.Trim();
+                        if (trimmed.StartsWith("["))
+                        {
+                            try
+                            {
+                                using var doc = JsonDocument.Parse(trimmed);
+                                if (doc.RootElement.ValueKind == JsonValueKind.Array)
+                                {
+                                    foreach (var item in doc.RootElement.EnumerateArray())
+                                    {
+                                        var name = item.TryGetProperty("name", out var nameProp) ? nameProp.GetString() : "";
+                                        var dosage = item.TryGetProperty("dosage", out var dosageProp) ? dosageProp.GetString() : "";
+                                        var food = item.TryGetProperty("food", out var foodProp) ? foodProp.GetString() : "";
+                                        var instruction = item.TryGetProperty("instruction", out var instructionProp) ? instructionProp.GetString() : "";
+                                        var duration = item.TryGetProperty("duration", out var durationProp) ? durationProp.GetString() : "";
+                                        var timing = string.Join(" | ", new[] { instruction, food, duration }.Where(x => !string.IsNullOrWhiteSpace(x)));
+                                        medicineRows.Add((name ?? "-", dosage ?? "-", string.IsNullOrWhiteSpace(timing) ? "-" : timing));
+                                    }
+                                }
+                            }
+                            catch
+                            {
+                                // Fallback to legacy format below.
+                            }
+                        }
+
+                        if (medicineRows.Count == 0)
+                        {
+                            var medicines = rawMedicines.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+                            foreach (var med in medicines)
+                            {
+                                var parts = med.Split('|');
+                                medicineRows.Add((
+                                    parts.Length > 0 ? parts[0] : med,
+                                    parts.Length > 1 ? parts[1] : "-",
+                                    parts.Length > 2 ? parts[2] : "-"
+                                ));
+                            }
+                        }
+                    }
+
+                    foreach (var med in medicineRows)
+                    {
                         <tr>
-                            <td style="font-weight: 600;">@(parts.Length > 0 ? parts[0] : med)</td>
-                            <td><span class="dosage-badge">@(parts.Length > 1 ? parts[1] : "-")</span></td>
-                            <td style="font-size: 14px;">@(parts.Length > 2 ? parts[2] : "-")</td>
+                            <td style="font-weight: 600;">@med.Name</td>
+                            <td><span class="dosage-badge">@med.Dosage</span></td>
+                            <td style="font-size: 14px;">@med.Timing</td>
+                        </tr>
+                    }
+
+                    if (medicineRows.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="3" style="text-align:center; color:#94a3b8;">No medicines listed</td>
                         </tr>
                     }
                 }

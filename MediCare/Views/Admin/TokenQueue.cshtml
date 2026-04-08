@@ -1,226 +1,223 @@
-@model IEnumerable<MediCare.Models.Appointment>
+﻿@model IEnumerable<MediCare.Models.Appointment>
 @{
-    ViewData["Title"] = "Real-time Token Queue";
+    ViewData["Title"] = "Token Queue";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
-    var currentTokens = ViewBag.CurrentTokens as System.Collections.Concurrent.ConcurrentDictionary<int, string>;
 }
 
 <style>
-    :root {
-        --primary-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        --secondary-gradient: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-        --glass-bg: rgba(255, 255, 255, 0.9);
-        --glass-border: rgba(255, 255, 255, 0.2);
-    }
-
-    .dashboard-header {
-        background: var(--primary-gradient);
-        padding: 40px;
-        border-radius: 24px;
-        color: white;
-        margin-bottom: 30px;
-        position: relative;
-        overflow: hidden;
-        box-shadow: 0 10px 30px rgba(16, 185, 129, 0.2);
-    }
-
-    .dashboard-header::after {
-        content: '';
-        position: absolute;
-        top: -50%;
-        right: -10%;
-        width: 300px;
-        height: 300px;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 50%;
-        pointer-events: none;
-    }
-
-    .token-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-        gap: 24px;
-    }
-
-    .token-card {
-        background: white;
-        border-radius: 20px;
-        padding: 24px;
-        border: 1px solid #f1f5f9;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        position: relative;
-    }
-
-    .token-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.05);
-    }
-
-    .now-serving-badge {
-        background: #fee2e2;
-        color: #ef4444;
-        padding: 4px 12px;
-        border-radius: 100px;
-        font-size: 12px;
-        font-weight: 600;
-        text-transform: uppercase;
-        display: inline-block;
-        margin-bottom: 12px;
-    }
-
-    .token-number {
-        font-size: 48px;
-        font-weight: 800;
-        color: #1e293b;
-        margin: 12px 0;
-        font-family: 'Inter', sans-serif;
-    }
-
-    .doctor-info {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-top: 16px;
-        padding-top: 16px;
-        border-top: 1px dashed #e2e8f0;
-    }
-
-    .doctor-avatar {
-        width: 40px;
-        height: 40px;
-        background: #f1f5f9;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #64748b;
-    }
-
-    .patient-queue-list {
-        background: white;
-        border-radius: 20px;
-        padding: 30px;
-        margin-top: 40px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    }
-
-    .status-pill {
-        padding: 4px 12px;
-        border-radius: 8px;
-        font-size: 13px;
-        font-weight: 500;
-    }
-
-    .status-waiting { background: #eff6ff; color: #3b82f6; }
-
-    .serve-btn {
-        background: var(--primary-gradient);
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 12px;
-        font-weight: 600;
-        transition: 0.2s;
-    }
-
-    .serve-btn:hover {
-        opacity: 0.9;
-        transform: scale(1.02);
-    }
-
+    .page-header h3 { font-weight:700; margin-bottom:4px; }
+    .stat-card { background:#fff; border-radius:18px; padding:20px; box-shadow:0 4px 20px rgba(0,0,0,0.04); display:flex; justify-content:space-between; align-items:center; }
+    .stat-icon { width:45px; height:45px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:18px; }
+    .icon-orange{background:#fff7ed; color:#f97316;} .icon-blue{background:#eff6ff; color:#3b82f6;} .icon-green{background:#ecfdf3; color:#22c55e;} .icon-slate{background:#e2e8f0; color:#0f172a;}
+    .card-custom{background:#fff; border-radius:20px; padding:25px; margin-top:20px; box-shadow:0 4px 25px rgba(0,0,0,0.05);}    
+    .search-box{background:#f8fafc; border:1px solid #e5e7eb; border-radius:12px; padding:10px 14px; display:flex; align-items:center; gap:10px;}
+    .search-box input{border:none; outline:none; background:transparent; width:100%; font-size:14px;}
+    .queue-item{background:#f9fafb; border-radius:16px; padding:16px 18px; display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border:1px solid #eef2f7;}
+    .token-badge{background:#d1fae5; color:#0f9a5f; font-weight:700; padding:10px 14px; border-radius:12px; min-width:70px; text-align:center;}
+    .badge-emg{background:#fee2e2!important; color:#b91c1c!important;}
 </style>
 
-<div class="dashboard-header h-100">
-    <div class="d-flex justify-content-between align-items-center">
-        <div>
-            <h1 class="fw-bold mb-2">OPD Queue Monitor</h1>
-            <p class="mb-0 opacity-75">Live tracking of patient sessions across all departments</p>
-        </div>
-        <div class="text-end">
-            <div class="fs-4 fw-bold">@DateTime.Now.ToString("hh:mm tt")</div>
-            <div class="opacity-75">@DateTime.Now.ToString("dd MMM yyyy")</div>
-        </div>
+<div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div>
+        <h3>Token Management</h3>
+        <p class="text-muted">Re-prioritize queue, call in, and finish tokens</p>
+    </div>
+    <div class="d-flex gap-2">
+        <button class="btn btn-outline-secondary" onclick="location.reload()"><i class="fa fa-rotate"></i> Refresh</button>
+        <a asp-action="TokenQueue" class="btn btn-success"><i class="fa fa-plus me-1"></i> Refresh Queue</a>
     </div>
 </div>
 
-<div class="token-grid">
-    @foreach (var doctor in Model.Select(m => m.Doctor).DistinctBy(d => d.Id))
-    {
-        var currentToken = currentTokens?.ContainsKey(doctor.Id) == true ? currentTokens[doctor.Id] : "---";
-        <div class="token-card shadow-sm">
-            <div class="now-serving-badge">Now Serving</div>
-            <div class="token-number">#@currentToken</div>
-            <div class="doctor-info">
-                <div class="doctor-avatar">
-                    <i class="fa-solid fa-user-md"></i>
-                </div>
-                <div>
-                    <div class="fw-bold text-slate-800">Dr. @doctor.FirstName @doctor.LastName</div>
-                    <div class="text-sm text-slate-500">@doctor.Specialty</div>
-                </div>
+<div class="row g-3 mt-2">
+    <div class="col-md-3"><div class="stat-card"><div><div class="text-muted small">Waiting</div><div class="h4 fw-bold">@ViewBag.WaitingCount</div></div><div class="stat-icon icon-orange"><i class="fa fa-clock"></i></div></div></div>
+    <div class="col-md-3"><div class="stat-card"><div><div class="text-muted small">In Progress</div><div class="h4 fw-bold">@ViewBag.InProgressCount</div></div><div class="stat-icon icon-blue"><i class="fa fa-play"></i></div></div></div>
+    <div class="col-md-3"><div class="stat-card"><div><div class="text-muted small">Completed</div><div class="h4 fw-bold">@ViewBag.CompletedCount</div></div><div class="stat-icon icon-green"><i class="fa fa-check"></i></div></div></div>
+    <div class="col-md-3"><div class="stat-card"><div><div class="text-muted small">Total</div><div class="h4 fw-bold">@ViewBag.TotalToday</div></div><div class="stat-icon icon-slate"><i class="fa fa-users"></i></div></div></div>
+</div>
+
+<div class="card-custom">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <div class="d-flex align-items-center gap-2">
+            <input type="checkbox" id="selectAll" class="form-check-input shadow-none">
+            <button class="btn btn-outline-danger btn-sm" id="deleteSelectedBtn" disabled>Delete Selected</button>
+            <button class="btn btn-outline-danger btn-sm" onclick="deleteAll()">Delete All</button>
+        </div>
+        <div style="width:280px;">
+            <div class="search-box">
+                <i class="fa-solid fa-search"></i>
+                <input type="text" id="searchBox" placeholder="Search tokens, patients..." onkeyup="filterList()" />
             </div>
         </div>
-    }
-</div>
-
-<div class="patient-queue-list">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="fw-bold m-0">Waiting List (Today)</h4>
-        <span class="badge bg-slate-100 text-slate-600 rounded-pill px-3 py-2">@Model.Count() Patients Waiting</span>
     </div>
 
-    <div class="table-responsive">
-        <table class="table table-hover align-middle">
-            <thead>
-                <tr class="text-slate-500 small text-uppercase">
-                    <th>Token</th>
-                    <th>Patient Name</th>
-                    <th>Doctor</th>
-                    <th>Time Slot</th>
-                    <th>Status</th>
-                    <th class="text-end">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var appt in Model)
-                {
-                    <tr>
-                        <td class="fw-bold fs-5">#@appt.TokenNumber</td>
-                        <td>
-                            <div class="fw-semibold">@appt.Patient?.FirstName @appt.Patient?.LastName</div>
-                            <div class="text-slate-400 small">ID: PAT-@appt.PatientId</div>
-                        </td>
-                        <td>
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="text-slate-700">Dr. @appt.Doctor?.FirstName</span>
-                            </div>
-                        </td>
-                        <td>@appt.TimeSlot</td>
-                        <td><span class="status-pill status-waiting">Waiting</span></td>
-                        <td class="text-end">
-                            <button onclick="serveToken(@appt.DoctorId, '@appt.TokenNumber')" class="serve-btn">
-                                <i class="fa-solid fa-bell me-2"></i>Call Patient
-                            </button>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+    <div id="queueList">
+        @foreach (var app in Model)
+        {
+            <div class="queue-item" draggable="true" data-id="@app.Id" data-search="@($"{app.TokenNumber} {app.Patient?.FirstName} {app.Patient?.LastName} {app.Doctor?.FirstName} {app.Doctor?.LastName} {app.Status}")">
+                <div class="d-flex align-items-center gap-3">
+                    <input type="checkbox" class="form-check-input row-check shadow-none" />
+                    <div class="token-badge @(app.IsEmergency ? "badge-emg" : "")">@(string.IsNullOrEmpty(app.TokenNumber) ? "#" + app.Id : app.TokenNumber)</div>
+                    <div class="patient-info">
+                        <h6 class="mb-1">@app.Patient?.FirstName @app.Patient?.LastName</h6>
+                        <small class="text-muted">Dr. @app.Doctor?.FirstName @app.Doctor?.LastName</small><br />
+                        <small class="text-muted">@app.AppointmentDate.ToString("HH:mm")</small>
+                        @if(app.IsEmergency){<span class="badge bg-danger ms-2">Emergency</span>}
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <span class="badge @(app.Status == "In Progress" || app.Status == "In-Progress" ? "bg-primary" : app.Status == "Completed" ? "bg-success" : "bg-warning text-dark")">@app.Status</span>
+                    @if (app.Status == "In Progress" || app.Status == "In-Progress")
+                    {
+                        <button class="btn btn-sm btn-success" onclick="updateStatus(@app.Id, 'Completed')">Complete</button>
+                    }
+                    else if (app.Status != "Completed")
+                    {
+                        <button class="btn btn-sm btn-outline-secondary" onclick="updateStatus(@app.Id, 'In Progress')">Call In</button>
+                    }
+                    <button class="btn btn-sm btn-outline-info" onclick="viewDetails(@app.Id)"><i class="fa-regular fa-eye"></i></button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteSingle(@app.Id)"><i class="fa-regular fa-trash-can"></i></button>
+                </div>
+            </div>
+        }
+
+        @if (!Model.Any())
+        {
+            <div class="text-muted">No tokens for today.</div>
+        }
     </div>
 </div>
 
-<script>
-    function serveToken(doctorId, tokenNumber) {
-        $.post('/Admin/ServeToken', { doctorId: doctorId, tokenNumber: tokenNumber }, function(res) {
-            if(res.success) {
-                location.reload();
-            }
+<div class="modal fade" id="detailModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-0">
+                <h5 class="modal-title">Token Detail</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="detailBody">Loading...</div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        const rowChecks = document.querySelectorAll('.row-check');
+        const selectAll = document.getElementById('selectAll');
+        const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+
+        function syncBulk() {
+            const selected = document.querySelectorAll('.row-check:checked').length;
+            deleteSelectedBtn.disabled = selected === 0;
+            if (selectAll) selectAll.checked = selected === rowChecks.length && rowChecks.length > 0;
+        }
+
+        rowChecks.forEach(cb => cb.addEventListener('change', syncBulk));
+        if (selectAll) selectAll.addEventListener('change', () => {
+            rowChecks.forEach(cb => cb.checked = selectAll.checked);
+            syncBulk();
         });
-    }
 
-    // Refresh page every 10 seconds to simulate real-time updates
-    // In a real app we'd use SignalR
-    setInterval(() => {
-        // location.reload(); 
-    }, 10000);
-</script>
+        function deleteSelected() {
+            const ids = Array.from(document.querySelectorAll('.row-check:checked')).map(cb => parseInt(cb.closest('.queue-item').dataset.id));
+            if (ids.length === 0) return;
+            if (!confirm(`Delete ${ids.length} token(s)?`)) return;
+            $.ajax({
+                url: '/Admin/BulkDeleteAppointments',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(ids),
+                success: function(res){
+                    if(res.success){
+                        location.reload();
+                    } else alert('Failed to delete.');
+                }
+            });
+        }
+        deleteSelectedBtn.addEventListener('click', deleteSelected);
+
+        function deleteAll(){
+            if(!confirm("Delete ALL tokens for today?")) return;
+            $.post('/Admin/DeleteAllAppointments', function(res){
+                if(res.success){
+                    location.reload();
+                }
+            });
+        }
+
+        function updateStatus(id, status){
+            $.post('/Admin/UpdateStatus', { id: id, status: status }, function(res){
+                if(res.success) location.reload();
+            });
+        }
+
+        function deleteSingle(id){
+            if(!confirm("Delete this token?")) return;
+            $.post('/Admin/DeleteAppointment', { id: id }, function(res){
+                if(res.success){
+                    location.reload();
+                }
+            });
+        }
+
+        function filterList(){
+            const q = document.getElementById('searchBox').value.toLowerCase();
+            document.querySelectorAll('#queueList .queue-item').forEach(item => {
+                item.style.display = item.dataset.search.toLowerCase().includes(q) ? '' : 'none';
+            });
+        }
+
+        function viewDetails(id){
+            $.get('/Admin/GetAppointmentDetails/' + id, function(data){
+                const html = `
+                    <div><strong>Token:</strong> ${data.token || ''}</div>
+                    <div><strong>Patient:</strong> ${data.patientName}</div>
+                    <div><strong>Doctor:</strong> ${data.doctorName}</div>
+                    <div><strong>Date:</strong> ${data.date} ${data.time}</div>
+                    <div><strong>Status:</strong> ${data.status}</div>
+                    <div><strong>Subject:</strong> ${data.subject || 'N/A'}</div>
+                    <div><strong>Notes:</strong> ${data.notes || 'N/A'}</div>
+                `;
+                document.getElementById('detailBody').innerHTML = html;
+                $('#detailModal').modal('show');
+            });
+        }
+
+        let dragEl = null;
+        document.querySelectorAll('.queue-item').forEach(item => {
+            item.addEventListener('dragstart', e => {
+                dragEl = item;
+                item.classList.add('opacity-50');
+            });
+            item.addEventListener('dragend', e => {
+                item.classList.remove('opacity-50');
+                dragEl = null;
+            });
+            item.addEventListener('dragover', e => {
+                e.preventDefault();
+                const after = e.clientY < item.getBoundingClientRect().top + item.offsetHeight / 2;
+                const list = document.getElementById('queueList');
+                if (dragEl && dragEl !== item) {
+                    if (after) list.insertBefore(dragEl, item);
+                    else list.insertBefore(dragEl, item.nextSibling);
+                }
+            });
+        });
+
+        function saveOrder() {
+            const ids = Array.from(document.querySelectorAll('#queueList .queue-item')).map(el => parseInt(el.dataset.id));
+            $.ajax({
+                url: '/Admin/UpdateOrder',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(ids),
+                success: function(res){ if(!res.success) alert('Failed to save order'); }
+            });
+        }
+
+        document.getElementById('queueList').addEventListener('drop', () => saveOrder());
+        document.getElementById('queueList').addEventListener('dragend', () => saveOrder());
+
+        syncBulk();
+    </script>
+}

@@ -1,167 +1,332 @@
 @model MediCare.Models.Patient
 @{
-    ViewData["Title"] = "Identity & Preferences";
+    ViewData["Title"] = "Your Identity Profile";
     Layout = "~/Views/Shared/_UserLayout.cshtml";
+    var pushEnabled = (ViewBag.PushNotificationsEnabled as bool?) ?? true;
+    var twoFactorEnabled = (ViewBag.TwoFactorEnabled as bool?) ?? false;
+    var first = string.IsNullOrWhiteSpace(Model?.FirstName) ? "P" : Model.FirstName.Substring(0, 1).ToUpper();
+    var last = string.IsNullOrWhiteSpace(Model?.LastName) ? "" : Model.LastName.Substring(0, 1).ToUpper();
+    var fullName = $"{Model?.FirstName} {Model?.LastName}".Trim();
 }
 
 <style>
-    .identity-card {
-        background: white;
-        border-radius: 30px;
-        padding: 40px;
-        border: 1px solid #f1f5f9;
-        box-shadow: 0 20px 50px rgba(0,0,0,0.03);
+    .profile-shell {
+        display: grid;
+        grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
+        gap: 26px;
     }
-    .id-avatar-large {
-        width: 120px;
-        height: 120px;
+    .profile-panel {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 28px;
+        box-shadow: 0 20px 50px rgba(15, 23, 42, 0.04);
+    }
+    .profile-left {
+        padding: 28px;
+    }
+    .profile-right {
+        padding: 28px;
+    }
+    .avatar-wrap {
+        width: 76px;
+        height: 76px;
         border-radius: 50%;
         background: #ecfdf5;
-        border: 5px solid #d1fae5;
+        border: 4px solid #d1fae5;
+        color: #10b981;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 42px;
+        font-size: 28px;
         font-weight: 800;
-        color: #10b981;
-        margin-bottom: 20px;
+        flex-shrink: 0;
     }
-    .id-input-group {
+    .field-shell {
         background: #f8fafc;
-        border-radius: 18px;
-        border: 1px solid #e2e8f0;
-        padding: 15px 25px;
-        margin-bottom: 20px;
-        transition: 0.3s;
+        border: 1px solid #dbe4ee;
+        border-radius: 16px;
+        padding: 12px 14px;
+        min-height: 78px;
+        transition: .2s ease;
     }
-    .id-input-group:focus-within {
+    .field-shell:focus-within {
         border-color: #10b981;
-        background: white;
-        box-shadow: 0 0 0 5px rgba(16, 185, 129, 0.1);
+        box-shadow: 0 0 0 4px rgba(16,185,129,.08);
+        background: #fff;
     }
+    .field-label {
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        color: #64748b;
+        margin-bottom: 4px;
+    }
+    .field-value, .field-value.form-control, .field-value.form-select {
+        border: 0 !important;
+        background: transparent !important;
+        padding: 0 !important;
+        font-weight: 700 !important;
+        color: #0f172a !important;
+        box-shadow: none !important;
+    }
+    .workspace-pill {
+        border: 1px solid #dbe4ee;
+        border-radius: 14px;
+        padding: 12px 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        background: #fff;
+    }
+    .switch {
+        position: relative;
+        width: 46px;
+        height: 26px;
+        display: inline-block;
+    }
+    .switch input { display: none; }
+    .slider {
+        position: absolute;
+        inset: 0;
+        background: #cbd5e1;
+        border-radius: 999px;
+        transition: .2s;
+        cursor: pointer;
+    }
+    .slider:before {
+        content: "";
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        left: 3px;
+        top: 3px;
+        border-radius: 50%;
+        background: #fff;
+        transition: .2s;
+    }
+    .switch input:checked + .slider { background: #10b981; }
+    .switch input:checked + .slider:before { transform: translateX(20px); }
+    .edit-actions { display: none; }
+    .edit-actions.show { display: flex; }
+    .logged-block {
+        margin-top: 18px;
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        border-radius: 18px;
+        padding: 16px;
+    }
+    .mini-muted { color: #64748b; font-size: 13px; }
 </style>
 
-<div class="d-flex justify-content-between align-items-center mb-5">
+<div class="d-flex justify-content-between align-items-end mb-4 flex-wrap gap-2">
     <div>
         <h1 class="fw-bold m-0 text-slate-800">Your Identity Profile</h1>
-        <p class="text-muted">Manage your personal and clinical preferences</p>
+        <p class="text-muted mb-0">Manage your personal and clinical preferences</p>
     </div>
     <div class="blood-badge">
         <i class="fa fa-fingerprint me-1"></i> Patient #P-@Model.Id
     </div>
 </div>
 
-<div class="row g-5">
-    <!-- INFO SECTION -->
-    <div class="col-lg-8">
-        <div class="identity-card border mb-4">
-            <div class="d-flex align-items-center gap-4 mb-5 border-bottom pb-4">
-                <div class="id-avatar-large shadow-sm">
-                    @(Model.FirstName[0])@(Model.LastName[0])
+<div class="profile-shell">
+    <div class="profile-panel profile-left">
+        <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+            <div class="d-flex align-items-center gap-3">
+                <div class="position-relative">
+                    <div class="avatar-wrap shadow-sm" id="photoPreview" style="background-size:cover; background-position:center;">
+                        @first@last
+                    </div>
+                    <button id="cameraBtn" type="button" class="btn btn-sm btn-light rounded-circle position-absolute bottom-0 end-0 border" onclick="document.getElementById('photoInput').click()">
+                        <i class="fa fa-camera"></i>
+                    </button>
                 </div>
                 <div>
-                    <h3 class="fw-bold m-0">@Model.FirstName @Model.LastName</h3>
-                    <div class="text-muted mb-3"><i class="fa fa-envelope me-2"></i> @Model.Email</div>
-                    <div class="d-flex gap-2">
-                        <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2 border">Verified Profile</span>
-                        <span class="badge bg-soft-blue text-blue-600 rounded-pill px-3 py-2 border">Active Account</span>
+                    <h3 class="fw-bold mb-0">@fullName</h3>
+                    <div class="mini-muted"><i class="fa fa-envelope me-1"></i> @Model.Email</div>
+                    <span class="badge bg-success bg-opacity-10 text-success border rounded-pill px-3 py-2 mt-2">Verified Profile</span>
+                </div>
+            </div>
+            <button id="editProfileBtn" type="button" class="btn btn-outline-success rounded-pill px-4 fw-bold">Edit Profile</button>
+        </div>
+
+        <form id="profileForm" asp-action="Profile" method="post" enctype="multipart/form-data" class="mt-4">
+            <input type="hidden" asp-for="Id" />
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="field-shell">
+                        <div class="field-label">First Name</div>
+                        <input asp-for="FirstName" class="form-control field-value editable-field" disabled />
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="field-shell">
+                        <div class="field-label">Last Name</div>
+                        <input asp-for="LastName" class="form-control field-value editable-field" disabled />
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="field-shell">
+                        <div class="field-label">Phone Contact</div>
+                        <input asp-for="Phone" class="form-control field-value editable-field" disabled />
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="field-shell">
+                        <div class="field-label">Blood Group</div>
+                        <select asp-for="BloodGroup" class="form-select field-value editable-field" disabled>
+                            <option>O+</option><option>O-</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="field-shell">
+                        <div class="field-label">Gender</div>
+                        <select asp-for="Gender" class="form-select field-value editable-field" disabled>
+                            <option>Male</option>
+                            <option>Female</option>
+                            <option>Other</option>
+                            <option>Not Specified</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="field-shell">
+                        <div class="field-label">Date of Birth</div>
+                        <input asp-for="DateOfBirth" type="date" class="form-control field-value editable-field" disabled />
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="field-shell">
+                        <div class="field-label">Full Residential Address</div>
+                        <textarea asp-for="Address" rows="2" class="form-control field-value editable-field" disabled></textarea>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="field-shell">
+                        <div class="field-label">Medical History</div>
+                        <textarea asp-for="MedicalHistory" rows="3" class="form-control field-value editable-field" disabled></textarea>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="field-shell">
+                        <div class="field-label">Profile Photo</div>
+                        <input type="file" name="photo" id="photoInput" accept="image/*" class="form-control field-value editable-field" onchange="previewPhoto(this)" style="display:none;" disabled />
+                        <div class="mini-muted">Use the camera icon to change the photo after enabling edit mode.</div>
                     </div>
                 </div>
             </div>
 
-            <form action="#" method="post">
-                <div class="row g-4">
-                    <div class="col-md-6">
-                        <div class="id-input-group">
-                            <label class="small fw-bold text-muted text-uppercase mb-1 d-block">First Name</label>
-                            <input type="text" value="@Model.FirstName" class="form-control border-0 bg-transparent p-0 fw-bold shadow-none" >
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="id-input-group">
-                            <label class="small fw-bold text-muted text-uppercase mb-1 d-block">Last Name</label>
-                            <input type="text" value="@Model.LastName" class="form-control border-0 bg-transparent p-0 fw-bold shadow-none">
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="id-input-group">
-                            <label class="small fw-bold text-muted text-uppercase mb-1 d-block">Phone Contact</label>
-                            <input type="text" value="@Model.Phone" class="form-control border-0 bg-transparent p-0 fw-bold shadow-none">
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="id-input-group">
-                            <label class="small fw-bold text-muted text-uppercase mb-1 d-block">Blood Group</label>
-                            <select class="form-select border-0 bg-transparent p-0 fw-bold shadow-none">
-                                <option value="O+">O Positive</option>
-                                <option value="O-">O Negative</option>
-                                <option value="A+">A Positive</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-12">
-                        <div class="id-input-group">
-                            <label class="small fw-bold text-muted text-uppercase mb-1 d-block">Full Residential Address</label>
-                            <textarea class="form-control border-0 bg-transparent p-0 fw-bold shadow-none" rows="2">@Model.Address</textarea>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="d-flex justify-content-end gap-3 mt-4">
-                    <button type="button" class="btn btn-light rounded-pill px-5 py-3 fw-bold border">Reset Changes</button>
-                    <button type="submit" class="btn btn-emerald-luxury rounded-pill px-5 py-3 fw-bold shadow-sm">Update Profile Details</button>
-                </div>
-            </form>
-        </div>
+            <div id="editActions" class="edit-actions justify-content-end gap-3 mt-4">
+                <button id="resetProfileBtn" type="button" class="btn btn-light rounded-pill px-4 fw-bold border">Reset Changes</button>
+                <button type="submit" class="btn btn-success rounded-pill px-4 fw-bold">Save Changes</button>
+            </div>
+        </form>
     </div>
 
-    <!-- SIDEBAR SECTION -->
-    <div class="col-lg-4">
-        <div class="identity-card border h-100 shadow-sm">
-            <div class="mb-5">
-                <h5 class="fw-bold mb-4">Account Workspace</h5>
-                <button class="btn btn-outline-secondary w-100 rounded-pill py-3 fw-bold mb-3 border d-flex align-items-center justify-content-between px-4" data-bs-toggle="modal" data-bs-target="#changePassModal">
-                    <div><i class="fa fa-lock me-3"></i> Change Credentials</div>
-                    <i class="fa fa-chevron-right small opacity-50"></i>
-                </button>
-                <button class="btn btn-outline-secondary w-100 rounded-pill py-3 fw-bold mb-3 border d-flex align-items-center justify-content-between px-4">
-                    <div><i class="fa fa-bell me-3"></i> Push Notifications</div>
-                    <i class="fa fa-toggle-on text-success"></i>
-                </button>
-                <button class="btn btn-outline-secondary w-100 rounded-pill py-3 fw-bold mb-3 border d-flex align-items-center justify-content-between px-4">
-                    <div><i class="fa fa-shield-halved me-3"></i> 2FA Activation</div>
-                    <i class="fa fa-toggle-off"></i>
-                </button>
-            </div>
+    <div class="profile-panel profile-right">
+        <h5 class="fw-bold mb-3">Account Workspace</h5>
 
-            <div class="alert bg-danger bg-opacity-10 border-0 rounded-4 p-4 mt-5">
-                <h6 class="text-danger fw-bold m-0"><i class="fa fa-circle-exclamation me-2"></i> Account Control</h6>
-                <p class="text-danger small mt-2 mb-3">Permanently withdraw all clinical data and delete your account profile.</p>
-                <button class="btn btn-danger w-100 rounded-pill fw-bold py-2 shadow-sm" onclick="alert('Contact administrator for account deletion.')">Close Account</button>
+        <div class="workspace-pill">
+            <div><i class="fa fa-bell me-2"></i> Push Notifications</div>
+            <label class="switch m-0">
+                <input id="pushToggle" type="checkbox" @(pushEnabled ? "checked" : "") />
+                <span class="slider"></span>
+            </label>
+        </div>
+        <div class="workspace-pill">
+            <div><i class="fa fa-shield-halved me-2"></i> 2FA Activation</div>
+            <label class="switch m-0">
+                <input id="tfaToggle" type="checkbox" @(twoFactorEnabled ? "checked" : "") />
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="logged-block">
+            <h6 class="fw-bold mb-3">Logged Details</h6>
+            <div class="d-flex flex-column gap-2 mini-muted">
+                <div><i class="fa-regular fa-user me-2"></i>@fullName</div>
+                <div><i class="fa-regular fa-envelope me-2"></i>@Model.Email</div>
+                <div><i class="fa-solid fa-id-badge me-2"></i>Patient</div>
             </div>
+        </div>
+
+        <div class="alert bg-danger bg-opacity-10 border-0 rounded-4 p-4 mt-4">
+            <h6 class="text-danger fw-bold m-0"><i class="fa fa-circle-exclamation me-2"></i> Account Control</h6>
+            <p class="text-danger small mt-2 mb-3">Permanently withdraw all clinical data and delete your account profile.</p>
+            <button class="btn btn-danger w-100 rounded-pill fw-bold py-2 shadow-sm" onclick="alert('Contact administrator for account deletion.')">Close Account</button>
         </div>
     </div>
 </div>
 
-<!-- CHANGE PASS MODAL -->
-<div class="modal fade" id="changePassModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg p-3" style="border-radius: 24px;">
-            <div class="modal-body">
-                <h4 class="fw-bold mb-4">Security Update</h4>
-                <div class="mb-3">
-                    <label class="small fw-bold text-muted text-uppercase mb-2">Current Credential</label>
-                    <input type="password" class="form-control rounded-pill py-3 px-4 bg-light border-0 shadow-none">
-                </div>
-                <div class="mb-3">
-                    <label class="small fw-bold text-muted text-uppercase mb-2">New Entry Key</label>
-                    <input type="password" class="form-control rounded-pill py-3 px-4 bg-light border-0 shadow-none">
-                </div>
-                <div class="d-flex gap-2 mt-4">
-                    <button class="btn btn-light rounded-pill w-100 py-3 fw-bold" data-bs-dismiss="modal">Discard</button>
-                    <button class="btn btn-emerald-luxury rounded-pill w-100 py-3 fw-bold shadow-sm">Save Security Key</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+@section Scripts {
+    <script>
+        let originalPreviewBackground = '';
+        let originalPreviewText = '';
+
+        function previewPhoto(inp) {
+            const file = inp.files && inp.files[0];
+            if (!file) return;
+            if (file.size > 2 * 1024 * 1024) { alert('File too large'); inp.value = ''; return; }
+            const url = URL.createObjectURL(file);
+            const ph = document.getElementById('photoPreview');
+            if (ph) { ph.style.backgroundImage = `url(${url})`; ph.textContent = ''; }
+        }
+
+        async function setPref(url, enabled) {
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+                body: `enabled=${enabled}`
+            });
+            if (!res.ok) alert('Unable to save setting. Please try again.');
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('profileForm');
+            const editBtn = document.getElementById('editProfileBtn');
+            const resetBtn = document.getElementById('resetProfileBtn');
+            const editActions = document.getElementById('editActions');
+            const fields = document.querySelectorAll('.editable-field');
+            const cameraBtn = document.getElementById('cameraBtn');
+            const photoPreview = document.getElementById('photoPreview');
+
+            if (photoPreview) {
+                originalPreviewBackground = photoPreview.style.backgroundImage || '';
+                originalPreviewText = photoPreview.textContent || '';
+            }
+
+            function setEditMode(enabled) {
+                fields.forEach(f => { f.disabled = !enabled; });
+                if (cameraBtn) {
+                    cameraBtn.disabled = !enabled;
+                    cameraBtn.style.opacity = enabled ? '1' : '0.5';
+                }
+                if (editActions) editActions.classList.toggle('show', enabled);
+                if (editBtn) editBtn.style.display = enabled ? 'none' : 'inline-block';
+            }
+
+            setEditMode(false);
+
+            if (editBtn) editBtn.addEventListener('click', function () { setEditMode(true); });
+
+            if (resetBtn) {
+                resetBtn.addEventListener('click', function () {
+                    form.reset();
+                    const photoInput = document.getElementById('photoInput');
+                    if (photoInput) photoInput.value = '';
+                    if (photoPreview) {
+                        photoPreview.style.backgroundImage = originalPreviewBackground;
+                        photoPreview.textContent = originalPreviewText;
+                    }
+                    setEditMode(false);
+                });
+            }
+
+            const push = document.getElementById('pushToggle');
+            const tfa = document.getElementById('tfaToggle');
+            if (push) push.addEventListener('change', function () { setPref('/User/TogglePushNotifications', this.checked); });
+            if (tfa) tfa.addEventListener('change', function () { setPref('/User/ToggleTwoFactor', this.checked); });
+        });
+    </script>
+}
