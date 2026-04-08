@@ -1,3 +1,4 @@
+@model MediCare.Models.ViewModels.DoctorDashboardViewModel
 @{
     ViewData["Title"] = "Doctor Dashboard";
     Layout = "~/Views/Shared/_DoctorLayout.cshtml";
@@ -214,17 +215,60 @@
         width: 33%;
         border-radius: 4px;
     }
+
+    .small-chart-card {
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        margin-top: 24px;
+    }
+
+    .small-chart-wrap {
+        position: relative;
+        width: 100%;
+        height: 220px;
+    }
+
+    .detail-mini-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 14px;
+    }
+
+    .detail-mini {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 12px 14px;
+    }
+
+    .detail-mini label {
+        display: block;
+        font-size: 11px;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+        margin-bottom: 3px;
+    }
+
+    .detail-mini span {
+        font-size: 18px;
+        font-weight: 800;
+        color: #111827;
+    }
 </style>
 
 <div class="page-header">
     <h3>Doctor Dashboard</h3>
-    <p>Welcome back, Dr. Sarah Johnson</p>
+    <p>Welcome back, @(Context.Session.GetString("UserName") ?? "Dr. Priya Patel") 👋</p>
 </div>
 
 <div class="stats-row">
     <div class="stat-card">
         <div class="stat-info">
-            <h2>12</h2>
+            <h2>@Model.TodayAppointmentsCount</h2>
             <p>Today's<br/>Appointments</p>
         </div>
         <div class="stat-icon icon-green">
@@ -234,7 +278,7 @@
     
     <div class="stat-card">
         <div class="stat-info">
-            <h2>8</h2>
+            <h2>@Model.WaitingPatientsCount</h2>
             <p>Waiting<br/>Patients</p>
         </div>
         <div class="stat-icon icon-blue">
@@ -244,7 +288,7 @@
 
     <div class="stat-card">
         <div class="stat-info">
-            <h2>4</h2>
+            <h2>@Model.CompletedAppointmentsCount</h2>
             <p>Completed</p>
         </div>
         <div class="stat-icon icon-purple">
@@ -254,7 +298,7 @@
 
     <div class="stat-card">
         <div class="stat-info">
-            <h2>15</h2>
+            <h2>@Model.TomorrowAppointmentsCount</h2>
             <p>Tomorrow</p>
         </div>
         <div class="stat-icon icon-orange">
@@ -263,64 +307,43 @@
     </div>
 </div>
 
+<div class="content-card mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0">Today Status Analysis</h4>
+        <a asp-action="Analytics" class="text-success text-decoration-none small fw-bold">Open Analytics</a>
+    </div>
+    <div class="small-chart-wrap">
+        <canvas id="doctorStatusChart"></canvas>
+    </div>
+</div>
+
 <div class="dashboard-grid">
     <div class="content-card">
         <h4>Today's Appointments</h4>
         
         <div class="appointment-list">
-            <div class="appointment-item">
-                <div class="time-slot">09:00 AM</div>
-                <div class="patient-details">
-                    <h5>John Smith</h5>
-                    <p>Checkup &bull; Token: A-045</p>
+            @if (Model.TodayAppointments != null && Model.TodayAppointments.Any())
+            {
+                @foreach (var appointment in Model.TodayAppointments)
+                {
+                    <div class="appointment-item">
+                        <div class="time-slot">@appointment.AppointmentDate.ToString("hh:mm tt")</div>
+                        <div class="patient-details">
+                            <h5>@(appointment.Patient?.FirstName + " " + appointment.Patient?.LastName)</h5>
+                            <p>@appointment.Subject &bull; Token: @appointment.TokenNumber</p>
+                        </div>
+                        <div class="status-badge status-@(appointment.Status?.ToLower().Replace(" ", "-") ?? "scheduled")">
+                            @appointment.Status
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="p-4 text-center text-muted">
+                    <p>No appointments for today.</p>
                 </div>
-                <div class="status-badge status-in-progress">In Progress</div>
-            </div>
-
-            <div class="appointment-item">
-                <div class="time-slot">09:30 AM</div>
-                <div class="patient-details">
-                    <h5>Sarah Johnson</h5>
-                    <p>Consultation &bull; Token: A-046</p>
-                </div>
-                <div class="status-badge status-waiting">Waiting</div>
-            </div>
-
-            <div class="appointment-item">
-                <div class="time-slot">10:00 AM</div>
-                <div class="patient-details">
-                    <h5>Michael Chen</h5>
-                    <p>Follow-up &bull; Token: A-047</p>
-                </div>
-                <div class="status-badge status-waiting">Waiting</div>
-            </div>
-
-            <div class="appointment-item">
-                <div class="time-slot">10:30 AM</div>
-                <div class="patient-details">
-                    <h5>Emily Davis</h5>
-                    <p>Checkup &bull; Token: A-048</p>
-                </div>
-                <div class="status-badge status-waiting">Waiting</div>
-            </div>
-
-            <div class="appointment-item">
-                <div class="time-slot">11:00 AM</div>
-                <div class="patient-details">
-                    <h5>Robert Wilson</h5>
-                    <p>Consultation &bull; Token: A-049</p>
-                </div>
-                <div class="status-badge status-scheduled">Scheduled</div>
-            </div>
-
-            <div class="appointment-item">
-                <div class="time-slot">11:30 AM</div>
-                <div class="patient-details">
-                    <h5>Lisa Anderson</h5>
-                    <p>Follow-up &bull; Token: A-050</p>
-                </div>
-                <div class="status-badge status-scheduled">Scheduled</div>
-            </div>
+            }
         </div>
     </div>
 
@@ -329,7 +352,7 @@
 
         <div class="quick-stat-item">
             <div class="quick-stat-label">Total Patients</div>
-            <div class="quick-stat-value">157</div>
+            <div class="quick-stat-value">@Model.TotalPatientsCount</div>
         </div>
 
         <div class="quick-stat-item">
@@ -339,17 +362,111 @@
 
         <div class="quick-stat-item" style="border-bottom: none; margin-bottom: 0; padding-bottom: 0;">
             <div class="quick-stat-label">Prescriptions Issued</div>
-            <div class="quick-stat-value">152</div>
+            <div class="quick-stat-value">@Model.PrescriptionsIssuedCount</div>
             
             <div class="progress-container">
                 <div class="progress-header">
                     <span class="progress-title">Today's Progress</span>
-                    <span class="progress-value">33%</span>
+                    <span class="progress-value">@Model.TodayProgressPercentage.ToString("0")%</span>
                 </div>
                 <div class="progress-bar-bg">
-                    <div class="progress-bar-fill"></div>
+                    <div class="progress-bar-fill" style="width: @Model.TodayProgressPercentage.ToString("0")%;"></div>
                 </div>
             </div>
         </div>
+
     </div>
 </div>
+
+<div class="small-chart-card">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5 class="fw-bold mb-0" style="font-size:16px;">Visit Breakdown</h5>
+        <span class="text-muted small">Real data</span>
+    </div>
+    <div class="small-chart-wrap" style="height:180px;">
+        <canvas id="doctorMiniPie"></canvas>
+    </div>
+    <div class="detail-mini-grid">
+        <div class="detail-mini">
+            <label>Total Patients</label>
+            <span>@Model.TotalPatientsCount</span>
+        </div>
+        <div class="detail-mini">
+            <label>Waiting Today</label>
+            <span>@Model.WaitingPatientsCount</span>
+        </div>
+        <div class="detail-mini">
+            <label>Completed</label>
+            <span>@Model.CompletedAppointmentsCount</span>
+        </div>
+        <div class="detail-mini">
+            <label>Tomorrow</label>
+            <span>@Model.TomorrowAppointmentsCount</span>
+        </div>
+    </div>
+</div>
+
+<div class="small-chart-card">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5 class="fw-bold mb-0" style="font-size:16px;">Recent Today</h5>
+        <a asp-action="Appointments" class="text-success text-decoration-none small fw-bold">Open Appointments</a>
+    </div>
+    @if (Model.TodayAppointments != null && Model.TodayAppointments.Any())
+    {
+        foreach (var item in Model.TodayAppointments.Take(3))
+        {
+            <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                <div>
+                    <div class="fw-semibold">@item.Patient?.FirstName @item.Patient?.LastName</div>
+                    <div class="text-muted small">@item.Subject</div>
+                </div>
+                <div class="text-end">
+                    <div class="fw-semibold">@item.TokenNumber</div>
+                    <div class="text-muted small">@item.TimeSlot</div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="text-muted small">No appointments for today.</div>
+    }
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const doctorStatusCtx = document.getElementById('doctorStatusChart');
+    if (doctorStatusCtx) {
+        new Chart(doctorStatusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: @Html.Raw(Json.Serialize(ViewBag.ChartLabels ?? new List<string>())),
+                datasets: [{
+                    data: @Html.Raw(Json.Serialize(ViewBag.ChartData ?? new List<int>())),
+                    backgroundColor: ['#f59e0b', '#3b82f6', '#10b981', '#ef4444']
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+        });
+    }
+
+    const doctorMiniPieCtx = document.getElementById('doctorMiniPie');
+    if (doctorMiniPieCtx) {
+        new Chart(doctorMiniPieCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Waiting', 'Completed', 'Tomorrow', 'Other'],
+                datasets: [{
+                    data: [
+                        @Model.WaitingPatientsCount,
+                        @Model.CompletedAppointmentsCount,
+                        @Model.TomorrowAppointmentsCount,
+                        Math.max(0, @Model.TodayAppointmentsCount - @Model.WaitingPatientsCount - @Model.CompletedAppointmentsCount)
+                    ],
+                    backgroundColor: ['#f59e0b', '#10b981', '#3b82f6', '#e2e8f0']
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+        });
+    }
+</script>

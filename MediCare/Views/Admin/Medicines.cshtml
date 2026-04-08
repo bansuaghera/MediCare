@@ -1,247 +1,149 @@
-﻿@{
+﻿@model IEnumerable<MediCare.Models.Medicine>
+@{
     ViewData["Title"] = "Medicine Master";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
 <style>
-    .page-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 25px;
-        flex-wrap: wrap;
-    }
-
-        .page-header h2 {
-            font-weight: 700;
-        }
-
-    /* GREEN ADD BUTTON */
-    .add-btn {
-        background: linear-gradient(135deg, #22c55e, #16a34a);
-        color: #fff !important;
-        padding: 10px 20px;
-        border-radius: 12px;
-        font-weight: 600;
-        border: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        text-decoration: none;
-        box-shadow: 0 6px 18px rgba(34,197,94,0.35);
-        transition: all 0.3s ease;
-    }
-
-        .add-btn:hover {
-            background: linear-gradient(135deg, #16a34a, #15803d);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(34,197,94,0.45);
-        }
-
-    .card-box {
-        background: white;
-        padding: 25px;
-        border-radius: 18px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-        overflow-x: auto;
-    }
-
-    .search-box {
-        width: 100%;
-        max-width: 400px;
-        padding: 10px 15px;
-        border-radius: 10px;
-        border: 1px solid #e5e5e5;
-        margin-bottom: 20px;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        min-width: 900px;
-    }
-
-    thead {
-        background: #f9fafb;
-    }
-
-    table th {
-        padding: 14px 10px;
-        font-size: 13px;
-        color: #6b7280;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        text-align: left;
-    }
-
-    table td {
-        padding: 14px 10px;
-        border-top: 1px solid #f1f1f1;
-        font-weight: 500;
-    }
-
-    .actions i {
-        margin-right: 12px;
-        cursor: pointer;
-        color: #374151;
-        transition: 0.2s;
-    }
-
-        .actions i:hover {
-            color: #16a34a;
-        }
-
-        .actions i.fa-trash:hover {
-            color: red;
-        }
-
-    .pagination-box {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 20px;
-        color: #6b7280;
-        flex-wrap: wrap;
-    }
-
-        .pagination-box button {
-            padding: 6px 14px;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-            background: white;
-            margin-left: 8px;
-            transition: 0.2s;
-        }
-
-            .pagination-box button:hover {
-                background: #f3f4f6;
-            }
-
-    /* Responsive */
-    @@media (max-width: 768px) {
-        .page-header {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 10px;
-        }
-
-        .add-btn {
-            width: 100%;
-            justify-content: center;
-        }
-
-        table {
-            font-size: 13px;
-        }
-    }
+    .page-shell { background:#fff; border-radius:24px; padding:24px; box-shadow:0 10px 30px rgba(15,23,42,.05); border:1px solid #eef2f7; }
+    .toolbar { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:18px; }
+    .search-box { width:min(420px,100%); border:1px solid #e2e8f0; border-radius:14px; padding:10px 14px; display:flex; align-items:center; gap:10px; background:#f8fafc; }
+    .search-box input { border:0; background:transparent; outline:none; width:100%; }
+    .action-bar { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .medicine-table { width:100%; min-width:980px; border-collapse:collapse; }
+    .medicine-table thead { background:#f9fafb; }
+    .medicine-table th, .medicine-table td { padding:14px 12px; border-bottom:1px solid #eef2f7; text-align:left; vertical-align:middle; }
+    .medicine-table th { font-size:12px; text-transform:uppercase; letter-spacing:.05em; color:#64748b; }
+    .medicine-row.selected { background:#f0fdf4; }
+    .row-actions { display:flex; gap:12px; align-items:center; }
+    .row-actions button, .row-actions a { border:0; background:transparent; padding:0; color:#475569; }
+    .row-actions a:hover, .row-actions button:hover { color:#16a34a; }
+    .badge-id { background:#ecfdf5; color:#059669; border-radius:999px; padding:6px 10px; font-weight:700; font-size:12px; }
 </style>
 
-<!-- PAGE HEADER -->
-<div class="page-header">
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
     <div>
-        <h2>Medicine Master</h2>
-        <p class="text-muted mb-0">Manage medicine inventory</p>
+        <h2 class="fw-bold mb-1">Medicine Master</h2>
+        <p class="text-muted mb-0">Manage medicine inventory stored in the database</p>
     </div>
-
-    <a asp-controller="Admin"
-       asp-action="AddMedicine"
-       class="add-btn">
-        <i class="fa-solid fa-plus"></i> Add Medicine
+    <a asp-action="AddMedicine" class="btn btn-success rounded-pill px-4 fw-bold">
+        <i class="fa-solid fa-plus me-1"></i> Add Medicine
     </a>
 </div>
 
-<!-- TABLE CARD -->
-<div class="card-box">
-
-    <input type="text" class="search-box" placeholder="Search medicines..." />
-
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Medicine Name</th>
-                <th>Category</th>
-                <th>Stock</th>
-                <th>Price</th>
-                <th>Supplier</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            <tr>
-                <td>1</td>
-                <td>Amlodipine 5mg</td>
-                <td>Cardiovascular</td>
-                <td>500</td>
-                <td>₹2.50</td>
-                <td>PharmaCorp</td>
-                <td class="actions">
-                    <i class="fa-solid fa-pen-to-square"></i>
-                    <i class="fa-solid fa-trash"></i>
-                </td>
-            </tr>
-
-            <tr>
-                <td>2</td>
-                <td>Metformin 500mg</td>
-                <td>Diabetes</td>
-                <td>750</td>
-                <td>₹1.80</td>
-                <td>MediSupply</td>
-                <td class="actions">
-                    <i class="fa-solid fa-pen-to-square"></i>
-                    <i class="fa-solid fa-trash"></i>
-                </td>
-            </tr>
-
-            <tr>
-                <td>3</td>
-                <td>Amoxicillin 500mg</td>
-                <td>Antibiotic</td>
-                <td>300</td>
-                <td>₹3.20</td>
-                <td>PharmaCorp</td>
-                <td class="actions">
-                    <i class="fa-solid fa-pen-to-square"></i>
-                    <i class="fa-solid fa-trash"></i>
-                </td>
-            </tr>
-
-            <tr>
-                <td>4</td>
-                <td>Ibuprofen 400mg</td>
-                <td>Pain Relief</td>
-                <td>1000</td>
-                <td>₹0.90</td>
-                <td>HealthDist</td>
-                <td class="actions">
-                    <i class="fa-solid fa-pen-to-square"></i>
-                    <i class="fa-solid fa-trash"></i>
-                </td>
-            </tr>
-
-            <tr>
-                <td>5</td>
-                <td>Omeprazole 20mg</td>
-                <td>Gastro</td>
-                <td>400</td>
-                <td>₹2.10</td>
-                <td>MediSupply</td>
-                <td class="actions">
-                    <i class="fa-solid fa-pen-to-square"></i>
-                    <i class="fa-solid fa-trash"></i>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-
-    <div class="pagination-box">
-        <div>Showing 5 results</div>
-        <div>
-            <button>Previous</button>
-            <button>Next</button>
+<div class="page-shell">
+    <div class="toolbar">
+        <div class="action-bar">
+            <input type="checkbox" id="selectAll" class="form-check-input shadow-none" />
+            <button class="btn btn-outline-danger btn-sm" id="deleteSelectedBtn" disabled>Delete Selected</button>
+            <form asp-action="DeleteAllMedicines" method="post" onsubmit="return confirm('Delete ALL medicines? This cannot be undone.');" class="m-0">
+                <button type="submit" class="btn btn-outline-danger btn-sm">Delete All</button>
+            </form>
+        </div>
+        <div class="search-box">
+            <i class="fa-solid fa-search text-muted"></i>
+            <input type="text" id="searchBox" placeholder="Search medicines..." onkeyup="filterMedicines()" />
         </div>
     </div>
 
+    <div class="table-responsive">
+        <table class="medicine-table">
+            <thead>
+                <tr>
+                    <th style="width:40px;"></th>
+                    <th>ID</th>
+                    <th>Medicine Name</th>
+                    <th>Category</th>
+                    <th>Stock</th>
+                    <th>Selling Price</th>
+                    <th>Company</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="medicineBody">
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var medicine in Model)
+                    {
+                        <tr class="medicine-row" data-id="@medicine.Id" data-search="@($"{medicine.MedicineName} {medicine.Category} {medicine.Manufacturer} {medicine.Supplier} {medicine.Strength} {medicine.DosageForm}")">
+                            <td><input type="checkbox" class="form-check-input row-check shadow-none" /></td>
+                            <td><span class="badge-id">MED-@(medicine.Id.ToString("D3"))</span></td>
+                            <td>@medicine.MedicineName</td>
+                            <td>@medicine.Category</td>
+                            <td>@medicine.Stock units</td>
+                            <td>$@medicine.SellingPrice.ToString("0.00")</td>
+                            <td>@medicine.Manufacturer</td>
+                            <td class="text-end">
+                                <div class="row-actions justify-content-end">
+                                    <a asp-action="EditMedicine" asp-route-id="@medicine.Id" title="Edit"><i class="fa-solid fa-pen-to-square"></i></a>
+                                    <form asp-action="DeleteMedicine" asp-route-id="@medicine.Id" method="post" class="m-0" onsubmit="return confirm('Delete this medicine?');">
+                                        <button type="submit" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="8" class="text-center text-muted py-4">No medicines found.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>
+
+@section Scripts {
+    <script>
+        const rowChecks = document.querySelectorAll('.row-check');
+        const selectAll = document.getElementById('selectAll');
+        const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+
+        function syncSelection() {
+            const selected = document.querySelectorAll('.row-check:checked').length;
+            deleteSelectedBtn.disabled = selected === 0;
+            if (selectAll) selectAll.checked = selected === rowChecks.length && rowChecks.length > 0;
+            document.querySelectorAll('.medicine-row').forEach(row => {
+                const cb = row.querySelector('.row-check');
+                row.classList.toggle('selected', cb && cb.checked);
+            });
+        }
+
+        rowChecks.forEach(cb => cb.addEventListener('change', syncSelection));
+        if (selectAll) {
+            selectAll.addEventListener('change', function () {
+                rowChecks.forEach(cb => cb.checked = selectAll.checked);
+                syncSelection();
+            });
+        }
+
+        deleteSelectedBtn?.addEventListener('click', function () {
+            const ids = Array.from(document.querySelectorAll('.row-check:checked')).map(cb => parseInt(cb.closest('.medicine-row').dataset.id));
+            if (!ids.length) return;
+            if (!confirm(`Delete ${ids.length} selected medicine(s)?`)) return;
+
+            $.ajax({
+                url: '/Admin/DeleteSelectedMedicines',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(ids),
+                success: function (res) {
+                    if (res && res.success) {
+                        location.reload();
+                    } else {
+                        alert('Unable to delete selected medicines.');
+                    }
+                }
+            });
+        });
+
+        function filterMedicines() {
+            const q = (document.getElementById('searchBox').value || '').toLowerCase();
+            document.querySelectorAll('.medicine-row').forEach(row => {
+                row.style.display = row.dataset.search.toLowerCase().includes(q) ? '' : 'none';
+            });
+        }
+
+        syncSelection();
+    </script>
+}

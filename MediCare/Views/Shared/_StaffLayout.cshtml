@@ -1,205 +1,302 @@
-
+@inject MediCare.Services.NotificationService NotificationService
+@inject MediCare.Services.LoginSessionService LoginSessionService
 @{
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
     var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+    var userEmail = Context.Session.GetString("UserEmail") ?? string.Empty;
+    var unreadNotificationCount = string.IsNullOrEmpty(userEmail) ? 0 : NotificationService.CountUnread(userEmail);
+    var loginAtRaw = Context.Session.GetString("LoginAt") ?? string.Empty;
+    var loginLabel = "Logged out";
+    if (DateTime.TryParse(loginAtRaw, null, System.Globalization.DateTimeStyles.RoundtripKind, out var loginAt))
+    {
+        loginLabel = loginAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss");
+    }
 }
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title>@ViewData["Title"] - Staff Panel</title>
+    <title>@ViewData["Title"] - MediCare Staff</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-
-    <!-- Font Awesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <style>
+        :root {
+            --primary: #10b981;
+            --primary-soft: #ecfdf5;
+            --text-dark: #111827;
+            --text-muted: #6b7280;
+            --bg-body: #f9fafb;
+        }
+
         body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
             margin: 0;
-            background-color: #f4f6f9;
-            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            min-height: 100vh;
         }
 
-        /* Sidebar */
         .sidebar {
-            width: 250px;
-            height: 100vh;
+            width: 260px;
             background: #ffffff;
-            position: fixed;
-            padding: 20px 15px;
-            border-right: 1px solid #eee;
+            border-right: 1px solid #f1f5f9;
+            display: flex;
+            flex-direction: column;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            z-index: 100;
         }
 
-        .brand {
+        .sidebar-header { padding: 30px 24px; }
+        
+        .logo-box {
             display: flex;
             align-items: center;
+            gap: 12px;
+            margin-bottom: 40px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            color: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .profile-card {
+            background-color: #f8fafc;
+            border-radius: 16px;
+            padding: 20px;
             margin-bottom: 30px;
         }
 
-        .brand-icon {
-            width: 40px;
-            height: 40px;
-            background: #22c55e;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            margin-right: 10px;
+        .profile-avatar {
+            width: 45px; height: 45px;
+            border-radius: 50%;
+            background: #d1fae5;
+            color: var(--primary);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 18px;
+            margin-bottom: 12px;
         }
 
-        .brand-text strong {
-            display: block;
+        .session-time {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 8px 10px;
+            margin-top: 10px;
+            font-size: 11px;
+            color: #64748b;
+            line-height: 1.45;
         }
 
         .nav-link {
-            color: #555;
-            padding: 10px 12px;
-            border-radius: 8px;
-            margin-bottom: 5px;
-            display: block;
-            font-weight: 500;
+            display: flex; align-items: center;
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: #4b5563;
+            text-decoration: none;
+            font-weight: 500; font-size: 14px;
+            margin-bottom: 4px;
+            transition: 0.2s;
         }
 
-            .nav-link i {
-                width: 20px;
-            }
-
-            .nav-link:hover {
-                background: #e8f7ed;
-                color: #16a34a;
-            }
-
-            .nav-link.active {
-                background: #d1f5e0;
-                color: #0f9b6d !important;
-                font-weight: 600;
-            }
-
-        .logout {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            color: #777;
+        .nav-link i {
+            width: 24px; font-size: 18px;
+            margin-right: 12px; color: #94a3b8;
         }
 
-        /* Content */
-        .content {
-            margin-left: 250px;
-            padding: 25px;
+        .nav-link:hover, .nav-link.active {
+            background-color: var(--primary-soft);
+            color: var(--primary);
         }
 
-        /* Topbar */
+        .nav-link:hover i, .nav-link.active i { color: var(--primary); }
+
+        .wrapper { flex-grow: 1; display: flex; flex-direction: column; }
+        
         .topbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
+            height: 80px; background: white;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 40px; position: sticky; top: 0; z-index: 90;
         }
 
-        .search-box {
-            width: 50%;
-        }
-
-        .profile {
-            width: 35px;
-            height: 35px;
-            background: #22c55e;
-            color: white;
-            border-radius: 50%;
+        .top-search {
+            width: min(520px, 100%);
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-weight: bold;
+            gap: 10px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 12px 16px;
+            color: #94a3b8;
         }
 
-        /* Responsive */
-        @@media (max-width: 992px) {
-            .sidebar {
-                position: relative;
-                width: 100%;
-                height: auto;
-            }
+        .top-search input {
+            border: 0;
+            outline: none;
+            background: transparent;
+            width: 100%;
+            font-size: 14px;
+            color: #111827;
+        }
 
-            .content {
-                margin-left: 0;
-            }
+        .user-dd {
+            width: 40px; height: 40px;
+            background: #f1f5f9; color: #374151;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; cursor: pointer;
         }
     </style>
 </head>
-
 <body>
-
-    <!-- Sidebar -->
-    <div class="sidebar">
-
-        <div class="brand">
-            <div class="brand-icon">
-                <i class="fa-solid fa-heart-pulse"></i>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-box">
+                <div class="logo-icon"><i class="fa-solid fa-heart-pulse"></i></div>
+                <div><h5 class="m-0 fw-bold">MediCare</h5><small class="text-muted">Staff Panel</small></div>
             </div>
-            <div class="brand-text">
-                <strong>MediCare</strong>
-                <small class="text-muted">Staff Panel</small>
+            <div class="profile-card">
+                <div class="profile-avatar shadow-sm">@(Context.Session.GetString("UserName")?.Substring(0, 1) ?? "S")</div>
+                <h6 class="m-0 fw-bold small uppercase">@(Context.Session.GetString("UserName") ?? "Bansi Aghera")</h6>
+                <div class="text-muted" style="font-size: 10px;">@(Context.Session.GetString("UserEmail") ?? "agherabansi2@gmail.com")</div>
+                <div class="badge bg-emerald-luxury mt-2" style="font-size: 9px; background: #10b981;">STAFF</div>
+                <div class="session-time">
+                    <div><i class="fa-regular fa-clock me-1"></i> Login: <span id="loginTimeText">@loginLabel</span></div>
+                    <div><i class="fa-solid fa-hourglass-half me-1"></i> Live: <span id="sessionLiveText">--:--:--</span></div>
+                </div>
             </div>
         </div>
-
-        <a class="nav-link @(currentAction == "Dashboard" ? "active" : "")" asp-controller="Staff" asp-action="Dashboard">
-            <i class="fa fa-chart-line"></i> Dashboard
-        </a>
-
-        <a class="nav-link @(currentAction == "RegisterPatient" ? "active" : "")" asp-controller="Staff" asp-action="RegisterPatient">
-            <i class="fa fa-user-plus"></i> Register Patient
-        </a>
-
-        <a class="nav-link @(currentAction == "Patients" ? "active" : "")" asp-controller="Staff" asp-action="Patients">
-            <i class="fa fa-users"></i> Patients
-        </a>
-
-        <a class="nav-link @(currentAction == "Appointments" ? "active" : "")" asp-controller="Staff" asp-action="TodayAppointments">
-            <i class="fa fa-calendar-check"></i> Appointments
-        </a>
-
-        <a class="nav-link @(currentAction == "Tokens" ? "active" : "")" asp-controller="Staff" asp-action="GenerateToken">
-            <i class="fa fa-ticket"></i> Tokens
-        </a>
-
-        <a class="nav-link @(currentAction == "Queue" ? "active" : "")" asp-controller="Staff" asp-action="Queue">
-            <i class="fa fa-list"></i> Queue
-        </a>
-
-        <a class="nav-link @(currentAction == "CallToken" ? "active" : "")" asp-controller="Staff" asp-action="CallToken">
-            <i class="fa fa-phone"></i> Call Token
-        </a>
-
-        <a class="nav-link @(currentAction == "Schedule" ? "active" : "")" asp-controller="Staff" asp-action="Schedule">
-            <i class="fa fa-clock"></i> Schedule
-        </a>
-
-        <a class="nav-link @(currentAction == "Print" ? "active" : "")" asp-controller="Staff" asp-action="PrintAppointment">
-            <i class="fa fa-print"></i> Print
-        </a>
-
-        <a asp-controller="Login" asp-action="Logout" class="logout text-decoration-none">
-            <i class="fa fa-sign-out-alt me-1"></i> Logout
-        </a>
-
-    </div>
-
-    <!-- Content -->
-    <div class="content">
-
-        <!-- Topbar -->
-        <div class="topbar">
-            <input type="text" class="form-control search-box" placeholder="Search patients, appointments..." />
-            <div class="profile">ST</div>
+        <div class="sidebar-menu px-3 flex-grow-1 overflow-auto">
+            <a class="nav-link @(currentAction == "Dashboard" ? "active" : "")" asp-controller="Staff" asp-action="Dashboard">
+                <i class="fa-solid fa-table-cells-large"></i> Dashboard
+            </a>
+            <a class="nav-link @(currentAction == "RegisterPatient" ? "active" : "")" asp-controller="Staff" asp-action="RegisterPatient">
+                <i class="fa-solid fa-user-plus"></i> Register Patient
+            </a>
+            <a class="nav-link @(currentAction == "Patients" ? "active" : "")" asp-controller="Staff" asp-action="Patients">
+                <i class="fa-solid fa-users"></i> Patients
+            </a>
+            <a class="nav-link @(currentAction == "Appointments" ? "active" : "")" asp-controller="Staff" asp-action="Appointments">
+                <i class="fa-regular fa-calendar-check text-success"></i> Appointments
+            </a>
+            <a class="nav-link @(currentAction == "Queue" ? "active" : "")" asp-controller="Staff" asp-action="Queue"><i class="fa-solid fa-list-ol"></i> Tokens / Queue</a>
+            <a class="nav-link @(currentAction == "CallToken" ? "active" : "")" asp-controller="Staff" asp-action="CallToken"><i class="fa-solid fa-bullhorn"></i> Call Token</a>
+            <a class="nav-link @(currentAction == "History" ? "active" : "")" asp-controller="Staff" asp-action="History"><i class="fa-solid fa-clock-rotate-left"></i> History</a>
+            <a class="nav-link @(currentAction == "Analytics" ? "active" : "")" asp-controller="Staff" asp-action="Analytics"><i class="fa-solid fa-chart-pie"></i> Analytics</a>
+            <a class="nav-link @(currentAction == "Profile" ? "active" : "")" asp-controller="Staff" asp-action="Profile"><i class="fa-regular fa-user"></i> Profile</a>
+            <a class="nav-link @(currentAction == "Notifications" ? "active" : "")" asp-controller="Staff" asp-action="Notifications">
+                <i class="fa-regular fa-bell"></i> Notifications
+                @if (unreadNotificationCount > 0)
+                {
+                    <span class="ms-auto rounded-circle bg-danger d-inline-block" style="width:8px;height:8px;"></span>
+                }
+            </a>
+            <a class="nav-link @(currentAction == "Print" ? "active" : "")" asp-controller="Staff" asp-action="Print">
+                <i class="fa-solid fa-print"></i> Print
+            </a>
+            <a class="nav-link @(currentAction == "Feedback" ? "active" : "")" asp-controller="Staff" asp-action="Feedback"><i class="fa-regular fa-comment-dots"></i> Feedback</a>
         </div>
-
-        @RenderBody()
-
+        <div class="p-3 border-top"><a class="nav-link text-danger" asp-controller="Login" asp-action="Logout"><i class="fa-solid fa-sign-out-alt"></i> Logout</a></div>
+    </aside>
+    <div class="wrapper">
+        <header class="topbar">
+            <div class="top-search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="pageSearchInput" placeholder="Search tokens, patients, appointments..." />
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <a asp-controller="Staff" asp-action="Notifications" class="text-muted fs-5 position-relative text-decoration-none">
+                    <i class="fa-regular fa-bell"></i>
+                    @if (unreadNotificationCount > 0)
+                    {
+                        <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle" style="width:8px;height:8px;"></span>
+                    }
+                </a>
+                <a asp-controller="Staff" asp-action="Profile" class="text-decoration-none">
+                    <div class="user-dd">@(Context.Session.GetString("UserName")?.Substring(0, 2).ToUpper() ?? "SA")</div>
+                </a>
+            </div>
+        </header>
+        <main class="p-5 flex-grow-1">@RenderBody()</main>
     </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+    <script>
+        (function () {
+            const raw = '@loginAtRaw';
+            if (!raw) return;
+            const start = new Date(raw);
+            if (isNaN(start.getTime())) return;
+            const tick = () => {
+                const diff = Math.max(0, Date.now() - start.getTime());
+                const sec = Math.floor(diff / 1000);
+                const h = String(Math.floor(sec / 3600)).padStart(2, '0');
+                const m = String(Math.floor((sec % 3600) / 60)).padStart(2, '0');
+                const s = String(sec % 60).padStart(2, '0');
+                const el = document.getElementById('sessionLiveText');
+                if (el) el.textContent = `${h}:${m}:${s}`;
+            };
+            tick();
+            setInterval(tick, 1000);
+        })();
 
+        (function () {
+            const input = document.getElementById('pageSearchInput');
+            if (!input) return;
+            const root = document.querySelector('.main-body') || document.body;
+            const selectors = [
+                'tbody tr',
+                '.appointment-card',
+                '.queue-item',
+                '.row-card',
+                '.card-box',
+                '.notification-item',
+                '.notification-card',
+                '.feedback-card',
+                '.history-item',
+                '.patient-card',
+                '.doctor-card',
+                '.prescription-card',
+                '.list-group-item',
+                '.searchable-item'
+            ];
+            const filter = () => {
+                const term = input.value.trim().toLowerCase();
+                const items = Array.from(root.querySelectorAll(selectors.join(',')));
+                const seen = new Set();
+                items.forEach(item => {
+                    if (seen.has(item)) return;
+                    seen.add(item);
+                    const text = (item.dataset.search || item.innerText || '').toLowerCase();
+                    item.style.display = !term || text.includes(term) ? '' : 'none';
+                });
+            };
+            input.addEventListener('input', filter);
+        })();
+    </script>
+    @if(TempData["ToastMessage"] != null){
+        <div class="toast align-items-center text-bg-@(TempData["ToastType"] ?? "success") position-fixed top-0 end-0 m-3 show" role="alert" aria-live="assertive" aria-atomic="true" style="z-index:2000;">
+            <div class="d-flex">
+                <div class="toast-body">
+                    @TempData["ToastMessage"]
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    }
 </body>
 </html>

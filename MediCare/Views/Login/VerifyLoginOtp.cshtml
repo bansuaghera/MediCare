@@ -1,0 +1,58 @@
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login OTP - MediCare+</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+    <link href="~/css/verifyOTP.css" rel="stylesheet" />
+</head>
+
+<body>
+
+    <div class="verify-otp-container">
+        <div class="left-section">
+            <div class="left-content">
+                <h1>Two-Factor Verification</h1>
+                <p>Enter the 6-digit OTP sent to your email to complete login.</p>
+            </div>
+        </div>
+
+        <div class="right-section">
+            <div class="otp-card">
+                <div class="shield-icon-box">
+                    <i class="fa-solid fa-shield-halved shield-icon"></i>
+                </div>
+
+                <h2>Enter Login OTP</h2>
+                <p class="subtitle">Check your inbox and type the code below</p>
+
+                @if (ViewBag.Error != null)
+                {
+                    <div style="background-color:#fee2e2;color:#dc2626;padding:12px;border-radius:8px;margin-bottom:20px;font-size:14px;font-weight:500;">
+                        @ViewBag.Error
+                    </div>
+                }
+
+                <form asp-action="VerifyLoginOtp" method="post" class="otp-form">
+                    <div class="otp-input-group">
+                        <input type="text" name="userOtp" class="otp-input" placeholder="------" maxlength="6" required />
+                    </div>
+
+                    <button type="submit" class="verify-btn">Verify & Login</button>
+                </form>
+
+                <a asp-action="Login" class="back-to-login">
+                    <i class="fa-solid fa-arrow-left" style="font-size:18px;"></i>
+                    <span>Back to Login</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

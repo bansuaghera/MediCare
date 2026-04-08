@@ -1,130 +1,186 @@
-﻿@{
+@model MediCare.Models.Appointment
+@{
+    bool isError = !ViewData.ModelState.IsValid;
     ViewData["Title"] = "Book Appointment";
     Layout = "~/Views/Shared/_StaffLayout.cshtml";
+    var doctors = ViewBag.Doctors as IEnumerable<MediCare.Models.Doctor>;
+    var patients = ViewBag.Patients as IEnumerable<MediCare.Models.Patient>;
 }
 
 <style>
-    .page-header {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 20px;
+    :root {
+        --primary: #10b981;
+        --primary-bold: #059669;
+        --bg-glass: rgba(255, 255, 255, 0.9);
     }
 
-        .page-header i {
-            font-size: 18px;
-            cursor: pointer;
-            color: #6b7280;
-        }
-
-    .card-box {
-        background: #ffffff;
-        border-radius: 18px;
-        padding: 30px;
-        box-shadow: 0 4px 25px rgba(0, 0, 0, 0.05);
-        max-width: 800px;
+    .booking-wrapper {
+        max-width: 900px;
+        margin: 20px auto;
+        animation: fadeIn 0.4s ease;
     }
 
-    .form-label {
-        font-weight: 600;
-        font-size: 14px;
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
-    .form-control, .form-select {
+    .form-card {
+        background: var(--bg-glass);
+        backdrop-filter: blur(10px);
+        border-radius: 24px;
+        padding: 40px;
+        border: 1px solid #f1f5f9;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.03);
+    }
+
+    .section-title {
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #64748b;
+        margin-bottom: 25px;
+        display: block;
+        border-bottom: 2px solid #f1f5f9;
+        padding-bottom: 10px;
+    }
+
+    .form-control-custom {
+        background: #f8fafc;
+        border: 2px solid #f1f5f9;
         border-radius: 12px;
-        padding: 10px 14px;
-        border: 1px solid #e5e7eb;
+        padding: 12px 16px;
+        transition: 0.2s;
+        font-weight: 500;
     }
 
-    .btn-success-custom {
-        background: #16a34a;
+    .form-control-custom:focus {
+        background: white;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+        outline: none;
+    }
+
+    .doctor-card-select {
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .btn-book {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-bold) 100%);
+        color: white;
         border: none;
-        padding: 10px 22px;
-        border-radius: 30px;
-        font-weight: 600;
+        padding: 16px 32px;
+        border-radius: 14px;
+        font-weight: 700;
+        width: 100%;
+        margin-top: 20px;
+        box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2);
     }
 
-        .btn-success-custom:hover {
-            background: #15803d;
-        }
-
-    .btn-cancel {
-        border-radius: 30px;
-        padding: 10px 20px;
+    .btn-book:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 25px rgba(16, 185, 129, 0.3);
     }
 
-    .form-row {
-        margin-bottom: 20px;
+    .token-alert {
+        background: #ecfdf5;
+        border: 1px dashed #10b981;
+        border-radius: 12px;
+        padding: 15px;
+        margin-top: 20px;
     }
 </style>
 
-<!-- Header -->
-<div class="page-header">
-    <i class="fa fa-arrow-left"></i>
-    <div>
-        <h4 class="fw-bold mb-0">Book Appointment</h4>
-        <small class="text-muted">Schedule a new appointment</small>
+<div class="booking-wrapper">
+    <div class="mb-4 d-flex align-items-center gap-3">
+        <a asp-action="Dashboard" class="btn btn-light rounded-circle shadow-sm" style="width: 45px; height: 45px; display: flex; align-items: center; justify-content: center;">
+            <i class="fa fa-arrow-left"></i>
+        </a>
+        <div>
+            <h2 class="fw-bold m-0">Quick Appointment</h2>
+            <p class="text-muted m-0">Book a slot and generate token for walk-in patient</p>
+        </div>
     </div>
-</div>
 
-<!-- Card -->
-<div class="card-box">
-
-    <form>
-
-        <div class="row form-row">
-            <div class="col-md-6">
-                <label class="form-label">Patient <span class="text-danger">*</span></label>
-                <select class="form-select">
-                    <option>Select patient</option>
-                    <option>John Smith</option>
-                    <option>Sarah Johnson</option>
-                </select>
+    <div class="form-card">
+        <form asp-action="BookAppointment" method="post">
+            <span class="section-title">Patient Information</span>
+            <div class="row g-4 mb-5">
+                <div class="col-md-8">
+                    <label class="form-label fw-bold small">Select Patient <span class="text-danger">*</span></label>
+                    <select asp-for="PatientId" class="form-control-custom w-100" required>
+                        <option value="">-- Choose registered patient --</option>
+                        @foreach (var p in patients)
+                        {
+                            <option value="@p.Id">@p.FirstName @p.LastName (@p.Phone)</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold small">&nbsp;</label>
+                    <a asp-action="RegisterPatient" class="btn btn-outline-primary d-block rounded-pill py-2 fw-semibold">
+                        <i class="fa fa-user-plus me-2"></i> New Patient
+                    </a>
+                </div>
             </div>
 
-            <div class="col-md-6">
-                <label class="form-label">Doctor <span class="text-danger">*</span></label>
-                <select class="form-select">
-                    <option>Select doctor</option>
-                    <option>Dr. Sarah Johnson</option>
-                    <option>Dr. Michael Chen</option>
-                </select>
+            <span class="section-title">Consultation Details</span>
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <label class="form-label fw-bold small">Assign Doctor <span class="text-danger">*</span></label>
+                    <select asp-for="DoctorId" class="form-control-custom w-100" required>
+                        <option value="">-- Choose doctor --</option>
+                        @foreach (var d in doctors)
+                        {
+                            <option value="@d.Id">Dr. @d.FirstName @d.LastName (@d.Specialty)</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold small">Appointment Type</label>
+                    <select asp-for="Subject" class="form-control-custom w-100">
+                        <option value="General Consultation">General Consultation</option>
+                        <option value="Follow-up">Follow-up</option>
+                        <option value="Emergency Checkup">Emergency Checkup</option>
+                        <option value="Tele-Consultation">Tele-Consultation</option>
+                    </select>
+                </div>
             </div>
-        </div>
 
-        <div class="row form-row">
-            <div class="col-md-6">
-                <label class="form-label">Date <span class="text-danger">*</span></label>
-                <input type="date" class="form-control" />
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <label class="form-label fw-bold small">Time Slot</label>
+                    <input asp-for="TimeSlot" type="time" class="form-control-custom w-100" value="@DateTime.Now.ToString("HH:mm")" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold small">Queue Priority</label>
+                    <div class="d-flex gap-3 pt-1">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="priority" checked>
+                            <label class="form-check-label small">Normal</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="priority">
+                            <label class="form-check-label small text-danger fw-bold">Emergency</label>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div class="col-md-6">
-                <label class="form-label">Time <span class="text-danger">*</span></label>
-                <input type="time" class="form-control" />
+            <div class="token-alert d-flex align-items-center gap-3">
+                <div class="bg-white rounded-circle p-2 text-primary" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fa fa-info-circle"></i>
+                </div>
+                <div class="small">
+                    <strong>Auto-Token Generation:</strong> A unique token number will be automatically assigned and printed upon confirmation.
+                </div>
             </div>
-        </div>
 
-        <div class="form-row">
-            <label class="form-label">Appointment Type <span class="text-danger">*</span></label>
-            <select class="form-select">
-                <option>Select type</option>
-                <option>Checkup</option>
-                <option>Consultation</option>
-                <option>Follow-up</option>
-                <option>Emergency</option>
-            </select>
-        </div>
-
-        <div class="mt-4">
-            <button type="submit" class="btn btn-success-custom me-3">
-                <i class="fa fa-calendar-check me-2"></i> Book Appointment
+            <button type="submit" class="btn-book">
+                <i class="fa fa-check-circle me-2"></i> Confirm Booking & Generate Token
             </button>
-
-            <button type="button" class="btn btn-outline-secondary btn-cancel">
-                Cancel
-            </button>
-        </div>
-
-    </form>
-
+        </form>
+    </div>
 </div>

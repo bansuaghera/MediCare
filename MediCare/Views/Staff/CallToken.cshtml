@@ -1,143 +1,236 @@
-﻿@{
+﻿@model IEnumerable<MediCare.Models.Appointment>
+@{
     ViewData["Title"] = "Call Token";
     Layout = "~/Views/Shared/_StaffLayout.cshtml";
+    var current = ViewBag.CurrentAppointment as MediCare.Models.Appointment;
+    var nextList = ViewBag.NextAppointments as IEnumerable<MediCare.Models.Appointment> ?? new List<MediCare.Models.Appointment>();
+    var totalToday = (ViewBag.TotalToday as int?) ?? (Model?.Count() ?? 0);
 }
 
 <style>
-    .page-header h3 {
-        font-weight: 700;
-        margin-bottom: 5px;
-    }
-
-    .card-custom {
-        background: #ffffff;
-        border-radius: 22px;
-        padding: 30px;
-        box-shadow: 0 4px 25px rgba(0,0,0,0.05);
-        margin-bottom: 25px;
-    }
-
-    .token-display {
-        background: #d1fae5;
-        border: 2px solid #86efac;
-        border-radius: 18px;
-        padding: 25px;
-        font-size: 48px;
-        font-weight: 800;
-        color: #047857;
-        text-align: center;
-        margin: 20px 0;
-    }
-
-    .btn-call {
-        background: #10b981;
-        color: white;
-        border-radius: 12px;
-        padding: 12px;
-        font-weight: 600;
-    }
-
-        .btn-call:hover {
-            background: #059669;
-            color: white;
-        }
-
-    .btn-outline-custom {
-        border-radius: 12px;
-        padding: 10px;
-        font-weight: 500;
-    }
-
-    .queue-item {
-        background: #f9fafb;
-        border-radius: 16px;
-        padding: 15px 18px;
-        margin-bottom: 12px;
-        display: flex;
-        align-items: center;
-    }
-
-    .queue-token {
-        background: #e0e7ff;
-        color: #4338ca;
-        font-weight: 700;
-        padding: 8px 14px;
-        border-radius: 10px;
-        margin-right: 15px;
-    }
+    .page-title { font-size: 26px; font-weight: 700; color: #111827; }
+    .page-sub { font-size: 14px; color: #6b7280; margin-bottom: 30px; }
+    .main-card { background: white; border-radius: 22px; padding: 30px; box-shadow: 0 4px 25px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; }
+    .token-display { background: #d1fae5; border: 2px solid #86efac; border-radius: 18px; padding: 26px 20px; font-size: 46px; font-weight: 800; color: #047857; text-align: center; margin: 16px 0; letter-spacing: 1px; }
+    .btn-call { background: #10b981; color: white; border-radius: 12px; padding: 12px; font-weight: 700; border: none; }
+    .btn-call:hover { background: #059669; color: white; }
+    .btn-outline-custom { border-radius: 12px; padding: 10px; font-weight: 600; }
+    .queue-item { background: #f9fafb; border-radius: 16px; padding: 15px 18px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; gap: 12px; border: 1px solid #eef2f7; }
+    .queue-token { background: #e0e7ff; color: #4338ca; font-weight: 800; padding: 8px 14px; border-radius: 10px; margin-right: 15px; min-width: 84px; text-align: center; }
+    .queue-token.emergency { background: #fee2e2; color: #dc2626; }
+    .pill { display:inline-flex; align-items:center; gap:6px; border-radius:999px; padding:4px 10px; font-size:12px; font-weight:700; }
+    .pill-wait { background:#fefce8; color:#a16207; }
+    .pill-await { background:#dbeafe; color:#1d4ed8; }
+    .pill-prog { background:#dbeafe; color:#2563eb; }
+    .pill-emg { background:#fee2e2; color:#dc2626; }
+    .queue-list { max-height: 420px; overflow:auto; padding-right: 4px; }
+    .queue-list::-webkit-scrollbar { width: 6px; }
+    .queue-list::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:999px; }
 </style>
 
-<div class="page-header">
-    <h3>Call Token</h3>
-    <p class="text-muted">Call next patient</p>
+<div class="d-flex justify-content-between align-items-center mb-1 flex-wrap gap-2">
+    <div>
+        <h2 class="page-title">Call Token</h2>
+        <p class="page-sub">Call the next patient, repeat a call, or skip a token back in the queue.</p>
+    </div>
+    <div class="blood-badge">
+        <i class="fa fa-list-ol me-1"></i> Today: @totalToday
+    </div>
 </div>
 
 <div class="row justify-content-center mt-4">
-
-    <div class="col-md-6">
-
-        <!-- Current Token Card -->
-        <div class="card-custom text-center">
-
+    <div class="col-lg-8">
+        <div class="main-card text-center mb-4">
             <small class="text-muted">Current Token</small>
 
-            <div class="token-display">
-                A-045
-            </div>
-
-            <h5 class="fw-bold">John Smith</h5>
-            <p class="text-muted">Dr. Sarah Johnson – Room 101</p>
-
-            <button class="btn btn-call w-100 mt-3">
-                <i class="fa fa-phone me-2"></i> Call Next Token
-            </button>
-
-            <div class="row mt-3">
-                <div class="col-6">
-                    <button class="btn btn-outline-secondary btn-outline-custom w-100">
-                        Repeat Call
-                    </button>
+            @if (current != null)
+            {
+                <div class="token-display @(current.IsEmergency ? "border-danger text-danger" : "")">
+                    @(string.IsNullOrWhiteSpace(current.TokenNumber) ? "--" : current.TokenNumber)
                 </div>
-                <div class="col-6">
-                    <button class="btn btn-outline-secondary btn-outline-custom w-100">
-                        Skip Token
-                    </button>
-                </div>
-            </div>
 
+                <h5 class="fw-bold mb-1">@current.Patient?.FirstName @current.Patient?.LastName</h5>
+                <p class="text-muted mb-2">Dr. @current.Doctor?.FirstName @current.Doctor?.LastName</p>
+                <div class="d-flex justify-content-center gap-2 flex-wrap mb-3">
+                    <span class="pill @(current.Status == "Awaiting Confirmation" ? "pill-await" : current.Status == "In Progress" || current.Status == "In-Progress" ? "pill-prog" : "pill-wait")">@current.Status</span>
+                    @if (current.IsEmergency)
+                    {
+                        <span class="pill pill-emg">Emergency</span>
+                    }
+                </div>
+
+                @if (current.Status == "Awaiting Confirmation")
+                {
+                    <button class="btn btn-call w-100 mt-3" onclick="openCallModal(@current.Id, '@(current.TokenNumber ?? "")', '@(current.Patient?.FirstName ?? "") @(current.Patient?.LastName ?? "")')">
+                        <i class="fa fa-phone me-2"></i> Awaiting Patient Response
+                    </button>
+                }
+                else if (current.Status == "In Progress" || current.Status == "In-Progress")
+                {
+                    <button class="btn btn-call w-100 mt-3" onclick="performCallAction('complete', @current.Id)">
+                        <i class="fa fa-check me-2"></i> Mark Finished
+                    </button>
+                }
+                else if (current.Status == "Completed")
+                {
+                    <button class="btn btn-call w-100 mt-3" onclick="performCallAction('call', @current.Id)">
+                        <i class="fa fa-phone me-2"></i> Call Again
+                    </button>
+                }
+                else
+                {
+                    <button class="btn btn-call w-100 mt-3" onclick="openCallModal(@current.Id, '@(current.TokenNumber ?? "")', '@(current.Patient?.FirstName ?? "") @(current.Patient?.LastName ?? "")')">
+                        <i class="fa fa-phone me-2"></i> Call Next Token
+                    </button>
+                }
+
+                <div class="row mt-3 g-3">
+                    <div class="col-6">
+                        <button class="btn btn-outline-secondary btn-outline-custom w-100" onclick="repeatCurrent(@current.Id)">
+                            Repeat Call
+                        </button>
+                    </div>
+                    <div class="col-6">
+                        <button class="btn btn-outline-secondary btn-outline-custom w-100" onclick="skipCurrent(@current.Id)">
+                            Skip Token
+                        </button>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="py-5">
+                    <i class="fa-regular fa-circle-check fa-3x text-success mb-3 opacity-50"></i>
+                    <h5 class="fw-bold">No active token found</h5>
+                    <p class="text-muted mb-0">Once appointments are scheduled for today, they will appear here.</p>
+                </div>
+            }
         </div>
 
-        <!-- Next in Queue -->
-        <div class="card-custom">
-
+        <div class="main-card">
             <h5 class="fw-bold mb-3">Next in Queue</h5>
 
-            <div class="queue-item">
-                <div class="queue-token">A-046</div>
-                <div>
-                    <strong>Sarah Johnson</strong><br />
-                    <small class="text-muted">Dr. Michael Chen</small>
-                </div>
+            <div class="queue-list">
+                @if (nextList.Any())
+                {
+                    foreach (var app in nextList)
+                    {
+                        <div class="queue-item" style="cursor:pointer;" onclick="location.href='/Staff/CallToken?id=@app.Id'">
+                            <div class="d-flex align-items-center gap-2 flex-grow-1">
+                                <div class="queue-token @(app.IsEmergency ? "emergency" : "")">@app.TokenNumber</div>
+                                <div>
+                                    <strong>@app.Patient?.FirstName @app.Patient?.LastName</strong><br />
+                                    <small class="text-muted">Dr. @app.Doctor?.FirstName @app.Doctor?.LastName</small>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center gap-2 flex-wrap justify-content-end">
+                                <span class="pill @(app.Status == "Awaiting Confirmation" ? "pill-await" : app.Status == "In Progress" || app.Status == "In-Progress" ? "pill-prog" : "pill-wait")">@app.Status</span>
+                                @if (app.IsEmergency)
+                                {
+                                    <span class="pill pill-emg">Emergency</span>
+                                }
+                                @if (app.Status == "Awaiting Confirmation")
+                                {
+                                    <button class="btn btn-outline-success btn-sm rounded-pill px-3" onclick="openCallModal(@app.Id, '@(app.TokenNumber ?? "")', '@(app.Patient?.FirstName ?? "") @(app.Patient?.LastName ?? "")')">Waiting</button>
+                                }
+                                else if (app.Status == "In Progress" || app.Status == "In-Progress")
+                                {
+                                    <button class="btn btn-outline-success btn-sm rounded-pill px-3" onclick="performCallAction('complete', @app.Id)">Finish</button>
+                                }
+                                else if (app.Status == "Completed")
+                                {
+                                    <button class="btn btn-outline-success btn-sm rounded-pill px-3" onclick="performCallAction('call', @app.Id)">Call Again</button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-outline-success btn-sm rounded-pill px-3" onclick="openCallModal(@app.Id, '@(app.TokenNumber ?? "")', '@(app.Patient?.FirstName ?? "") @(app.Patient?.LastName ?? "")')">Call</button>
+                                }
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="text-center py-4 text-muted">No further tokens in the queue.</div>
+                }
             </div>
-
-            <div class="queue-item">
-                <div class="queue-token">A-047</div>
-                <div>
-                    <strong>Michael Chen</strong><br />
-                    <small class="text-muted">Dr. Emily Davis</small>
-                </div>
-            </div>
-
-            <div class="queue-item">
-                <div class="queue-token">A-048</div>
-                <div>
-                    <strong>Emily Davis</strong><br />
-                    <small class="text-muted">Dr. Robert Wilson</small>
-                </div>
-            </div>
-
         </div>
-
     </div>
-
 </div>
+
+<div class="modal fade" id="callConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius:20px;">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold">Call Appointment?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pt-2">
+                <div class="alert alert-success border-0 rounded-4 mb-3">
+                    You are about to call <strong id="modalToken"></strong> for <strong id="modalPatient"></strong>.
+                </div>
+                <p class="text-muted mb-0">Choose Yes to call this token and mark it In Progress, or No to skip it and move it to the back of the queue.</p>
+            </div>
+            <div class="modal-footer border-0 pt-0 d-flex gap-2">
+                <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-outline-danger rounded-pill px-4" onclick="performCallAction('skip')">No, Skip</button>
+                <button type="button" class="btn btn-success rounded-pill px-4" onclick="performCallAction('call')">Yes, Call</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let selectedTokenId = null;
+        let callModal = null;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const modalEl = document.getElementById('callConfirmModal');
+            if (modalEl && window.bootstrap) {
+                callModal = new bootstrap.Modal(modalEl);
+            }
+        });
+
+        function openCallModal(id, token, patient) {
+            selectedTokenId = id;
+            document.getElementById('modalToken').textContent = token || '--';
+            document.getElementById('modalPatient').textContent = patient || 'Patient';
+            callModal?.show();
+        }
+
+        function performCallAction(action, id) {
+            const targetId = id || selectedTokenId;
+            if (!targetId) return;
+            $.post('/Staff/CallTokenAction', { appointmentId: targetId, action: action }, function (res) {
+                if (res && res.success) {
+                    callModal?.hide();
+                    window.location.reload();
+                } else {
+                    alert('Unable to process token. Please try again.');
+                }
+            });
+        }
+
+        function repeatCurrent(id) {
+            $.post('/Staff/CallTokenAction', { appointmentId: id, action: 'repeat' }, function (res) {
+                if (res && res.success) {
+                    window.location.reload();
+                } else {
+                    alert('Unable to repeat call.');
+                }
+            });
+        }
+
+        function skipCurrent(id) {
+            if (!confirm('Skip this token and move it to the back of the queue?')) return;
+            $.post('/Staff/CallTokenAction', { appointmentId: id, action: 'skip' }, function (res) {
+                if (res && res.success) {
+                    window.location.reload();
+                } else {
+                    alert('Unable to skip token.');
+                }
+            });
+        }
+    </script>
+}

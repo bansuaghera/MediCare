@@ -1,0 +1,143 @@
+@model IEnumerable<MediCare.Models.Notification>
+@{
+    var deleteAllUrl = ViewBag.DeleteAllUrl as string ?? "#";
+    var deleteUrl = ViewBag.DeleteUrl as string ?? "#";
+    var titleText = ViewBag.TitleText as string ?? "Activity History";
+    var subtitleText = ViewBag.SubtitleText as string ?? "All recent activity is stored here";
+}
+
+<style>
+    .activity-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 18px;
+        padding: 18px;
+        box-shadow: 0 10px 30px rgba(15,23,42,0.04);
+    }
+
+    .activity-row {
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 16px 18px;
+        display: flex;
+        gap: 14px;
+        align-items: flex-start;
+    }
+
+    .activity-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 15px;
+        flex-shrink: 0;
+    }
+
+    .type-success { background: #10b981; }
+    .type-info { background: #3b82f6; }
+    .type-warning { background: #f59e0b; }
+    .type-error { background: #ef4444; }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <div>
+        <h4 class="fw-bold mb-0">@titleText</h4>
+        <div class="text-muted">@subtitleText</div>
+    </div>
+    @if (Model.Any())
+    {
+        <div class="d-flex gap-2 align-items-center flex-wrap">
+            <button class="btn btn-outline-secondary btn-sm" id="selectAllActivity">Select All</button>
+            <button class="btn btn-outline-danger btn-sm" id="deleteSelectedActivity" disabled>Delete Selected</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteAllActivity()">Delete All</button>
+        </div>
+    }
+</div>
+
+@if (Model.Any())
+{
+    <div class="activity-card">
+        @foreach (var item in Model)
+        {
+            var cls = item.Type == "success" ? "type-success" : item.Type == "warning" ? "type-warning" : item.Type == "error" ? "type-error" : "type-info";
+            <div class="mb-3 activity-item" data-id="@item.Id">
+                <div class="activity-row">
+                    <input type="checkbox" class="form-check-input shadow-none mt-1 activity-check" />
+                    <div class="activity-icon @cls">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="fw-bold">@item.Title</div>
+                        <div class="text-muted small">@item.Message</div>
+                        <div class="text-muted small mt-1">@item.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="alert alert-info border-0 rounded-4">No history found yet.</div>
+}
+
+<script>
+    (function () {
+        const checks = () => Array.from(document.querySelectorAll('.activity-check'));
+        const delSel = document.getElementById('deleteSelectedActivity');
+        const selAll = document.getElementById('selectAllActivity');
+
+        function sync() {
+            const any = checks().some(c => c.checked);
+            if (delSel) delSel.disabled = !any;
+            if (selAll) {
+                const all = checks().length > 0 && checks().every(c => c.checked);
+                selAll.textContent = all ? 'Clear All' : 'Select All';
+            }
+        }
+
+        checks().forEach(c => c.addEventListener('change', sync));
+
+        if (selAll) {
+            selAll.addEventListener('click', () => {
+                const all = checks().length > 0 && checks().every(c => c.checked);
+                checks().forEach(c => c.checked = !all);
+                sync();
+            });
+        }
+
+        if (delSel) {
+            delSel.addEventListener('click', () => {
+                const ids = checks()
+                    .filter(c => c.checked)
+                    .map(c => parseInt(c.closest('.activity-item').dataset.id))
+                    .filter(id => !Number.isNaN(id));
+                if (ids.length === 0) return;
+                if (!confirm(`Delete ${ids.length} selected history item(s)?`)) return;
+
+                $.ajax({
+                    url: '@deleteUrl',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(ids),
+                    success: function () {
+                        location.reload();
+                    }
+                });
+            });
+        }
+
+        window.deleteAllActivity = function () {
+            if (!confirm('Delete ALL history items?')) return;
+            $.post('@deleteAllUrl', function () {
+                location.reload();
+            });
+        };
+
+        sync();
+    })();
+</script>

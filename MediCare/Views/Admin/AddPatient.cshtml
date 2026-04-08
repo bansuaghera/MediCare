@@ -1,4 +1,5 @@
-﻿@{
+@model MediCare.Models.Patient
+@{
     ViewData["Title"] = "Add New Patient";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
@@ -72,10 +73,12 @@
         padding: 10px 22px;
         border-radius: 10px;
         border: none;
+        text-decoration: none;
+        color: inherit;
     }
 
     @@media (max-width: 768px) {
-        .save-btn {
+        .btn-save {
             width: 100%;
             float: none;
             margin-top: 20px;
@@ -98,38 +101,43 @@
             <div class="form-row">
                 <div class="form-group">
                     <label>First Name *</label>
-                    <input type="text" class="form-control" placeholder="Enter first name" required />
+                    <input type="text" asp-for="FirstName" class="form-control" placeholder="Enter first name" required />
                 </div>
 
                 <div class="form-group">
                     <label>Last Name *</label>
-                    <input type="text" class="form-control" placeholder="Enter last name" required />
+                    <input type="text" asp-for="LastName" class="form-control" placeholder="Enter last name" required />
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
                     <label>Date of Birth *</label>
-                    <input type="date" class="form-control" required />
+                    <input type="date" asp-for="DateOfBirth" class="form-control" required />
                 </div>
 
                 <div class="form-group">
                     <label>Gender *</label>
-                    <select class="form-control">
-                        <option>Select gender</option>
-                        <option>Male</option>
-                        <option>Female</option>
+                    <select asp-for="Gender" class="form-control" required>
+                        <option value="">Select gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
                     </select>
                 </div>
 
                 <div class="form-group">
                     <label>Blood Group</label>
-                    <select class="form-control">
-                        <option>Select blood group</option>
-                        <option>A+</option>
-                        <option>B+</option>
-                        <option>O+</option>
-                        <option>AB+</option>
+                    <select asp-for="BloodGroup" class="form-control" required>
+                        <option value="">Select blood group</option>
+                        <option value="A+">A+</option>
+                        <option value="B+">B+</option>
+                        <option value="O+">O+</option>
+                        <option value="AB+">AB+</option>
+                        <option value="A-">A-</option>
+                        <option value="B-">B-</option>
+                        <option value="O-">O-</option>
+                        <option value="AB-">AB-</option>
                     </select>
                 </div>
             </div>
@@ -137,23 +145,23 @@
             <div class="form-row">
                 <div class="form-group">
                     <label>Phone Number *</label>
-                    <input type="text" class="form-control" placeholder="+91 00000 00000" required />
+                    <input type="text" asp-for="Phone" class="form-control" placeholder="+91 00000 00000" required />
                 </div>
 
                 <div class="form-group">
                     <label>Email</label>
-                    <input type="email" class="form-control" placeholder="patient@example.com" />
+                    <input type="email" asp-for="Email" class="form-control" placeholder="patient@example.com" />
                 </div>
             </div>
 
             <div class="form-group mb-3">
-                <label>Address</label>
-                <input type="text" class="form-control" placeholder="Enter full address" />
+                <label>Address *</label>
+                <input type="text" asp-for="Address" class="form-control" placeholder="Enter full address" required />
             </div>
 
             <div class="form-group">
-                <label>Medical History</label>
-                <textarea rows="4" class="form-control"></textarea>
+                <label>Medical History *</label>
+                <textarea rows="4" asp-for="MedicalHistory" class="form-control" required placeholder="N/A if none"></textarea>
             </div>
 
             <div class="mt-4">
@@ -161,9 +169,9 @@
                     <i class="fa-solid fa-floppy-disk me-2"></i> Save Patient
                 </button>
 
-                <button type="button" class="btn-cancel">
+                <a asp-action="Patient" class="btn-cancel">
                     Cancel
-                </button>
+                </a>
             </div>
 
         </form>

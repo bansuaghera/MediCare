@@ -1,140 +1,97 @@
-﻿@{
+﻿@model MediCare.Models.Appointment
+@{
     ViewData["Title"] = "Book Appointment";
     Layout = "~/Views/Shared/_UserLayout.cshtml";
 }
 
 <style>
-    .page-header {
-        margin-bottom: 20px;
-    }
-
-        .page-header h3 {
-            font-weight: 700;
-        }
-
-    .appointment-card {
+    .card-box {
         background: #ffffff;
         padding: 30px;
-        border-radius: 18px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-        max-width: 750px;
+        border-radius: 20px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
     }
-
-    .form-label {
-        font-weight: 600;
-        margin-bottom: 6px;
-    }
-
-    .form-control, .form-select {
-        border-radius: 12px;
-        padding: 10px 14px;
-        border: 1px solid #e5e7eb;
-    }
-
-        .form-control:focus,
-        .form-select:focus {
-            box-shadow: none;
-            border-color: #16a34a;
-        }
-
     .btn-book {
         background: #16a34a;
         color: white;
         padding: 12px 25px;
         border-radius: 12px;
         border: none;
+        width: 100%;
         font-weight: 600;
-        min-width: 220px;
-        transition: 0.3s;
+        margin-top: 20px;
     }
-
-        .btn-book:hover {
-            background: #15803d;
-        }
-
-    .btn-cancel {
-        background: #e5e7eb;
-        padding: 12px 25px;
-        border-radius: 12px;
-        border: none;
-        font-weight: 600;
-        margin-left: 10px;
-    }
-
-    @@media (max-width: 768px) {
-        .appointment-card {
-            padding: 20px;
-        }
-
-        .btn-book,
-        .btn-cancel {
-            width: 100%;
-            margin-top: 10px;
-        }
+    .btn-book:hover { background: #15803d; }
+    .form-label { font-weight: 500; color: #374151; }
+    .form-control, .form-select {
+        border-radius: 10px;
+        padding: 12px;
+        border: 1px solid #e5e7eb;
     }
 </style>
 
-<div class="page-header">
-    <h3>‹ Book Appointment</h3>
-    <p class="text-muted">Schedule your visit</p>
+<div class="mb-4">
+    <h3><i class="fa fa-calendar-plus text-success me-2"></i> Book Appointment</h3>
+    <p class="text-muted">Schedule your visit with our specialist</p>
 </div>
 
-<div class="appointment-card">
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
 
-    <form method="post" asp-action="BookAppointment">
-
-        <!-- Select Doctor -->
+<div class="row">
+<div class="card-box col-md-8">
+    <form asp-action="BookAppointment" method="post">
+        
         <div class="mb-3">
-            <label class="form-label">
-                Select Doctor <span class="text-danger">*</span>
-            </label>
-            <select class="form-select">
-                <option>Choose a doctor</option>
-                <option>Dr. Sarah Johnson</option>
-                <option>Dr. Michael Chen</option>
-                <option>Dr. Emily Davis</option>
-                <option>Dr. Robert Wilson</option>
+            <label class="form-label">Select Doctor</label>
+            <select name="DoctorId" class="form-select" required>
+                <option value="">-- Choose Doctor --</option>
+                @if (ViewBag.Doctors != null)
+                {
+                    foreach (var doc in (IEnumerable<MediCare.Models.Doctor>)ViewBag.Doctors)
+                    {
+                        <option value="@doc.Id">Dr. @doc.FirstName @doc.LastName (@doc.Specialty)</option>
+                    }
+                }
             </select>
         </div>
 
-        <!-- Date & Time -->
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <label class="form-label">
-                    Preferred Date <span class="text-danger">*</span>
-                </label>
-                <input type="date" class="form-control" />
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Appointment Date</label>
+                <input type="date" name="AppointmentDate" class="form-control" required min="@DateTime.Now.ToString("yyyy-MM-dd")" />
             </div>
-
-            <div class="col-md-6">
-                <label class="form-label">
-                    Preferred Time <span class="text-danger">*</span>
-                </label>
-                <input type="time" class="form-control" />
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Preferred Time Slot</label>
+                <select name="TimeSlot" class="form-select" required>
+                    <option>09:00 AM - 10:00 AM</option>
+                    <option>10:00 AM - 11:00 AM</option>
+                    <option>11:00 AM - 12:00 PM</option>
+                    <option>02:00 PM - 03:00 PM</option>
+                    <option>03:00 PM - 04:00 PM</option>
+                    <option>04:00 PM - 05:00 PM</option>
+                </select>
             </div>
         </div>
 
-        <!-- Reason -->
-        <div class="mb-4">
-            <label class="form-label">Reason for Visit</label>
-            <textarea class="form-control"
-                      rows="4"
-                      placeholder="Describe your symptoms or reason for visit..."></textarea>
+        <div class="mb-3">
+            <label class="form-label">Reason for Appointment</label>
+            <textarea name="Notes" class="form-control" rows="3" placeholder="Briefly describe your symptoms..."></textarea>
         </div>
 
-        <!-- Buttons -->
-        <div>
-            <button type="submit" class="btn-book">
-                📅 Book Appointment
-            </button>
-
-            <a asp-controller="User"
-               asp-action="Doctors"
-               class="btn btn-cancel">
-                Cancel
-            </a>
+        <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" value="true" id="isEmergency" name="IsEmergency">
+            <label class="form-check-label fw-semibold" for="isEmergency">
+                Mark as Emergency (prioritize in queue)
+            </label>
         </div>
 
+        <div class="d-flex gap-3 mt-4">
+            <button type="submit" class="btn btn-book">Confirm Appointment</button>
+            <a asp-action="Dashboard" class="btn btn-light w-100 py-2" style="border-radius:12px; font-weight:600; text-align:center;">Cancel</a>
+        </div>
     </form>
-
+</div>
 </div>

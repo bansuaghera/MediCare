@@ -1,0 +1,127 @@
+﻿@using MediCare.Models
+@{
+    ViewData["Title"] = "Branches";
+    Layout = "~/Views/Shared/_DoctorLayout.cshtml";
+    var branches = ViewBag.Branches as IEnumerable<PrescriptionTemplate> ?? new List<PrescriptionTemplate>();
+}
+
+<style>
+    .panel-card { background:#fff; border:1px solid #e5e7eb; border-radius:22px; box-shadow:0 12px 30px rgba(15,23,42,.04); padding:24px; }
+    .toolbar { display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:18px; }
+    .item-row { background:#f8fafc; border:1px solid #eef2f7; border-radius:16px; padding:16px; display:flex; justify-content:space-between; align-items:center; gap:14px; margin-bottom:12px; }
+    .item-row.selected { background:#f0fdf4; }
+    .search-box { width:min(420px,100%); display:flex; align-items:center; gap:10px; border:1px solid #e2e8f0; border-radius:14px; padding:10px 14px; background:#f8fafc; }
+    .search-box input { border:0; outline:none; background:transparent; width:100%; }
+</style>
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+    <div>
+        <h2 class="fw-bold mb-1">Branch Master</h2>
+        <p class="text-muted mb-0">Manage branch/facility options for examination.</p>
+    </div>
+</div>
+
+<div class="panel-card mb-4">
+    <h5 class="fw-bold mb-3">Add Branch</h5>
+    <form id="branchForm" class="row g-3">
+        <div class="col-md-5"><input type="text" class="form-control" id="branchName" placeholder="Branch name" required /></div>
+        <div class="col-md-5"><input type="text" class="form-control" id="branchLocation" placeholder="Location" /></div>
+        <div class="col-md-2 d-grid"><button type="submit" class="btn btn-success rounded-pill fw-bold">Save</button></div>
+    </form>
+</div>
+
+<div class="panel-card">
+    <div class="toolbar">
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <input type="checkbox" id="selectAll" class="form-check-input shadow-none" />
+            <button class="btn btn-outline-danger btn-sm" id="deleteSelectedBtn" disabled>Delete Selected</button>
+            <button class="btn btn-outline-danger btn-sm" id="deleteAllBtn">Delete All</button>
+        </div>
+        <div class="search-box">
+            <i class="fa-solid fa-search text-muted"></i>
+            <input type="text" id="searchBox" placeholder="Search branches..." onkeyup="filterItems()" />
+        </div>
+    </div>
+
+    <div id="listBody">
+        @if (branches.Any())
+        {
+            foreach (var b in branches)
+            {
+                <div class="item-row" data-id="@b.Id" data-search="@($"{b.Title} {b.AdditionalNotes}")">
+                    <div class="d-flex align-items-start gap-3">
+                        <input type="checkbox" class="form-check-input row-check shadow-none mt-1" />
+                        <div>
+                            <div class="fw-bold">@b.Title</div>
+                            <div class="text-muted small">@b.AdditionalNotes</div>
+                            <div class="text-muted small">@b.CreatedAt.ToString("yyyy-MM-dd")</div>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <form asp-action="DeleteBranch" asp-route-id="@b.Id" method="post" class="m-0" onsubmit="return confirm('Delete this branch?');">
+                            <button type="submit" class="btn btn-link p-0 text-danger"><i class="fa-solid fa-trash"></i></button>
+                        </form>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="text-muted">No branches found.</div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const rowChecks = document.querySelectorAll('.row-check');
+        const selectAll = document.getElementById('selectAll');
+        const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+        const deleteAllBtn = document.getElementById('deleteAllBtn');
+
+        function syncSelection() {
+            const selected = document.querySelectorAll('.row-check:checked').length;
+            deleteSelectedBtn.disabled = selected === 0;
+            if (selectAll) selectAll.checked = selected === rowChecks.length && rowChecks.length > 0;
+            document.querySelectorAll('.item-row').forEach(row => {
+                const cb = row.querySelector('.row-check');
+                row.classList.toggle('selected', cb && cb.checked);
+            });
+        }
+
+        rowChecks.forEach(cb => cb.addEventListener('change', syncSelection));
+        if (selectAll) selectAll.addEventListener('change', function () {
+            rowChecks.forEach(cb => cb.checked = selectAll.checked);
+            syncSelection();
+        });
+
+        deleteSelectedBtn?.addEventListener('click', function () {
+            const ids = Array.from(document.querySelectorAll('.row-check:checked')).map(cb => parseInt(cb.closest('.item-row').dataset.id));
+            if (!ids.length) return;
+            if (!confirm(`Delete ${ids.length} selected branch(es)?`)) return;
+            $.ajax({ url: '/Doctor/DeleteSelectedBranches', type: 'POST', contentType: 'application/json', data: JSON.stringify(ids), success: r => { if (r && r.success) location.reload(); else alert('Unable to delete selected branches.'); } });
+        });
+
+        deleteAllBtn?.addEventListener('click', function () {
+            if (!confirm('Delete ALL branches?')) return;
+            $.post('/Doctor/DeleteAllBranches', function (r) { if (r && r.success) location.reload(); });
+        });
+
+        document.getElementById('branchForm')?.addEventListener('submit', function (e) {
+            e.preventDefault();
+            $.post('/Doctor/AddBranch', {
+                name: document.getElementById('branchName').value,
+                location: document.getElementById('branchLocation').value
+            }, function (res) {
+                if (res && res.success) location.reload(); else alert('Unable to save branch.');
+            });
+        });
+
+        function filterItems(){
+            const q = (document.getElementById('searchBox').value || '').toLowerCase();
+            document.querySelectorAll('.item-row').forEach(row => { row.style.display = row.dataset.search.toLowerCase().includes(q) ? '' : 'none'; });
+        }
+
+        syncSelection();
+    </script>
+}

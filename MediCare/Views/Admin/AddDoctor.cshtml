@@ -1,4 +1,5 @@
-﻿@{
+@model MediCare.Models.Doctor
+@{
     ViewData["Title"] = "Add Doctor";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
@@ -55,62 +56,63 @@
 
 <div class="card-box">
 
-    <form>
+    <form method="post" asp-action="AddDoctor">
 
         <div class="row">
 
             <!-- First Name -->
             <div class="col-md-6 mb-3">
                 <label class="form-label">First Name *</label>
-                <input type="text" class="form-control" placeholder="Enter first name" />
+                <input type="text" asp-for="FirstName" class="form-control" placeholder="Enter first name" required />
             </div>
 
             <!-- Last Name -->
             <div class="col-md-6 mb-3">
                 <label class="form-label">Last Name *</label>
-                <input type="text" class="form-control" placeholder="Enter last name" />
+                <input type="text" asp-for="LastName" class="form-control" placeholder="Enter last name" required />
             </div>
 
             <!-- Specialty -->
             <div class="col-md-6 mb-3">
                 <label class="form-label">Specialty *</label>
-                <select class="form-select">
-                    <option>Select specialty</option>
-                    <option>Cardiology</option>
-                    <option>Dermatology</option>
-                    <option>Pediatrics</option>
-                    <option>Orthopedics</option>
+                <select asp-for="Specialty" class="form-select" required>
+                    <option value="">Select specialty</option>
+                    <option value="Cardiology">Cardiology</option>
+                    <option value="Dermatology">Dermatology</option>
+                    <option value="Pediatrics">Pediatrics</option>
+                    <option value="Orthopedics">Orthopedics</option>
+                    <option value="Neurology">Neurology</option>
                 </select>
             </div>
 
             <!-- License -->
             <div class="col-md-6 mb-3">
                 <label class="form-label">License Number *</label>
-                <input type="text" class="form-control" placeholder="Enter license number" />
+                <input type="text" asp-for="LicenseNumber" class="form-control" placeholder="Enter license number" required />
             </div>
 
             <!-- Phone -->
             <div class="col-md-6 mb-3">
                 <label class="form-label">Phone Number *</label>
-                <input type="text" class="form-control" placeholder="+1 234-567-8900" />
+                <input type="text" asp-for="Phone" class="form-control" placeholder="+91 98765 43210" required />
             </div>
 
             <!-- Email -->
             <div class="col-md-6 mb-3">
                 <label class="form-label">Email *</label>
-                <input type="email" class="form-control" placeholder="doctor@example.com" />
+                <input type="email" asp-for="Email" class="form-control" placeholder="doctor@example.com" required />
             </div>
 
             <!-- Consultation Fee -->
             <div class="col-md-6 mb-3">
                 <label class="form-label">Consultation Fee</label>
-                <input type="number" class="form-control" placeholder="50.00" />
+                <input type="number" step="0.01" asp-for="ConsultationFee" class="form-control" placeholder="50.00" />
             </div>
 
             <!-- Experience -->
             <div class="col-md-6 mb-3">
                 <label class="form-label">Experience (years)</label>
-                <input type="number" class="form-control" placeholder="5" />
+                <input type="number" asp-for="ExperienceYears" class="form-control" placeholder="5" />
             </div>
 
         </div>
@@ -120,9 +122,9 @@
             <button type="submit" class="btn btn-save me-2">
                 <i class="fa fa-check me-1"></i> Save Doctor
             </button>
-            <button type="button" class="btn btn-light btn-cancel">
+            <a asp-action="Doctors" class="btn btn-light btn-cancel">
                 Cancel
-            </button>
+            </a>
         </div>
 
     </form>

@@ -1,125 +1,221 @@
-﻿@{
-    ViewData["Title"] = "Register Patient";
+@model MediCare.Models.Patient
+@{
+    ViewData["Title"] = "Patient Registry";
     Layout = "~/Views/Shared/_StaffLayout.cshtml";
 }
 
 <style>
-    .page-header {
-        margin-bottom: 25px;
+    :root {
+        --primary: #10b981;
+        --secondary: #3b82f6;
     }
 
-    .form-card {
-        background: #ffffff;
-        border-radius: 18px;
-        padding: 30px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    .registry-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        animation: fadeIn 0.5s ease-out;
     }
 
-    .form-control, .form-select {
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .step-indicator {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 40px;
+        position: relative;
+    }
+
+    .step-indicator::before {
+        content: '';
+        position: absolute;
+        top: 20px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: #e2e8f0;
+        z-index: 1;
+    }
+
+    .step-item {
+        position: relative;
+        z-index: 2;
+        background: #f8fafc;
+        padding: 0 15px;
+        text-align: center;
+    }
+
+    .step-number {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: white;
+        border: 2px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 10px;
+        font-weight: 700;
+        transition: 0.3s;
+    }
+
+    .step-item.active .step-number {
+        border-color: var(--primary);
+        color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+    }
+
+    .form-glass-card {
+        background: white;
+        border-radius: 24px;
+        padding: 40px;
+        border: 1px solid #f1f5f9;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.04);
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 30px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .section-header i {
+        width: 35px;
+        height: 35px;
+        background: #ecfdf5;
+        color: var(--primary);
         border-radius: 10px;
-        padding: 10px 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
-    .btn-register {
-        background: #16a34a;
+    .custom-input {
+        border: 2px solid #f1f5f9;
+        border-radius: 12px;
+        padding: 12px 16px;
+        background: #f8fafc;
+        transition: 0.3s;
+    }
+
+    .custom-input:focus {
+        background: white;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+    }
+
+    .btn-registry-submit {
+        background: linear-gradient(135deg, var(--primary) 0%, #059669 100%);
+        color: white;
         border: none;
-        padding: 10px 20px;
-        border-radius: 10px;
+        padding: 16px 40px;
+        border-radius: 14px;
+        font-weight: 700;
+        transition: 0.3s;
+        box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2);
     }
 
-        .btn-register:hover {
-            background: #15803d;
-        }
-
-    .btn-cancel {
-        border-radius: 10px;
-        padding: 10px 20px;
+    .btn-registry-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 30px rgba(16, 185, 129, 0.3);
     }
 </style>
 
-<div class="page-header">
-    <h3 class="fw-bold">Register New Patient</h3>
-    <p class="text-muted">Add patient information</p>
-</div>
+<div class="registry-container">
+    <div class="d-flex align-items-center justify-content-between mb-5">
+        <div>
+            <h1 class="fw-bold m-0">Patient Onboarding</h1>
+            <p class="text-muted">Register a new life into our care network</p>
+        </div>
+        <div class="d-flex gap-2">
+            <span class="badge bg-soft-success text-success p-2 px-3 rounded-pill fw-bold">
+                <i class="fa fa-shield-halved me-1"></i> Secure Registry
+            </span>
+        </div>
+    </div>
 
-<div class="form-card">
-
-    <form method="post">
-
-        <div class="row g-4">
-
-            <!-- First Name -->
-            <div class="col-md-4">
-                <label class="form-label">First Name *</label>
-                <input type="text" class="form-control" placeholder="Enter first name" required />
-            </div>
-
-            <!-- Last Name -->
-            <div class="col-md-4">
-                <label class="form-label">Last Name *</label>
-                <input type="text" class="form-control" placeholder="Enter last name" required />
-            </div>
-
-            <!-- Date of Birth -->
-            <div class="col-md-4">
-                <label class="form-label">Date of Birth *</label>
-                <input type="date" class="form-control" required />
-            </div>
-
-            <!-- Gender -->
-            <div class="col-md-4">
-                <label class="form-label">Gender *</label>
-                <select class="form-select" required>
-                    <option selected disabled>Select gender</option>
-                    <option>Male</option>
-                    <option>Female</option>
-                    <option>Other</option>
-                </select>
-            </div>
-
-            <!-- Blood Group -->
-            <div class="col-md-4">
-                <label class="form-label">Blood Group</label>
-                <select class="form-select">
-                    <option selected disabled>Select</option>
-                    <option>O+</option>
-                    <option>O-</option>
-                    <option>A+</option>
-                    <option>A-</option>
-                    <option>B+</option>
-                    <option>B-</option>
-                    <option>AB+</option>
-                    <option>AB-</option>
-                </select>
-            </div>
-
-            <!-- Phone -->
-            <div class="col-md-4">
-                <label class="form-label">Phone Number *</label>
-                <input type="tel" class="form-control" placeholder="+1 234-567-8900" required />
-            </div>
-
-            <!-- Email -->
-            <div class="col-md-4">
-                <label class="form-label">Email</label>
-                <input type="email" class="form-control" placeholder="patient@example.com" />
-            </div>
-
+    <form asp-action="RegisterPatient" method="post" class="form-glass-card">
+        
+        <div class="section-header">
+            <i class="fa fa-user"></i>
+            <h5 class="fw-bold m-0">Personal Demographics</h5>
         </div>
 
-        <!-- Buttons -->
-        <div class="mt-4">
+        <div class="row g-4 mb-5">
+            <div class="col-md-4">
+                <label class="form-label small fw-bold text-uppercase text-muted">First Name</label>
+                <input asp-for="FirstName" class="form-control custom-input" placeholder="e.g. Rahul" required />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label small fw-bold text-uppercase text-muted">Last Name</label>
+                <input asp-for="LastName" class="form-control custom-input" placeholder="e.g. Sharma" required />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label small fw-bold text-uppercase text-muted">Date of Birth</label>
+                <input asp-for="DateOfBirth" type="date" class="form-control custom-input" required />
+            </div>
+        </div>
 
-            <button type="submit" class="btn btn-register text-white me-2">
-                <i class="fa fa-plus me-2"></i> Register Patient
+        <div class="row g-4 mb-5">
+            <div class="col-md-4">
+                <label class="form-label small fw-bold text-uppercase text-muted">Gender</label>
+                <div class="d-flex gap-2 mt-1">
+                    <input type="radio" class="btn-check" name="Gender" id="male" value="Male" checked>
+                    <label class="btn btn-outline-light text-dark border-2 rounded-pill px-3 py-2 w-100" for="male">Male</label>
+
+                    <input type="radio" class="btn-check" name="Gender" id="female" value="Female">
+                    <label class="btn btn-outline-light text-dark border-2 rounded-pill px-3 py-2 w-100" for="female">Female</label>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label small fw-bold text-uppercase text-muted">Blood Group</label>
+                <select asp-for="BloodGroup" class="form-select custom-input">
+                    <option value="O+">O Positive</option>
+                    <option value="O-">O Negative</option>
+                    <option value="A+">A Positive</option>
+                    <option value="A-">A Negative</option>
+                    <option value="B+">B Positive</option>
+                    <option value="B-">B Negative</option>
+                    <option value="AB+">AB Positive</option>
+                    <option value="AB-">AB Negative</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label small fw-bold text-uppercase text-muted">Phone Number</label>
+                <input asp-for="Phone" class="form-control custom-input" placeholder="+91 00000 00000" required />
+            </div>
+        </div>
+
+        <div class="section-header">
+            <i class="fa fa-house-medical"></i>
+            <h5 class="fw-bold m-0">Contact & History</h5>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-md-6">
+                <label class="form-label small fw-bold text-uppercase text-muted">Email Address (Optional)</label>
+                <input asp-for="Email" class="form-control custom-input" placeholder="patient@example.com" />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label small fw-bold text-uppercase text-muted">Home Address</label>
+                <input asp-for="Address" class="form-control custom-input" placeholder="Full residential address" />
+            </div>
+            <div class="col-md-12">
+                <label class="form-label small fw-bold text-uppercase text-muted">Clinical Medical History</label>
+                <textarea asp-for="MedicalHistory" class="form-control custom-input" rows="3" placeholder="List allergies, chronic conditions, or previous surgeries..."></textarea>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-3 mt-4">
+            <a asp-action="Patients" class="btn btn-light rounded-pill px-4 fw-bold">Discard</a>
+            <button type="submit" class="btn-registry-submit">
+                <i class="fa fa-save me-2"></i> Register & Open Profile
             </button>
-
-            <a asp-action="Dashboard" class="btn btn-outline-secondary btn-cancel">
-                Cancel
-            </a>
-
         </div>
-
     </form>
-
 </div>

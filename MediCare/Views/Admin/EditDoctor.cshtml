@@ -1,0 +1,133 @@
+@model MediCare.Models.Doctor
+@{
+    ViewData["Title"] = "Edit Doctor";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .page-header h3 {
+        font-weight: 600;
+    }
+
+    .card-box {
+        background: #ffffff;
+        border-radius: 14px;
+        padding: 30px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    }
+
+    .form-label {
+        font-weight: 500;
+    }
+
+    .form-control, .form-select {
+        border-radius: 10px;
+        padding: 10px 12px;
+        border: 1px solid #e5e7eb;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #22c55e;
+            box-shadow: 0 0 0 0.2rem rgba(34,197,94,.15);
+        }
+
+    .btn-save {
+        background: #16a34a;
+        color: white;
+        border: none;
+        padding: 10px 22px;
+        border-radius: 10px;
+    }
+
+        .btn-save:hover {
+            background: #15803d;
+        }
+
+    .btn-cancel {
+        border-radius: 10px;
+        padding: 10px 22px;
+    }
+</style>
+
+<div class="page-header mb-4">
+    <h3><i class="fa fa-arrow-left me-2 text-muted"></i> Edit Doctor</h3>
+    <small class="text-muted">Update doctor details</small>
+</div>
+
+<div class="card-box">
+
+    <form asp-action="EditDoctor" method="post">
+        <input type="hidden" asp-for="Id" />
+
+        <div class="row">
+
+            <!-- First Name -->
+            <div class="col-md-6 mb-3">
+                <label class="form-label">First Name *</label>
+                <input type="text" asp-for="FirstName" class="form-control" placeholder="Enter first name" required />
+            </div>
+
+            <!-- Last Name -->
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Last Name *</label>
+                <input type="text" asp-for="LastName" class="form-control" placeholder="Enter last name" required />
+            </div>
+
+            <!-- Specialty -->
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Specialty *</label>
+                <select asp-for="Specialty" class="form-select" required>
+                    <option value="">Select specialty</option>
+                    <option value="Cardiology">Cardiology</option>
+                    <option value="Dermatology">Dermatology</option>
+                    <option value="Pediatrics">Pediatrics</option>
+                    <option value="Orthopedics">Orthopedics</option>
+                    <option value="Neurology">Neurology</option>
+                </select>
+            </div>
+
+            <!-- License -->
+            <div class="col-md-6 mb-3">
+                <label class="form-label">License Number *</label>
+                <input type="text" asp-for="LicenseNumber" class="form-control" placeholder="Enter license number" required />
+            </div>
+
+            <!-- Phone -->
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Phone Number *</label>
+                <input type="text" asp-for="Phone" class="form-control" placeholder="+91 98765 43210" required />
+            </div>
+
+            <!-- Email -->
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Email *</label>
+                <input type="email" asp-for="Email" class="form-control" placeholder="doctor@example.com" required />
+            </div>
+
+            <!-- Consultation Fee -->
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Consultation Fee</label>
+                <input type="number" step="0.01" asp-for="ConsultationFee" class="form-control" placeholder="50.00" />
+            </div>
+
+            <!-- Experience -->
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Experience (years)</label>
+                <input type="number" asp-for="ExperienceYears" class="form-control" placeholder="5" />
+            </div>
+
+        </div>
+
+        <!-- Buttons -->
+        <div class="mt-3">
+            <button type="submit" class="btn btn-save me-2">
+                <i class="fa fa-save me-1"></i> Save Changes
+            </button>
+            <a asp-action="Doctors" class="btn btn-light btn-cancel">
+                Cancel
+            </a>
+        </div>
+
+    </form>
+
+</div>

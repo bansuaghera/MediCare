@@ -1,0 +1,194 @@
+@{
+    ViewData["Title"] = "Edit OPD Schedule";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .card-box {
+        background: #ffffff;
+        padding: 25px;
+        border-radius: 14px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        margin-bottom: 20px;
+    }
+
+    .section-title {
+        font-weight: 600;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .day-btn {
+        border: 1px solid #ddd;
+        padding: 6px 12px;
+        border-radius: 8px;
+        background: #f5f5f5;
+        cursor: pointer;
+        margin-right: 5px;
+    }
+
+        .day-btn.active {
+            background: #16a34a;
+            color: white;
+            border: none;
+        }
+
+    .btn-green {
+        background: #16a34a;
+        color: white;
+        border-radius: 25px;
+        padding: 8px 20px;
+        border: none;
+    }
+
+        .btn-green:hover {
+            background: #15803d;
+        }
+
+    .btn-outline {
+        border-radius: 25px;
+        padding: 8px 20px;
+    }
+</style>
+
+<div class="mb-4">
+    <h2 class="fw-bold">
+        <i class="fa fa-calendar-alt text-success"></i> Edit OPD Schedule
+    </h2>
+    <small class="text-muted">Update doctor schedule</small>
+</div>
+
+<form asp-action="EditOPDSchedule" method="post">
+
+    <!-- Doctor Info -->
+    <div class="card-box">
+        <div class="section-title">
+            <i class="fa fa-user-md text-success"></i> Doctor Information
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Select Doctor *</label>
+            <select class="form-select" name="Doctor" required>
+                <option value="">Choose a doctor</option>
+                <option>Dr. Priya Patel</option>
+                <option>Dr. Amit Kumar</option>
+                <option>Dr. Neha Singh</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Schedule Timing -->
+    <div class="card-box">
+        <div class="section-title">
+            <i class="fa fa-clock text-primary"></i> Schedule Timing
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label>Start Time *</label>
+                <input type="time" class="form-control" name="StartTime" required />
+            </div>
+
+            <div class="col-md-6">
+                <label>End Time *</label>
+                <input type="time" class="form-control" name="EndTime" required />
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <label>Consultation Duration (minutes)</label>
+                <select class="form-select" name="Duration">
+                    <option>10 minutes</option>
+                    <option selected>15 minutes</option>
+                    <option>20 minutes</option>
+                    <option>30 minutes</option>
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label>Total Slots *</label>
+                <input type="number" class="form-control" name="Slots" placeholder="Enter total slots" required />
+            </div>
+        </div>
+    </div>
+
+    <!-- Recurring -->
+    <div class="card-box">
+        <div class="section-title">
+            <i class="fa fa-repeat text-warning"></i> Recurring Schedule
+        </div>
+
+        <label class="mb-2">Select Days *</label>
+        <div>
+            <button type="button" class="day-btn">Mon</button>
+            <button type="button" class="day-btn">Tue</button>
+            <button type="button" class="day-btn">Wed</button>
+            <button type="button" class="day-btn">Thu</button>
+            <button type="button" class="day-btn">Fri</button>
+            <button type="button" class="day-btn">Sat</button>
+            <button type="button" class="day-btn">Sun</button>
+        </div>
+    </div>
+
+    <!-- Location -->
+    <div class="card-box">
+        <div class="section-title">
+            <i class="fa fa-map-marker-alt text-danger"></i> Location Details
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <label>Room / Cabin Number *</label>
+                <select class="form-select" name="Room">
+                    <option>Select room</option>
+                    <option>Room 101</option>
+                    <option>Room 102</option>
+                    <option>Room 103</option>
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label>Floor *</label>
+                <select class="form-select" name="Floor">
+                    <option>Select floor</option>
+                    <option>1st Floor</option>
+                    <option>2nd Floor</option>
+                    <option>3rd Floor</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notes -->
+    <div class="card-box">
+        <div class="section-title">
+            <i class="fa fa-sticky-note text-secondary"></i> Additional Information
+        </div>
+
+        <label>Schedule Notes</label>
+        <textarea class="form-control" rows="4" name="Notes"></textarea>
+    </div>
+
+    <!-- Buttons -->
+    <div class="mb-4">
+        <button type="submit" class="btn btn-green">
+            <i class="fa fa-save"></i> Save Changes
+        </button>
+
+        <a asp-action="OPDSchedule" class="btn btn-outline-secondary btn-outline">
+            Cancel
+        </a>
+    </div>
+
+</form>
+
+<script>
+    document.querySelectorAll('.day-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            this.classList.toggle('active');
+        });
+    });
+</script>

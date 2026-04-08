@@ -1,126 +1,139 @@
-﻿@{
+@model IEnumerable<MediCare.Models.Appointment>
+@{
     ViewData["Title"] = "Token Status";
     Layout = "~/Views/Shared/_UserLayout.cshtml";
 }
 
 <style>
-    .page-header h2 {
-        font-weight: 700;
-    }
-
-    .token-wrapper {
-        display: flex;
-        justify-content: center;
-        margin-top: 40px;
-    }
-
-    .token-card {
-        background: #ffffff;
-        padding: 35px;
-        border-radius: 20px;
-        box-shadow: 0 15px 35px rgba(0,0,0,0.08);
-        width: 100%;
-        max-width: 520px;
-        transition: 0.3s;
-    }
-
-        .token-card:hover {
-            transform: translateY(-4px);
-        }
-
-    .token-title {
-        text-align: center;
-        color: #6b7280;
-        font-size: 14px;
-        margin-bottom: 15px;
-    }
-
-    .token-number {
-        background: #d1fae5;
-        color: #065f46;
-        text-align: center;
-        font-size: 48px;
-        font-weight: 800;
-        padding: 25px;
-        border-radius: 15px;
-        margin-bottom: 25px;
-    }
-
-    .info-box {
-        background: #f9fafb;
-        padding: 14px 18px;
-        border-radius: 12px;
-        margin-bottom: 12px;
-        display: flex;
-        justify-content: space-between;
-        font-size: 14px;
-        color: #374151;
-    }
-
-        .info-box i {
-            margin-right: 6px;
-            color: #6b7280;
-        }
-
-    .status-box {
-        background: #d1fae5;
-        padding: 20px;
-        border-radius: 15px;
-        text-align: center;
-        margin-top: 25px;
-        border: 1px solid #a7f3d0;
-    }
-
-        .status-box h5 {
-            margin: 0;
-            font-weight: 700;
-            color: #065f46;
-        }
-
-        .status-box small {
-            color: #047857;
-        }
-
-    @@media (max-width: 768px) {
-        .token-number {
-            font-size: 36px;
-        }
-    }
+    .card-box { background:#fff; border:1px solid #eef2f7; border-radius:16px; padding:20px; box-shadow:0 8px 24px rgba(0,0,0,0.03); }
+    .token-pill { padding:8px 12px; border-radius:10px; font-weight:700; }
+    .token-emg { background:#fee2e2; color:#b91c1c; }
+    .token-norm { background:#d1fae5; color:#065f46; }
+    .status-badge { padding:6px 10px; border-radius:8px; font-size:12px; font-weight:700; }
+    .status-wait { background:#fef3c7; color:#92400e; }
+    .status-prog { background:#e0e7ff; color:#4338ca; }
+    .status-await { background:#dbeafe; color:#1d4ed8; }
+    .status-comp { background:#dcfce7; color:#166534; }
 </style>
 
-<div class="page-header">
-    <h2>Token Status</h2>
-    <p class="text-muted">Check your live queue status</p>
-</div>
-
-<div class="token-wrapper">
-    <div class="token-card">
-
-        <div class="token-title">Your Token Number</div>
-
-        <div class="token-number">
-            A-045
-        </div>
-
-        <div class="info-box">
-            <div><i class="fa fa-user"></i> Patient</div>
-            <div>John Smith</div>
-        </div>
-
-        <div class="info-box">
-            <div><i class="fa fa-user-doctor"></i> Doctor</div>
-            <div>Dr. Sarah Johnson</div>
-        </div>
-
-        <div class="info-box">
-            <div><i class="fa fa-clock"></i> Est. Wait Time</div>
-            <div style="color:#059669;font-weight:600;">~15 minutes</div>
-        </div>
-
-        <div class="status-box">
-            <h5>Status: Waiting</h5>
-            <small>4 patients ahead of you</small>
-        </div>
-
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <div>
+        <h3 class="fw-bold m-0">My Token Status</h3>
+        <p class="text-muted mb-0">See your active queue tokens</p>
     </div>
+    @if (Model != null && Model.Any())
+    {
+        <div class="d-flex align-items-center gap-2">
+            <input type="checkbox" id="selectAll" class="form-check-input shadow-none" />
+            <button class="btn btn-outline-danger btn-sm" id="deleteSelected" disabled>Delete Selected</button>
+            <button class="btn btn-outline-danger btn-sm" onclick="deleteAll()">Delete All</button>
+        </div>
+    }
 </div>
+
+@if (Model != null && Model.Any())
+{
+    <div class="card-box">
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th style="width:40px;"><input type="checkbox" id="selectAllTop" class="form-check-input shadow-none" /></th>
+                        <th>Token</th>
+                        <th>Doctor</th>
+                        <th>Date/Time</th>
+                        <th>Status</th>
+                        <th>Subject</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var appt in Model)
+                    {
+                        <tr data-id="@appt.Id">
+                            <td><input type="checkbox" class="form-check-input row-check shadow-none" /></td>
+                            <td>
+                                <span class="token-pill @(appt.IsEmergency ? "token-emg" : "token-norm")">@appt.TokenNumber</span>
+                                @if(appt.IsEmergency){<span class="badge bg-danger ms-1">Emergency</span>}
+                            </td>
+                            <td>Dr. @appt.Doctor?.FirstName @appt.Doctor?.LastName</td>
+                            <td>@appt.AppointmentDate.ToString("yyyy-MM-dd HH:mm")</td>
+                            <td>
+                                <span class="status-badge @(appt.Status == "Waiting" || appt.Status == "Scheduled" ? "status-wait" : appt.Status == "Awaiting Confirmation" ? "status-await" : appt.Status.Contains("Progress") ? "status-prog" : "status-comp")">@appt.Status</span>
+                            </td>
+                            <td>@(string.IsNullOrWhiteSpace(appt.Subject) ? "Consultation" : appt.Subject)</td>
+                            <td>
+                                @if (appt.Status == "Awaiting Confirmation")
+                                {
+                                    <div class="d-flex gap-2 flex-wrap">
+                                        <button class="btn btn-success btn-sm" onclick="respondToken(@appt.Id, 'accept')">Yes</button>
+                                        <button class="btn btn-outline-danger btn-sm" onclick="respondToken(@appt.Id, 'reject')">No</button>
+                                    </div>
+                                }
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteOne(@appt.Id)"><i class="fa-regular fa-trash-can"></i></button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+else
+{
+    <div class="card-box text-center">
+        <h5 class="fw-bold">No active tokens</h5>
+        <p class="text-muted">Book an appointment to see your token status here.</p>
+        <a asp-action="BookAppointment" class="btn btn-success">Book Appointment</a>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        const rowChecks = document.querySelectorAll('.row-check');
+        const selectAll = document.getElementById('selectAll');
+        const selectAllTop = document.getElementById('selectAllTop');
+        const deleteSelectedBtn = document.getElementById('deleteSelected');
+
+        function sync() {
+            const selected = document.querySelectorAll('.row-check:checked').length;
+            if(deleteSelectedBtn) deleteSelectedBtn.disabled = selected === 0;
+            if(selectAll) selectAll.checked = selected === rowChecks.length && rowChecks.length>0;
+            if(selectAllTop) selectAllTop.checked = selectAll?.checked;
+        }
+
+        function toggleAll(master){
+            rowChecks.forEach(cb => cb.checked = master.checked);
+            sync();
+        }
+        if(selectAll) selectAll.addEventListener('change', ()=>toggleAll(selectAll));
+        if(selectAllTop) selectAllTop.addEventListener('change', ()=>toggleAll(selectAllTop));
+        rowChecks.forEach(cb => cb.addEventListener('change', sync));
+
+        function deleteOne(id){
+            if(!confirm('Delete this token?')) return;
+            $.post('/User/DeleteAppointment', { id:id }, function(res){ if(res.success) location.reload(); else alert('Failed'); });
+        }
+
+        function respondToken(id, action){
+            const prompt = action === 'accept' ? 'Accept this token?' : 'Reject this token and move it back?';
+            if(!confirm(prompt)) return;
+            $.post('/User/RespondToToken', { id:id, action: action }, function(res){
+                if(res && res.success) {
+                    location.reload();
+                } else {
+                    alert('Unable to update token response.');
+                }
+            });
+        }
+
+        function deleteSelected(){
+            const ids = Array.from(document.querySelectorAll('.row-check:checked')).map(cb => parseInt(cb.closest('tr').dataset.id));
+            if(ids.length===0) return; if(!confirm(`Delete ${ids.length} selected token(s)?`)) return;
+            $.ajax({ url:'/User/DeleteSelectedAppointments', type:'POST', contentType:'application/json', data: JSON.stringify(ids), success: r=>{ if(r.success) location.reload(); else alert('Failed'); }});
+        }
+        if(deleteSelectedBtn) deleteSelectedBtn.addEventListener('click', deleteSelected);
+
+        function deleteAll(){ if(confirm('Delete ALL tokens?')) $.post('/User/DeleteAllAppointments', r=>{ if(r.success) location.reload(); }); }
+    </script>
+}

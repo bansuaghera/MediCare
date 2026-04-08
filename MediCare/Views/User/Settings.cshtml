@@ -1,0 +1,87 @@
+@{
+    ViewData["Title"] = "Account Privacy Workspace";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+}
+
+<style>
+    .settings-panel {
+        background: white;
+        border-radius: 30px;
+        padding: 40px;
+        border: 1px solid #f1f5f9;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.03);
+    }
+    .setting-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .setting-item:last-child { border-bottom: none; }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-5">
+    <div>
+        <h1 class="fw-bold m-0"><i class="fa-solid fa-gear text-success me-2"></i> Account Privacy Workspace</h1>
+        <p class="text-muted">Personalize your clinical experience and security parameters</p>
+    </div>
+</div>
+
+<div class="row g-5">
+    <div class="col-lg-8 mx-auto">
+        <div class="settings-panel border">
+            <h5 class="fw-bold mb-4 border-bottom pb-3"><i class="fa fa-bell me-2 opacity-50"></i> Communication Preferences</h5>
+            
+            <div class="setting-item">
+                <div>
+                    <h6 class="fw-bold m-0">Appointment Reminders</h6>
+                    <p class="small text-muted m-0">Receive SMS alerts for upcoming doctor sessions</p>
+                </div>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" checked style="width: 50px; height: 25px;">
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <div>
+                    <h6 class="fw-bold m-0">Marketing Digest</h6>
+                    <p class="small text-muted m-0">Stay updated on new clinic health packages</p>
+                </div>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" style="width: 50px; height: 25px;">
+                </div>
+            </div>
+
+            <h5 class="fw-bold mb-4 border-bottom pb-3 mt-5"><i class="fa fa-shield-halved me-2 opacity-50"></i> Security & Privacy</h5>
+            
+            <div class="setting-item">
+                <div>
+                    <h6 class="fw-bold m-0">Two-Factor Authentication</h6>
+                    <p class="small text-muted m-0">Add an extra layer of clinical data security</p>
+                </div>
+                <button class="btn btn-sm btn-outline-primary rounded-pill px-4 fw-bold">Active Shield</button>
+            </div>
+
+            <div class="setting-item">
+                <div>
+                    <h6 class="fw-bold m-0">Clinical Session Logs</h6>
+                    <p class="small text-muted m-0">Download a log of all account login activities</p>
+                </div>
+                <button class="btn btn-sm btn-light border rounded-pill px-4 fw-bold">Download Log</button>
+            </div>
+
+            <div class="alert bg-danger bg-opacity-10 border-0 rounded-4 p-4 mt-5 d-flex align-items-center justify-content-between">
+                <div>
+                    <h6 class="text-danger fw-bold m-0">Deactivate Health Profile</h6>
+                    <p class="text-danger small mt-2 m-0">Permanently withdraw your account from clinical database.</p>
+                </div>
+                <button class="btn btn-danger rounded-pill px-4 py-2 fw-bold shadow-sm" onclick="alert('Contact administrator to withdraw clinical profile.')">Deactivate</button>
+            </div>
+        </div>
+
+        <div class="text-center mt-5">
+            <p class="small text-muted"><i class="fa fa-shield-check me-1"></i> Your account configuration is protected by MediCare encryption policies.</p>
+        </div>
+    </div>
+</div>

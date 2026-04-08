@@ -1,0 +1,332 @@
+@model MediCare.Models.Prescription
+@{
+    Layout = null;
+}
+@using System.Text.Json
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prescription - #@Model.Id</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 40px;
+            color: #1e293b;
+        }
+
+        .prescription-container {
+            max-width: 800px;
+            margin: 0 auto;
+            border: 1px solid #e2e8f0;
+            padding: 40px;
+            position: relative;
+            background: white;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 3px solid #10b981;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .clinic-info h2 {
+            margin: 0;
+            color: #10b981;
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        .doctor-info {
+            text-align: right;
+        }
+
+        .doctor-name {
+            font-weight: 700;
+            font-size: 18px;
+            margin: 0;
+        }
+
+        .specialty {
+            color: #64748b;
+            font-size: 14px;
+            margin: 5px 0;
+        }
+
+        .patient-details {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .detail-item label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #94a3b8;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .detail-item span {
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .diagnosis-box {
+            margin-bottom: 30px;
+        }
+
+        .diagnosis-box h4 {
+            margin: 0 0 10px;
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .rx-symbol {
+            font-size: 40px;
+            font-family: serif;
+            font-weight: bold;
+            color: #10b981;
+            margin-bottom: 20px;
+        }
+
+        .medicine-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 40px;
+        }
+
+        .medicine-table th {
+            text-align: left;
+            padding: 12px;
+            background: #f1f5f9;
+            color: #475569;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .medicine-table td {
+            padding: 15px 12px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .dosage-badge {
+            background: #f1f5f9;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .footer {
+            margin-top: 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .signature-box {
+            text-align: center;
+            width: 200px;
+        }
+
+        .sign-line {
+            border-top: 1px solid #1e293b;
+            margin-bottom: 10px;
+        }
+
+        .print-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 30px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2);
+        }
+
+        @@media print {
+            .print-btn { display: none; }
+            body { padding: 0; }
+            .prescription-container { border: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <button class="print-btn" onclick="window.print()">
+        <i class="fa fa-print me-2"></i> Print Prescription
+    </button>
+
+    <div class="prescription-container">
+        <div class="header">
+            <div class="clinic-info">
+                <h2>MediCare+</h2>
+                <p style="margin: 5px 0;">Smart Healthcare Solutions</p>
+                <small>Reg No: MED-99283-X</small>
+            </div>
+            <div class="doctor-info">
+                <p class="doctor-name">Dr. @Model.Doctor?.FirstName @Model.Doctor?.LastName</p>
+                <p class="specialty">@Model.Doctor?.Specialty</p>
+                <p style="margin: 3px 0; font-size: 12px;">Reg #@Model.Doctor?.LicenseNumber</p>
+                <p style="margin: 3px 0; font-size: 12px;">Contact: @Model.Doctor?.Phone</p>
+            </div>
+        </div>
+
+        <div class="patient-details">
+            <div class="detail-item">
+                <label>Patient Name</label>
+                <span>@Model.Patient?.FirstName @Model.Patient?.LastName</span>
+            </div>
+            <div class="detail-item">
+                <label>Patient ID</label>
+                <span>#P-@Model.PatientId</span>
+            </div>
+            <div class="detail-item">
+                <label>Date</label>
+                <span>@Model.DateIssued.ToString("dd MMM yyyy")</span>
+            </div>
+            <div class="detail-item">
+                <label>Gender/Age</label>
+                <span>@Model.Patient?.Gender / @((DateTime.Now.Year - @Model.Patient.DateOfBirth.Year)) Yrs</span>
+            </div>
+            <div class="detail-item">
+                <label>Blood Group</label>
+                <span>@Model.Patient?.BloodGroup</span>
+            </div>
+            <div class="detail-item">
+                <label>Token No</label>
+                <span>#@Model.Appointment?.TokenNumber</span>
+            </div>
+        </div>
+
+        <div class="diagnosis-box">
+            <h4><i class="fa fa-stethoscope me-2"></i> Diagnosis</h4>
+            <div style="font-weight: 600; font-size: 16px;">@Model.Diagnosis</div>
+        </div>
+
+        <div class="rx-symbol">℞</div>
+
+        <table class="medicine-table">
+            <thead>
+                <tr>
+                    <th>Medicine Name</th>
+                    <th>Dosage</th>
+                    <th>Timing / Instructions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    var medicineRows = new List<(string Name, string Dosage, string Timing)>();
+                    var rawMedicines = Model.MedicineNotes ?? string.Empty;
+
+                    if (!string.IsNullOrWhiteSpace(rawMedicines))
+                    {
+                        var trimmed = rawMedicines.Trim();
+                        if (trimmed.StartsWith("["))
+                        {
+                            try
+                            {
+                                using var doc = JsonDocument.Parse(trimmed);
+                                if (doc.RootElement.ValueKind == JsonValueKind.Array)
+                                {
+                                    foreach (var item in doc.RootElement.EnumerateArray())
+                                    {
+                                        var name = item.TryGetProperty("name", out var nameProp) ? nameProp.GetString() : "";
+                                        var dosage = item.TryGetProperty("dosage", out var dosageProp) ? dosageProp.GetString() : "";
+                                        var food = item.TryGetProperty("food", out var foodProp) ? foodProp.GetString() : "";
+                                        var instruction = item.TryGetProperty("instruction", out var instructionProp) ? instructionProp.GetString() : "";
+                                        var duration = item.TryGetProperty("duration", out var durationProp) ? durationProp.GetString() : "";
+                                        var timing = string.Join(" | ", new[] { instruction, food, duration }.Where(x => !string.IsNullOrWhiteSpace(x)));
+                                        medicineRows.Add((name ?? "-", dosage ?? "-", string.IsNullOrWhiteSpace(timing) ? "-" : timing));
+                                    }
+                                }
+                            }
+                            catch
+                            {
+                                // Fallback to legacy format below.
+                            }
+                        }
+
+                        if (medicineRows.Count == 0)
+                        {
+                            var medicines = rawMedicines.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+                            foreach (var med in medicines)
+                            {
+                                var parts = med.Split('|');
+                                medicineRows.Add((
+                                    parts.Length > 0 ? parts[0] : med,
+                                    parts.Length > 1 ? parts[1] : "-",
+                                    parts.Length > 2 ? parts[2] : "-"
+                                ));
+                            }
+                        }
+                    }
+
+                    foreach (var med in medicineRows)
+                    {
+                        <tr>
+                            <td style="font-weight: 600;">@med.Name</td>
+                            <td><span class="dosage-badge">@med.Dosage</span></td>
+                            <td style="font-size: 14px;">@med.Timing</td>
+                        </tr>
+                    }
+
+                    if (medicineRows.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="3" style="text-align:center; color:#94a3b8;">No medicines listed</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+
+        @if (!string.IsNullOrEmpty(Model.AdditionalNotes))
+        {
+            <div style="margin-top: 20px;">
+                <label style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Advice / Notes</label>
+                <p style="margin-top: 8px; font-size: 14px; line-height: 1.6;">@Model.AdditionalNotes</p>
+            </div>
+        }
+
+        <div class="footer">
+            <div style="font-size: 12px; color: #94a3b8;">
+                <p>Generated by MediCare Smart OPD</p>
+                <p>Date: @DateTime.Now.ToString("g")</p>
+            </div>
+            <div class="signature-box">
+                <div class="sign-line"></div>
+                <p style="font-weight: 700; margin: 0;">Digital Signature</p>
+                <p style="font-size: 12px; margin: 0;">Dr. @Model.Doctor?.FirstName @Model.Doctor?.LastName</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Auto-open print dialog on load
+        window.onload = function() {
+            // setTimeout(() => window.print(), 500);
+        }
+    </script>
+</body>
+</html>

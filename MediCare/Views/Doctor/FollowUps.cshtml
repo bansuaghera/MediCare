@@ -1,3 +1,4 @@
+@model IEnumerable<MediCare.Models.Appointment>
 @{
     ViewData["Title"] = "Follow-ups";
     Layout = "~/Views/Shared/_DoctorLayout.cshtml";
@@ -160,15 +161,22 @@
 </div>
 
 <div class="table-card">
-    <div class="search-box">
-        <i class="fa-solid fa-search"></i>
-        <input type="text" placeholder="Search follow-ups..." />
+    <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap">
+        <div class="search-box mb-2 mb-sm-0">
+            <i class="fa-solid fa-search"></i>
+            <input type="text" placeholder="Search follow-ups..." />
+        </div>
+        <div id="bulkPanel" class="d-none gap-2 align-items-center">
+            <span class="text-muted small fw-bold"><span id="selCount">0</span> selected</span>
+            <button class="btn btn-sm btn-danger rounded-pill px-3" onclick="bulkDelete()">Delete Selected</button>
+        </div>
     </div>
 
     <div class="table-responsive">
         <table class="table">
             <thead>
                 <tr>
+                    <th style="width:40px;"><input type="checkbox" id="selectAll" class="form-check-input shadow-none" /></th>
                     <th>Patient</th>
                     <th>Last Visit</th>
                     <th>Next Visit</th>
@@ -178,51 +186,40 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td class="patient-name">John Smith</td>
-                    <td>2024-02-10</td>
-                    <td>2024-02-24</td>
-                    <td>Hypertension</td>
-                    <td><span class="badge-status status-scheduled">Scheduled</span></td>
-                    <td>
-                        <div class="actions-cell">
-                            <button class="action-btn" onclick="alert('View details')"><i class="fa-regular fa-eye"></i></button>
-                            <button class="action-btn" onclick="alert('Call patient')"><i class="fa-solid fa-phone"></i></button>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="patient-name">Sarah Johnson</td>
-                    <td>2024-02-11</td>
-                    <td>2024-02-25</td>
-                    <td>Diabetes Check</td>
-                    <td><span class="badge-status status-pending">Pending</span></td>
-                    <td>
-                        <div class="actions-cell">
-                            <button class="action-btn" onclick="alert('View details')"><i class="fa-regular fa-eye"></i></button>
-                            <button class="action-btn" onclick="alert('Call patient')"><i class="fa-solid fa-phone"></i></button>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="patient-name">Michael Chen</td>
-                    <td>2024-02-08</td>
-                    <td>2024-02-22</td>
-                    <td>Post Surgery</td>
-                    <td><span class="badge-status status-scheduled">Scheduled</span></td>
-                    <td>
-                        <div class="actions-cell">
-                            <button class="action-btn" onclick="alert('View details')"><i class="fa-regular fa-eye"></i></button>
-                            <button class="action-btn" onclick="alert('Call patient')"><i class="fa-solid fa-phone"></i></button>
-                        </div>
-                    </td>
-                </tr>
+                @foreach (var appointment in Model)
+                {
+                    <tr data-id="@appointment.Id">
+                        <td><input type="checkbox" class="form-check-input row-check shadow-none" /></td>
+                        <td class="patient-name">@(appointment.Patient != null ? $"{appointment.Patient.FirstName} {appointment.Patient.LastName}" : "Unknown")</td>
+                        <td>@appointment.AppointmentDate.AddDays(-14).ToString("yyyy-MM-dd")</td> @* Mock last visit *@
+                        <td>@appointment.AppointmentDate.ToString("yyyy-MM-dd")</td>
+                        <td>@appointment.Subject</td>
+                        <td>
+                            <select class="badge-status @(appointment.Status == "Scheduled" ? "status-scheduled" : "status-pending")" onchange="updateStatus(@appointment.Id, this)" style="border:none; cursor:pointer; background-color: inherit; outline:none;">
+                                <option value="Scheduled" selected="@(appointment.Status == "Scheduled")">Scheduled</option>
+                                <option value="Pending" selected="@(appointment.Status == "Pending")">Pending</option>
+                            </select>
+                        </td>
+                        <td>
+                            <div class="actions-cell">
+                                <a asp-action="Profile" asp-route-id="@appointment.PatientId" class="action-btn text-decoration-none"><i class="fa-regular fa-eye"></i></a>
+                                <button class="action-btn" onclick="alert('Call patient: @(appointment.Patient?.Phone)')"><i class="fa-solid fa-phone"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">No follow-up appointments found.</td>
+                    </tr>
+                }
             </tbody>
         </table>
     </div>
 
     <div class="pagination-bar">
-        <span>Showing <strong style="color: #1a1a1a;" id="resultCount">3</strong> results</span>
+        <span>Showing <strong style="color: #1a1a1a;" id="resultCount">@Model.Count()</strong> results</span>
         <div>
             <button class="paginate-btn">Previous</button>
             <button class="paginate-btn">Next</button>
@@ -248,5 +245,58 @@
             });
             document.getElementById('resultCount').textContent = count;
         });
+
+        // --- bulk delete ---
+        const selectAll = document.getElementById('selectAll');
+        const bulkPanel = document.getElementById('bulkPanel');
+        const selCount = document.getElementById('selCount');
+
+        selectAll.addEventListener('change', function () {
+            document.querySelectorAll('.row-check').forEach(cb => cb.checked = selectAll.checked);
+            toggleBulk();
+        });
+
+        document.addEventListener('change', function (e) {
+            if (e.target.classList.contains('row-check')) toggleBulk();
+        });
+
+        function toggleBulk() {
+            const count = document.querySelectorAll('.row-check:checked').length;
+            selCount.textContent = count;
+            bulkPanel.classList.toggle('d-none', count === 0);
+        }
+
+        function bulkDelete() {
+            if (!confirm("Delete selected follow-up appointments?")) return;
+            const ids = [];
+            document.querySelectorAll('.row-check:checked').forEach(cb => {
+                const id = cb.closest('tr').getAttribute('data-id');
+                if (id) ids.push(parseInt(id));
+            });
+            if (ids.length === 0) return;
+
+            $.ajax({
+                url: '/Doctor/BulkDeleteAppointments',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(ids),
+                success: function (res) {
+                    if (res.success) location.reload();
+                    else alert('Unable to delete selected items.');
+                }
+            });
+        }
+
+        function updateStatus(id, selectElement) {
+            var status = selectElement.value;
+            $.post('/Doctor/UpdateStatus', { id: id, status: status }, function(res) {
+                if(res.success) {
+                    selectElement.className = "badge-status " + (status === "Scheduled" ? "status-scheduled" : "status-pending");
+                } else {
+                    alert('Could not update status.');
+                    location.reload();
+                }
+            });
+        }
     </script>
 }

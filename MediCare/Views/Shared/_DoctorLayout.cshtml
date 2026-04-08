@@ -1,355 +1,484 @@
+@inject MediCare.Services.NotificationService NotificationService
+@inject MediCare.Services.LoginSessionService LoginSessionService
 @{
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
     var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+    var userEmail = Context.Session.GetString("UserEmail") ?? string.Empty;
+    var unreadNotificationCount = string.IsNullOrEmpty(userEmail) ? 0 : NotificationService.CountUnread(userEmail);
+    var loginAtRaw = Context.Session.GetString("LoginAt") ?? string.Empty;
+    var loginLabel = "Logged out";
+    if (DateTime.TryParse(loginAtRaw, null, System.Globalization.DateTimeStyles.RoundtripKind, out var loginAt))
+    {
+        loginLabel = loginAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss");
+    }
 }
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title>@ViewData["Title"] - MediCare Doctor Panel</title>
+    <title>@ViewData["Title"] - MediCare Doctor</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <!-- Fonts -->
+    <!-- Google Fonts: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome -->
+    <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
 
     <style>
         :root {
             --primary: #10b981;
-            --primary-light: #d1fae5;
-            --bg-color: #f4f6f9;
-            --sidebar-bg: #f8fafc;
-            --text-dark: #1a1a1a;
+            --primary-soft: #ecfdf5;
+            --text-dark: #111827;
             --text-muted: #6b7280;
-            --border-color: #e5e5e5;
+            --sidebar-width: 280px;
+            --bg-body: #f9fafb;
         }
 
         body {
-            margin: 0;
-            background-color: var(--bg-color);
             font-family: 'Inter', sans-serif;
-            color: var(--text-dark);
-            height: 100vh;
+            background-color: var(--bg-body);
+            margin: 0;
             display: flex;
-            overflow: hidden;
+            min-height: 100vh;
+            color: var(--text-dark);
         }
 
         /* SIDEBAR */
         .sidebar {
-            width: 260px;
-            background: var(--sidebar-bg);
-            border-right: 1px solid var(--border-color);
+            width: var(--sidebar-width);
+            background: #ffffff;
+            border-right: 1px solid #f1f5f9;
+            flex-shrink: 0;
             display: flex;
             flex-direction: column;
-            transition: 0.3s ease;
-            z-index: 1000;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            z-index: 100;
         }
 
         .sidebar-header {
-            padding: 30px 24px 20px 24px;
+            padding: 18px 20px 14px;
         }
 
         .logo-box {
             display: flex;
             align-items: center;
+            gap: 12px;
+            margin-bottom: 18px;
         }
 
         .logo-icon {
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
             background: var(--primary);
             color: white;
-            border-radius: 10px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 12px;
-            font-size: 16px;
+            font-size: 18px;
         }
 
-        .brand-title {
+        .profile-card {
+            background-color: #f8fafc;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 14px;
+            border: 1px solid #f1f5f9;
+        }
+
+        .profile-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #d1fae5;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-weight: 700;
             font-size: 18px;
-            color: var(--text-dark);
-            line-height: 1.2;
+            margin-bottom: 10px;
         }
 
-        .brand-sub {
-            font-size: 12px;
+        .profile-name {
+            font-weight: 700;
+            font-size: 14px;
+            margin: 0;
+            text-transform: uppercase;
+        }
+
+        .profile-email {
+            font-size: 11px;
             color: var(--text-muted);
+            word-break: break-all;
+            margin-bottom: 8px;
         }
 
-        .sidebar-content {
+        .session-time {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 10px;
+            line-height: 1.45;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 8px 10px;
+        }
+
+        .role-badge {
+            background: var(--primary);
+            color: white;
+            padding: 2px 10px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            display: inline-block;
+        }
+
+        .sidebar-menu {
             flex-grow: 1;
-            padding: 10px 16px;
+            padding: 0 12px;
             overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 transparent;
+        }
+        .sidebar-menu::-webkit-scrollbar {
+            width: 6px;
+        }
+        .sidebar-menu::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        .sidebar-menu::-webkit-scrollbar-track {
+            background: transparent;
         }
 
         .nav-link {
             display: flex;
             align-items: center;
             padding: 12px 16px;
-            color: var(--text-muted);
+            border-radius: 12px;
+            color: #4b5563;
             text-decoration: none;
-            border-radius: 10px;
-            margin-bottom: 4px;
             font-weight: 500;
             font-size: 14px;
-            transition: all 0.2s;
+            margin-bottom: 4px;
+            transition: 0.2s;
         }
 
         .nav-link i {
             width: 24px;
-            font-size: 16px;
-            margin-right: 8px;
-            text-align: center;
+            font-size: 18px;
+            margin-right: 12px;
+            color: #94a3b8;
         }
 
         .nav-link:hover {
-            color: var(--text-dark);
-            background: rgba(0,0,0,0.03);
+            background-color: #f8fafc;
+            color: var(--primary);
+        }
+
+        .nav-link:hover i {
+            color: var(--primary);
         }
 
         .nav-link.active {
-            background: var(--primary-light);
+            background-color: var(--primary-soft);
             color: var(--primary);
             font-weight: 600;
         }
-        
-        .logout-container {
-            padding: 24px;
-            margin-top: auto;
-            border-top: 1px solid var(--border-color);
+
+        .nav-link.active i {
+            color: var(--primary);
         }
-        
+
+        .sidebar-footer {
+            padding: 12px 16px 14px;
+            border-top: 1px solid #f1f5f9;
+        }
+
         .logout-link {
-            font-size: 16px;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-        .logout-link:hover {
-            color: var(--text-dark);
+            color: #ef4444;
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
         }
 
         /* MAIN CONTENT AREA */
-        .main-wrapper {
+        .wrapper {
             flex-grow: 1;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
-            background: white;
+            min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        /* TOPBAR */
         .topbar {
             height: 80px;
-            border-bottom: 1px solid var(--border-color);
+            background: #ffffff;
+            border-bottom: 1px solid #f1f5f9;
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0 40px;
-            background: white;
+            position: sticky;
+            top: 0;
+            z-index: 90;
         }
 
-        .search-wrapper {
-            display: flex;
-            align-items: center;
-            background: var(--bg-color);
-            border-radius: 20px;
-            padding: 10px 16px;
-            width: 400px;
-            border: 1px solid transparent;
+        .top-search {
+            width: 450px;
+            position: relative;
         }
 
-        .search-wrapper i {
-            color: var(--text-muted);
-            margin-right: 12px;
-        }
-
-        .search-wrapper input {
-            border: none;
-            background: transparent;
-            outline: none;
+        .top-search input {
             width: 100%;
-            font-family: inherit;
+            height: 44px;
+            border-radius: 12px;
+            background: #f8fafc;
+            border: 1px solid #f1f5f9;
+            padding-left: 45px;
             font-size: 14px;
+            outline: none;
+        }
+
+        .top-search i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
         }
 
         .topbar-right {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 25px;
         }
 
-        .notification-btn {
-            background: none;
-            border: none;
-            color: var(--text-muted);
+        .notif-bell {
             font-size: 20px;
+            color: #94a3b8;
             cursor: pointer;
             position: relative;
         }
 
-        .user-avatar {
+        .notif-dot {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 6px;
+            height: 6px;
+            background: #ef4444;
+            border-radius: 50%;
+        }
+
+        .user-dd {
             width: 40px;
             height: 40px;
-            border-radius: 50%;
-            background: var(--primary);
-            color: white;
+            background: #d1fae5;
+            color: var(--primary);
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 600;
+            font-weight: 700;
+            cursor: pointer;
             font-size: 14px;
-            cursor: pointer;
         }
 
-        /* PAGE CONTENT */
-        .page-content {
-            padding: 40px;
-            overflow-y: auto;
+        .main-body {
             flex-grow: 1;
-            background: white;
-        }
-
-        /* MOBILE MENU TOGGLE */
-        .mobile-toggle {
-            display: none;
-            background: none;
-            border: none;
-            font-size: 24px;
-            color: var(--text-dark);
-            cursor: pointer;
-            margin-right: 20px;
-        }
-
-        .sidebar-backdrop {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 999;
-        }
-
-        @@media (max-width: 992px) {
-            .sidebar {
-                position: fixed;
-                left: -260px;
-                height: 100vh;
-            }
-            .sidebar.show {
-                left: 0;
-            }
-            .sidebar-backdrop.show {
-                display: block;
-            }
-            .mobile-toggle {
-                display: block;
-            }
-            .search-wrapper {
-                width: 250px;
-            }
+            padding: 40px;
+            background-color: #f9fafb; /* Light gray body so white cards pop */
+            overflow-y: auto;
         }
     </style>
 </head>
-
 <body>
 
-    <!-- OVERLAY FOR MOBILE -->
-    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
-
-    <!-- SIDEBAR -->
-    <div class="sidebar" id="sidebar">
+    <aside class="sidebar">
         <div class="sidebar-header">
             <div class="logo-box">
                 <div class="logo-icon">
                     <i class="fa-solid fa-heart-pulse"></i>
                 </div>
                 <div>
-                    <div class="brand-title">MediCare</div>
-                    <div class="brand-sub">Doctor Panel</div>
+                    <h5 class="m-0 fw-bold" style="font-size: 18px; color: #111827;">MediCare</h5>
+                    <small class="text-muted" style="font-size: 11px; font-weight: 600;">Doctor Panel</small>
+                </div>
+            </div>
+
+            <div class="profile-card">
+                <div class="profile-avatar shadow-sm">
+                    @(Context.Session.GetString("UserName")?.Substring(0, 1) ?? "D")
+                </div>
+                <h6 class="profile-name">@(Context.Session.GetString("UserName") ?? "Dhiraj Dabhii")</h6>
+                <div class="profile-email">@(Context.Session.GetString("UserEmail") ?? "dabhidhiraj75@gmail.com")</div>
+                <div class="role-badge">DOCTOR</div>
+                <div class="session-time">
+                    <div><i class="fa-regular fa-clock me-1"></i> Login: <span id="loginTimeText">@loginLabel</span></div>
+                    <div><i class="fa-solid fa-hourglass-half me-1"></i> Live: <span id="sessionLiveText">--:--:--</span></div>
                 </div>
             </div>
         </div>
 
-        <div class="sidebar-content">
-            <nav>
-                <a class="nav-link @(currentAction == "Dashboard" ? "active" : "")" asp-controller="Doctor" asp-action="Dashboard">
-                    <i class="fa-solid fa-table-cells-large"></i> Dashboard
-                </a>
-                <a class="nav-link @(currentAction == "Appointments" ? "active" : "")" asp-controller="Doctor" asp-action="Appointments">
-                    <i class="fa-regular fa-calendar-check"></i> Appointments
-                </a>
-                <a class="nav-link @(currentAction == "Patients" ? "active" : "")" asp-controller="Doctor" asp-action="Patients">
-                    <i class="fa-regular fa-user"></i> Patients
-                </a>
-                <a class="nav-link @(currentAction == "Examination" ? "active" : "")" asp-controller="Doctor" asp-action="Examination">
-                    <i class="fa-regular fa-clock"></i> Examination
-                </a>
-                <a class="nav-link @(currentAction == "Prescriptions" ? "active" : "")" asp-controller="Doctor" asp-action="Prescriptions">
-                    <i class="fa-solid fa-file-prescription"></i> Prescriptions
-                </a>
-                <a class="nav-link @(currentAction == "Schedule" ? "active" : "")" asp-controller="Doctor" asp-action="Schedule">
-                    <i class="fa-regular fa-calendar-days"></i> Schedule
-                </a>
-                <a class="nav-link @(currentAction == "FollowUps" ? "active" : "")" asp-controller="Doctor" asp-action="FollowUps">
-                    <i class="fa-regular fa-circle-check"></i> Follow-ups
-                </a>
-            </nav>
-        </div>
-
-        <div class="logout-container">
-            <a class="nav-link logout-link" asp-controller="Login" asp-action="Logout">
-                <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+        <div class="sidebar-menu">
+            <a class="nav-link @(currentAction == "Dashboard" ? "active" : "")" asp-controller="Doctor" asp-action="Dashboard">
+                <i class="fa-solid fa-table-cells-large"></i> Dashboard
+            </a>
+            <a class="nav-link @(currentAction == "TokenQueue" ? "active" : "")" href="/Doctor/TokenQueue">
+                <i class="fa-regular fa-clock"></i> Token Queue
+            </a>
+            <a class="nav-link @(currentAction == "Appointments" ? "active" : "")" asp-controller="Doctor" asp-action="Appointments">
+                <i class="fa-regular fa-calendar-check"></i> Appointments
+            </a>
+            <a class="nav-link @(currentAction == "Patients" ? "active" : "")" asp-controller="Doctor" asp-action="Patients">
+                <i class="fa-regular fa-user"></i> Patients
+            </a>
+            <a class="nav-link @(currentAction == "Examination" ? "active" : "")" href="/Doctor/Examination">
+                <i class="fa-solid fa-stethoscope"></i> Examination
+            </a>
+            <a class="nav-link @(currentAction == "Medicines" ? "active" : "")" href="/Doctor/Medicines">
+                <i class="fa-solid fa-pills"></i> Medicines
+            </a>
+            <a class="nav-link @(currentAction == "Templates" ? "active" : "")" href="/Doctor/Templates">
+                <i class="fa-solid fa-file-medical"></i> Templates
+            </a>
+            <a class="nav-link @(currentAction == "Branches" ? "active" : "")" href="/Doctor/Branches">
+                <i class="fa-solid fa-building"></i> Branches
+            </a>
+            <a class="nav-link @(currentAction == "Prescriptions" ? "active" : "")" href="/Doctor/Prescriptions">
+                <i class="fa-solid fa-file-prescription"></i> Prescriptions
+            </a>
+            <a class="nav-link @(currentAction == "History" ? "active" : "")" asp-controller="Doctor" asp-action="History">
+                <i class="fa-solid fa-clock-rotate-left"></i> History
+            </a>
+            <a class="nav-link @(currentAction == "Analytics" ? "active" : "")" asp-controller="Doctor" asp-action="Analytics">
+                <i class="fa-solid fa-chart-pie"></i> Analytics
+            </a>
+            <a class="nav-link @(currentAction == "Profile" ? "active" : "")" asp-controller="Doctor" asp-action="Profile">
+                <i class="fa-regular fa-user"></i> Profile
+            </a>
+            <a class="nav-link" href="/Doctor/Notifications">
+                <i class="fa-regular fa-bell"></i> Notifications
+                @if (unreadNotificationCount > 0)
+                {
+                    <span class="ms-auto rounded-circle bg-danger d-inline-block" style="width:8px;height:8px;"></span>
+                }
+            </a>
+            <a class="nav-link @(currentAction == "Feedback" ? "active" : "")" href="/Doctor/Feedback">
+                <i class="fa-regular fa-comment-dots"></i> Feedback
             </a>
         </div>
-    </div>
 
-    <!-- MAIN APP AREA -->
-    <div class="main-wrapper">
-        
-        <!-- TOP NAVBAR -->
+        <div class="sidebar-footer">
+            <a class="logout-link" asp-controller="Login" asp-action="Logout">
+                <i class="fa-solid fa-arrow-right-from-bracket me-2"></i> Logout
+            </a>
+        </div>
+    </aside>
+
+    <div class="wrapper">
         <header class="topbar">
-            <div style="display: flex; align-items: center;">
-                <button class="mobile-toggle" id="menuToggle">
-                    <i class="fa-solid fa-bars"></i>
-                </button>
-                <div class="search-wrapper">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" placeholder="Search patients, appointments..." />
-                </div>
+            <div class="top-search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="pageSearchInput" placeholder="Search patients, appointments..." />
             </div>
-            
+
             <div class="topbar-right">
-                <button class="notification-btn">
+                <a class="notif-bell text-decoration-none" href="/Doctor/Notifications" title="Notifications">
                     <i class="fa-regular fa-bell"></i>
-                </button>
-                <div class="user-avatar">DR</div>
+                    @if (unreadNotificationCount > 0)
+                    {
+                        <div class="notif-dot"></div>
+                    }
+                </a>
+                <a asp-controller="Doctor" asp-action="Profile" class="text-decoration-none">
+                    <div class="user-dd">@(Context.Session.GetString("UserName")?.Substring(0, 2).ToUpper() ?? "DD")</div>
+                </a>
             </div>
         </header>
 
-        <!-- PAGE CONTENT -->
-        <main class="page-content">
+        <main class="main-body">
             @RenderBody()
         </main>
     </div>
 
     @await RenderSectionAsync("Scripts", required: false)
-
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    @if(TempData["ToastMessage"] != null){
+        <div class="toast align-items-center text-bg-@(TempData["ToastType"] ?? "success") position-fixed top-0 end-0 m-3 show" role="alert" aria-live="assertive" aria-atomic="true" style="z-index:2000;">
+            <div class="d-flex">
+                <div class="toast-body">
+                    @TempData["ToastMessage"]
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    }
     <script>
-        const menuToggle = document.getElementById('menuToggle');
-        const sidebar = document.getElementById('sidebar');
-        const backdrop = document.getElementById('sidebarBackdrop');
+        (function () {
+            const raw = '@loginAtRaw';
+            if (!raw) return;
+            const start = new Date(raw);
+            if (isNaN(start.getTime())) return;
+            const tick = () => {
+                const diff = Math.max(0, Date.now() - start.getTime());
+                const sec = Math.floor(diff / 1000);
+                const h = String(Math.floor(sec / 3600)).padStart(2, '0');
+                const m = String(Math.floor((sec % 3600) / 60)).padStart(2, '0');
+                const s = String(sec % 60).padStart(2, '0');
+                const el = document.getElementById('sessionLiveText');
+                if (el) el.textContent = `${h}:${m}:${s}`;
+            };
+            tick();
+            setInterval(tick, 1000);
+        })();
 
-        function toggleMenu() {
-            sidebar.classList.toggle('show');
-            backdrop.classList.toggle('show');
-        }
-
-        menuToggle?.addEventListener('click', toggleMenu);
-        backdrop?.addEventListener('click', toggleMenu);
+        (function () {
+            const input = document.getElementById('pageSearchInput');
+            if (!input) return;
+            const root = document.querySelector('.main-body') || document.body;
+            const selectors = [
+                'tbody tr',
+                '.appointment-card',
+                '.queue-item',
+                '.row-card',
+                '.card-box',
+                '.notification-item',
+                '.notification-card',
+                '.feedback-card',
+                '.history-item',
+                '.patient-card',
+                '.doctor-card',
+                '.prescription-card',
+                '.list-group-item',
+                '.searchable-item'
+            ];
+            const filter = () => {
+                const term = input.value.trim().toLowerCase();
+                const items = Array.from(root.querySelectorAll(selectors.join(',')));
+                const seen = new Set();
+                items.forEach(item => {
+                    if (seen.has(item)) return;
+                    seen.add(item);
+                    const text = (item.dataset.search || item.innerText || '').toLowerCase();
+                    item.style.display = !term || text.includes(term) ? '' : 'none';
+                });
+            };
+            input.addEventListener('input', filter);
+        })();
     </script>
 </body>
 </html>

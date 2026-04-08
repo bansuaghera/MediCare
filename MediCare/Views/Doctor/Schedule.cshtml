@@ -1,6 +1,9 @@
+@model IEnumerable<MediCare.Models.Appointment>
 @{
     ViewData["Title"] = "Schedule";
     Layout = "~/Views/Shared/_DoctorLayout.cshtml";
+    var morningAppointments = Model.Count(a => a.AppointmentDate.TimeOfDay < new TimeSpan(12, 0, 0));
+    var afternoonAppointments = Model.Count(a => a.AppointmentDate.TimeOfDay >= new TimeSpan(12, 0, 0));
 }
 
 <style>
@@ -248,7 +251,7 @@
             </div>
             <div class="session-detail">
                 <i class="fa-solid fa-user-group"></i>
-                <span>12 appointments scheduled</span>
+                <span>@morningAppointments appointments scheduled</span>
             </div>
 
             <div class="session-icon">
@@ -266,11 +269,11 @@
             </div>
             <div class="session-detail">
                 <i class="fa-solid fa-user-group"></i>
-                <span>8 appointments scheduled</span>
+                <span>@afternoonAppointments appointments scheduled</span>
             </div>
 
             <div class="session-icon">
-                <i class="fa-solid fa-moon"></i>
+                <i class="fa-solid fa-calendar-day"></i>
             </div>
         </div>
 

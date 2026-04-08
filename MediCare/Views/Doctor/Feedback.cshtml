@@ -1,0 +1,187 @@
+@model IEnumerable<MediCare.Models.Feedback>
+@{
+    ViewData["Title"] = "Feedback & Support";
+    Layout = "~/Views/Shared/_DoctorLayout.cshtml";
+}
+
+<style>
+    .feedback-wrap { max-width: 1200px; }
+    .feedback-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 20px;
+        padding: 24px;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+    }
+    .star-btn {
+        width: 40px;
+        height: 36px;
+        border-radius: 10px;
+        border: 1px solid #f59e0b;
+        background: #fff;
+        color: #f59e0b;
+        font-size: 18px;
+        line-height: 1;
+    }
+    .star-btn.active {
+        background: #fef3c7;
+        border-color: #f59e0b;
+    }
+    .history-box {
+        min-height: 340px;
+        border: 1px dashed #d1d5db;
+        border-radius: 16px;
+        padding: 14px;
+        background: #fff;
+    }
+    .history-item {
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 12px;
+        margin-bottom: 10px;
+        background: #f9fafb;
+    }
+    .empty-history {
+        min-height: 290px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6b7280;
+    }
+</style>
+
+<div class="feedback-wrap">
+    <div class="mb-4">
+        <h2 class="fw-bold mb-1">Feedback & Support</h2>
+        <p class="text-muted mb-0">Share doctor panel feedback and view your history.</p>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="feedback-card">
+                <h5 class="fw-bold mb-4"><i class="fa-regular fa-message me-2 text-success"></i>Send New Feedback</h5>
+
+                <form id="feedbackForm">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Subject</label>
+                        <input name="subject" class="form-control rounded-3" placeholder="Briefly describe your topic" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Experience Rating</label>
+                        <div class="d-flex gap-2" id="starRow">
+                            <button type="button" class="star-btn" data-rate="1"><i class="fa-solid fa-star"></i></button>
+                            <button type="button" class="star-btn" data-rate="2"><i class="fa-solid fa-star"></i></button>
+                            <button type="button" class="star-btn" data-rate="3"><i class="fa-solid fa-star"></i></button>
+                            <button type="button" class="star-btn" data-rate="4"><i class="fa-solid fa-star"></i></button>
+                            <button type="button" class="star-btn active" data-rate="5"><i class="fa-solid fa-star"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Detail Message</label>
+                        <textarea name="comment" class="form-control rounded-3" rows="5" placeholder="Write your detailed experience here..." required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100 rounded-pill py-2 fw-bold">
+                        <i class="fa-regular fa-paper-plane me-2"></i>Send Feedback
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="feedback-card">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="fw-bold m-0"><i class="fa-regular fa-calendar me-2 text-success"></i>Feedback History</h5>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3" id="selectAllFeedback">Select All</button>
+                        <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3" id="deleteSelectedFeedback">Delete Selected</button>
+                        <button type="button" class="btn btn-danger btn-sm rounded-pill px-3" id="deleteAllFeedback">Delete All</button>
+                    </div>
+                </div>
+
+                <div class="history-box">
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var fb in Model)
+                        {
+                            <div class="history-item d-flex gap-3 align-items-start searchable-item" data-search="@($"{fb.PatientName} {fb.Comment} {fb.Rating}")">
+                                <input type="checkbox" class="feedback-check mt-1" data-id="@fb.Id" />
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <strong>@fb.SubmittedAt.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")</strong>
+                                        <span class="text-warning">
+                                            @for (int i = 0; i < fb.Rating; i++)
+                                            {
+                                                <i class="fa-solid fa-star"></i>
+                                            }
+                                        </span>
+                                    </div>
+                                    <div class="text-muted small">@fb.Comment</div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="empty-history">
+                            <div class="text-center">
+                                <i class="fa-regular fa-message fa-2x mb-2 text-muted"></i>
+                                <div>No feedback history found.</div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    let selectedRating = 5;
+
+    function paintStars(value) {
+        document.querySelectorAll('#starRow .star-btn').forEach(btn => {
+            const rate = parseInt(btn.dataset.rate);
+            btn.classList.toggle('active', rate <= value);
+        });
+    }
+
+    document.querySelectorAll('#starRow .star-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            selectedRating = parseInt(this.dataset.rate);
+            paintStars(selectedRating);
+        });
+    });
+
+    document.getElementById('feedbackForm').addEventListener('submit', function(e){
+        e.preventDefault();
+        const form = e.target;
+        $.post('/Doctor/SubmitFeedback', {
+            Rating: selectedRating,
+            Comment: form.comment.value,
+            subject: form.subject.value
+        }, function(res){
+            if(res && res.success){ window.location.reload(); }
+        });
+    });
+
+    const checks = () => Array.from(document.querySelectorAll('.feedback-check'));
+    document.getElementById('selectAllFeedback')?.addEventListener('click', () => {
+        const next = !checks().every(c => c.checked);
+        checks().forEach(c => c.checked = next);
+    });
+    document.getElementById('deleteSelectedFeedback')?.addEventListener('click', () => {
+        const ids = checks().filter(c => c.checked).map(c => parseInt(c.dataset.id));
+        if(ids.length === 0) return;
+        if(!confirm(`Delete ${ids.length} feedback item(s)?`)) return;
+        $.ajax({ url: '/Doctor/DeleteSelectedFeedbacks', type: 'POST', contentType: 'application/json', data: JSON.stringify(ids), success: r => r.success && location.reload() });
+    });
+    document.getElementById('deleteAllFeedback')?.addEventListener('click', () => {
+        if(!confirm('Delete all feedback history?')) return;
+        $.post('/Doctor/DeleteAllFeedbacks', {}, r => r.success && location.reload());
+    });
+</script>
+}

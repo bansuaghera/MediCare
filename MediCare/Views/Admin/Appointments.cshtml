@@ -1,23 +1,10 @@
-﻿@{
+@model IEnumerable<MediCare.Models.Appointment>
+@{
     ViewData["Title"] = "Appointments";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
 <style>
-    .page-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-    }
-
-    .filter-btn {
-        padding: 6px 12px;
-        border-radius: 6px;
-        border: 1px solid #ddd;
-        background: white;
-        cursor: pointer;
-    }
 
     .card-box {
         background: white;
@@ -32,6 +19,22 @@
         border-radius: 6px;
         border: 1px solid #ddd;
         margin-bottom: 15px;
+    }
+
+    .nav-tabs {
+        margin-bottom: 15px;
+        border-bottom: 1px solid #eee;
+    }
+    .nav-tabs .nav-link {
+        color: #666;
+        border: none;
+        padding: 8px 15px;
+    }
+    .nav-tabs .nav-link.active {
+        color: #16a34a;
+        border-bottom: 2px solid #16a34a;
+        font-weight: 600;
+        background: transparent;
     }
 
     table {
@@ -50,22 +53,14 @@
         border-radius: 20px;
         font-size: 12px;
         font-weight: 600;
+        border: none;
+        cursor: pointer;
     }
 
-    .confirmed {
-        background: #d1f5e0;
-        color: #0f9b6d;
-    }
-
-    .pending {
-        background: #fff4cc;
-        color: #b38f00;
-    }
-
-    .cancelled {
-        background: #ffd6d6;
-        color: #cc0000;
-    }
+    .confirmed { background: #d1f5e0; color: #0f9b6d; }
+    .pending { background: #fff4cc; color: #b38f00; }
+    .cancelled { background: #ffd6d6; color: #cc0000; }
+    .no-show { background: #f0f0f0; color: #666; }
 
     .pagination {
         margin-top: 15px;
@@ -91,9 +86,35 @@
 
 <div class="card-box">
 
-    <input class="search-box" type="text" placeholder="Search appointments..." />
+    <ul class="nav nav-tabs" id="appointmentTabs" role="tablist">
+        <li class="nav-item">
+            <button class="nav-link active" onclick="filterByStatus('All')">All</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" onclick="filterByStatus('Waiting')">Waiting</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" onclick="filterByStatus('In Progress')">In Progress</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" onclick="filterByStatus('Completed')">Completed</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" onclick="filterByStatus('Cancelled')">Cancelled</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" onclick="filterByStatus('No-Show')">No-Show</button>
+        </li>
+    </ul>
 
-    <table>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <input class="search-box" type="text" placeholder="Search appointments..." id="searchInput" onkeyup="filterTable()" style="margin-bottom: 0;" />
+        <form asp-action="DeleteAllAppointments" method="post" onsubmit="return confirm('WARNING: Are you sure you want to delete ALL appointments? This cannot be undone.');">
+            <button type="submit" class="btn btn-danger" style="border-radius: 8px; padding: 6px 15px;">Delete All</button>
+        </form>
+    </div>
+
+    <table id="appointmentsTable">
         <thead>
             <tr>
                 <th>ID</th>
@@ -101,68 +122,42 @@
                 <th>Doctor</th>
                 <th>Date</th>
                 <th>Time</th>
-                <th>Type</th>
                 <th>Status</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-
-            <tr>
-                <td>1</td>
-                <td>John Smith</td>
-                <td>Dr. Sarah Johnson</td>
-                <td>2024-02-12</td>
-                <td>10:00 AM</td>
-                <td>Checkup</td>
-                <td><span class="badge confirmed">Confirmed</span></td>
-                <td><i class="fa fa-eye"></i></td>
-            </tr>
-
-            <tr>
-                <td>2</td>
-                <td>Sarah Johnson</td>
-                <td>Dr. Michael Chen</td>
-                <td>2024-02-12</td>
-                <td>11:00 AM</td>
-                <td>Consultation</td>
-                <td><span class="badge pending">Pending</span></td>
-                <td><i class="fa fa-eye"></i></td>
-            </tr>
-
-            <tr>
-                <td>3</td>
-                <td>Michael Chen</td>
-                <td>Dr. Emily Davis</td>
-                <td>2024-02-12</td>
-                <td>02:00 PM</td>
-                <td>Follow-up</td>
-                <td><span class="badge confirmed">Confirmed</span></td>
-                <td><i class="fa fa-eye"></i></td>
-            </tr>
-
-            <tr>
-                <td>4</td>
-                <td>Emily Davis</td>
-                <td>Dr. Robert Wilson</td>
-                <td>2024-02-13</td>
-                <td>09:00 AM</td>
-                <td>Emergency</td>
-                <td><span class="badge cancelled">Cancelled</span></td>
-                <td><i class="fa fa-eye"></i></td>
-            </tr>
-
-            <tr>
-                <td>5</td>
-                <td>Robert Wilson</td>
-                <td>Dr. Sarah Johnson</td>
-                <td>2024-02-13</td>
-                <td>03:00 PM</td>
-                <td>Checkup</td>
-                <td><span class="badge confirmed">Confirmed</span></td>
-                <td><i class="fa fa-eye"></i></td>
-            </tr>
-
+            @foreach(var app in Model)
+            {
+                <tr data-status="@app.Status">
+                    <td>#@app.Id.ToString("D4")</td>
+                    <td>@(app.Patient?.FirstName + " " + app.Patient?.LastName ?? "Unknown")</td>
+                    <td>Dr. @(app.Doctor?.FirstName + " " + app.Doctor?.LastName ?? "Unknown")</td>
+                    <td>@app.AppointmentDate.ToString("yyyy-MM-dd")</td>
+                    <td>@app.TimeSlot</td>
+                    <td>
+                        <select class="badge @app.Status.ToLower().Replace(" ", "-")" onchange="updateStatus(@app.Id, this)" style="border:none; cursor:pointer; background-color: inherit;">
+                            <option value="Scheduled" selected="@(app.Status == "Scheduled")">Scheduled</option>
+                            <option value="Waiting" selected="@(app.Status == "Waiting")">Waiting</option>
+                            <option value="In Progress" selected="@(app.Status == "In Progress")">In Progress</option>
+                            <option value="Completed" selected="@(app.Status == "Completed")">Completed</option>
+                            <option value="Cancelled" selected="@(app.Status == "Cancelled")">Cancelled</option>
+                            <option value="No-Show" selected="@(app.Status == "No-Show")">No-Show</option>
+                        </select>
+                    </td>
+                    <td>
+                        <span style="cursor:pointer; margin-right:8px;" title="Edit">✏️</span>
+                        <form asp-action="DeleteAppointment" method="post" style="display:inline;" onsubmit="return confirm('Are you sure?');">
+                            <input type="hidden" name="id" value="@app.Id" />
+                            <button type="submit" style="background:none; border:none; color:red; cursor:pointer; padding:0;">🗑️</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            @if(!Model.Any())
+            {
+                <tr><td colspan="7" class="text-center">No records found.</td></tr>
+            }
         </tbody>
     </table>
 
@@ -172,3 +167,47 @@
     </div>
 
 </div>
+
+<script>
+    function filterByStatus(status) {
+        // Toggle active class on tabs
+        document.querySelectorAll('.nav-link').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+
+        var rows = document.querySelectorAll("#appointmentsTable tbody tr");
+        rows.forEach(function (row) {
+            if (row.children.length === 1) return;
+            if (status === 'All' || row.dataset.status === status) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    function filterTable() {
+        var searchTerm = document.getElementById("searchInput").value.toLowerCase();
+        var rows = document.querySelectorAll("#appointmentsTable tbody tr");
+        rows.forEach(function (row) {
+            if (row.children.length === 1) return;
+            var text = row.innerText.toLowerCase();
+            if (text.includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    function updateStatus(id, selectElement) {
+        var status = selectElement.value;
+        $.post('/Admin/UpdateStatus', { id: id, status: status }, function(res) {
+            if(res.success) {
+                selectElement.className = "badge " + status.toLowerCase().replace(/\s+/g, '-');
+            } else {
+                alert('Failed to update status.');
+                location.reload();
+            }
+        });
+    }
+</script>

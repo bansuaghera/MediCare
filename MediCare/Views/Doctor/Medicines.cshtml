@@ -1,0 +1,148 @@
+﻿@model IEnumerable<MediCare.Models.Medicine>
+@{
+    ViewData["Title"] = "Medicines";
+    Layout = "~/Views/Shared/_DoctorLayout.cshtml";
+}
+
+<style>
+    .panel-card { background:#fff; border:1px solid #e5e7eb; border-radius:22px; box-shadow:0 12px 30px rgba(15,23,42,.04); padding:24px; }
+    .toolbar { display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:18px; }
+    .search-box { width:min(420px,100%); display:flex; align-items:center; gap:10px; border:1px solid #e2e8f0; border-radius:14px; padding:10px 14px; background:#f8fafc; }
+    .search-box input { border:0; outline:none; background:transparent; width:100%; }
+    .medicine-table { width:100%; min-width:980px; border-collapse:collapse; }
+    .medicine-table th, .medicine-table td { padding:14px 12px; border-bottom:1px solid #eef2f7; vertical-align:middle; }
+    .medicine-table th { font-size:12px; text-transform:uppercase; letter-spacing:.05em; color:#64748b; }
+    .medicine-row.selected { background:#f0fdf4; }
+    .badge-id { background:#ecfdf5; color:#059669; border-radius:999px; padding:6px 10px; font-weight:700; font-size:12px; }
+</style>
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+    <div>
+        <h2 class="fw-bold mb-1">Medicine Master</h2>
+        <p class="text-muted mb-0">Add medicines used in examination and prescriptions.</p>
+    </div>
+    <a href="#addMedicineForm" class="btn btn-success rounded-pill px-4 fw-bold"><i class="fa-solid fa-plus me-1"></i> Add Medicine</a>
+</div>
+
+<div class="panel-card mb-4" id="addMedicineForm">
+    <h5 class="fw-bold mb-3">Add Medicine</h5>
+    <form asp-action="AddMedicine" method="post" class="row g-3">
+        <div class="col-md-4"><input name="MedicineName" class="form-control" placeholder="Medicine name" required /></div>
+        <div class="col-md-4"><input name="GenericName" class="form-control" placeholder="Generic name" /></div>
+        <div class="col-md-4"><input name="Category" class="form-control" placeholder="Category" /></div>
+        <div class="col-md-3"><input name="Strength" class="form-control" placeholder="Strength" /></div>
+        <div class="col-md-3"><input name="DosageForm" class="form-control" placeholder="Dosage form" /></div>
+        <div class="col-md-3"><input name="Manufacturer" class="form-control" placeholder="Manufacturer" /></div>
+        <div class="col-md-3"><input name="Supplier" class="form-control" placeholder="Supplier" /></div>
+        <div class="col-md-3"><input name="Stock" type="number" class="form-control" value="0" required /></div>
+        <div class="col-md-3"><input name="PurchasePrice" type="number" step="0.01" class="form-control" placeholder="Purchase price" required /></div>
+        <div class="col-md-3"><input name="SellingPrice" type="number" step="0.01" class="form-control" placeholder="Selling price" required /></div>
+        <div class="col-md-3"><input name="ExpDate" type="date" class="form-control" /></div>
+        <div class="col-12"><textarea name="Usage" class="form-control" rows="3" placeholder="Usage instructions"></textarea></div>
+        <div class="col-12 d-flex gap-2">
+            <button class="btn btn-success rounded-pill px-4 fw-bold" type="submit">Save Medicine</button>
+            <a asp-action="Medicines" class="btn btn-outline-secondary rounded-pill px-4">Reset</a>
+        </div>
+    </form>
+</div>
+
+<div class="panel-card">
+    <div class="toolbar">
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <input type="checkbox" id="selectAll" class="form-check-input shadow-none" />
+            <button class="btn btn-outline-danger btn-sm" id="deleteSelectedBtn" disabled>Delete Selected</button>
+            <form asp-action="DeleteAllMedicines" method="post" class="m-0" onsubmit="return confirm('Delete ALL medicines?');">
+                <button type="submit" class="btn btn-outline-danger btn-sm">Delete All</button>
+            </form>
+        </div>
+        <div class="search-box">
+            <i class="fa-solid fa-search text-muted"></i>
+            <input type="text" id="searchBox" placeholder="Search medicines..." onkeyup="filterMedicines()" />
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="medicine-table">
+            <thead>
+                <tr>
+                    <th style="width:40px;"></th>
+                    <th>ID</th><th>Name</th><th>Category</th><th>Stock</th><th>Price</th><th>Company</th><th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="medicineBody">
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var medicine in Model)
+                    {
+                        <tr class="medicine-row" data-id="@medicine.Id" data-search="@($"{medicine.MedicineName} {medicine.Category} {medicine.Manufacturer} {medicine.Supplier} {medicine.Strength} {medicine.DosageForm}")">
+                            <td><input type="checkbox" class="form-check-input row-check shadow-none" /></td>
+                            <td><span class="badge-id">MED-@(medicine.Id.ToString("D3"))</span></td>
+                            <td>@medicine.MedicineName</td>
+                            <td>@medicine.Category</td>
+                            <td>@medicine.Stock</td>
+                            <td>@medicine.SellingPrice.ToString("0.00")</td>
+                            <td>@medicine.Manufacturer</td>
+                            <td class="text-end">
+                                <div class="d-flex justify-content-end gap-3">
+                                    <form asp-action="DeleteMedicine" asp-route-id="@medicine.Id" method="post" class="m-0" onsubmit="return confirm('Delete this medicine?');">
+                                        <button type="submit" class="btn btn-link p-0 text-danger"><i class="fa-solid fa-trash"></i></button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="8" class="text-center text-muted py-4">No medicines found.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const rowChecks = document.querySelectorAll('.row-check');
+        const selectAll = document.getElementById('selectAll');
+        const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+
+        function syncSelection() {
+            const selected = document.querySelectorAll('.row-check:checked').length;
+            deleteSelectedBtn.disabled = selected === 0;
+            if (selectAll) selectAll.checked = selected === rowChecks.length && rowChecks.length > 0;
+            document.querySelectorAll('.medicine-row').forEach(row => {
+                const cb = row.querySelector('.row-check');
+                row.classList.toggle('selected', cb && cb.checked);
+            });
+        }
+
+        rowChecks.forEach(cb => cb.addEventListener('change', syncSelection));
+        if (selectAll) selectAll.addEventListener('change', function () {
+            rowChecks.forEach(cb => cb.checked = selectAll.checked);
+            syncSelection();
+        });
+
+        deleteSelectedBtn?.addEventListener('click', function () {
+            const ids = Array.from(document.querySelectorAll('.row-check:checked')).map(cb => parseInt(cb.closest('.medicine-row').dataset.id));
+            if (!ids.length) return;
+            if (!confirm(`Delete ${ids.length} selected medicine(s)?`)) return;
+            $.ajax({
+                url: '/Doctor/DeleteSelectedMedicines',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(ids),
+                success: function (res) { if (res && res.success) location.reload(); else alert('Unable to delete selected medicines.'); }
+            });
+        });
+
+        function filterMedicines() {
+            const q = (document.getElementById('searchBox').value || '').toLowerCase();
+            document.querySelectorAll('.medicine-row').forEach(row => {
+                row.style.display = row.dataset.search.toLowerCase().includes(q) ? '' : 'none';
+            });
+        }
+
+        syncSelection();
+    </script>
+}

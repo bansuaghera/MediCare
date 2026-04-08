@@ -1,0 +1,94 @@
+@{
+    ViewData["Title"] = "Prescription Details";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .card-box {
+        background: #ffffff;
+        border-radius: 14px;
+        padding: 30px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    .header-info { margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 20px; }
+    .header-info h4 { font-weight: 700; margin-bottom: 5px; }
+    .medicine-list { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    .medicine-list th { background: #f8fafc; color: #6b7280; font-size: 13px; text-transform: uppercase; font-weight: 600; padding: 12px; }
+    .medicine-list td { padding: 16px 12px; border-bottom: 1px solid #f1f5f9; color: #374151; font-weight: 500; }
+    
+    .btn-print {
+        background-color: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer;
+    }
+    .btn-print:hover { background-color: #2563eb; }
+</style>
+
+<div class="mb-4">
+    <h3 class="fw-bold"><i class="fa fa-file-prescription text-primary"></i> Prescription Details #1</h3>
+    <small class="text-muted">Viewing comprehensive prescription report</small>
+</div>
+
+<div class="card-box">
+    <div class="header-info row">
+        <div class="col-md-6">
+            <h4>Patient Information</h4>
+            <div class="text-muted">
+                <strong>Name:</strong> Rahul Sharma<br/>
+                <strong>Age/Gender:</strong> 45 / Male<br/>
+                <strong>Date:</strong> 2024-02-12
+            </div>
+        </div>
+        <div class="col-md-6 text-md-end mt-3 mt-md-0">
+            <h4>Doctor Information</h4>
+            <div class="text-muted">
+                <strong>Name:</strong> Dr. Priya Patel<br/>
+                <strong>Department:</strong> Cardiology<br/>
+            </div>
+        </div>
+    </div>
+    
+    <h5 class="fw-bold mb-3">Medicines Prescribed</h5>
+    <div class="table-responsive mb-4">
+        <table class="medicine-list">
+            <thead>
+                <tr>
+                    <th>Medicine Name</th>
+                    <th>Dosage</th>
+                    <th>Duration</th>
+                    <th>Instructions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Amoxicillin 500mg</td>
+                    <td>1 - 0 - 1</td>
+                    <td>5 Days</td>
+                    <td>After meals</td>
+                </tr>
+                <tr>
+                    <td>Paracetamol 650mg</td>
+                    <td>1 - 1 - 1</td>
+                    <td>3 Days</td>
+                    <td>When required for fever</td>
+                </tr>
+                <tr>
+                    <td>Vitamin C Supplement</td>
+                    <td>1 - 0 - 0</td>
+                    <td>30 Days</td>
+                    <td>Morning, empty stomach</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="mt-4">
+        <h5 class="fw-bold">Additional Notes</h5>
+        <div class="p-3 bg-light rounded text-muted">
+            Patient reported mild fever and congestion. Advised to drink plenty of warm fluids. Avoid cold and sugary foods. Follow up after 5 days if symptoms persist.
+        </div>
+    </div>
+    
+    <div class="mt-5 border-top pt-4 text-end">
+        <a asp-action="Prescriptions" class="btn btn-light me-2 fw-bold">Back to List</a>
+        <button class="btn btn-print"><i class="fa fa-print me-2"></i> Print Prescription</button>
+    </div>
+</div>

@@ -1,0 +1,171 @@
+@model IEnumerable<MediCare.Models.Appointment>
+@{
+    ViewData["Title"] = "Manage Appointments";
+    Layout = "~/Views/Shared/_StaffLayout.cshtml";
+}
+
+<style>
+    .page-title { font-size: 26px; font-weight: 700; color: #111827; }
+    .page-sub { font-size: 14px; color: #6b7280; margin-bottom: 30px; }
+
+    .btn-red { background: #ef4444; color: white !important; border: none; padding: 10px 24px; border-radius: 12px; font-weight: 700; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2); }
+    .btn-emerald { background: #10b981; color: white !important; border: none; padding: 10px 24px; border-radius: 12px; font-weight: 700; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); }
+
+    .main-card { background: white; border-radius: 16px; padding: 35px; box-shadow: 0 4px 25px rgba(0,0,0,0.03); margin-top: 30px; border: 1px solid #f1f5f9; }
+    
+    .search-input { width: 320px; padding: 10px 15px 10px 45px; border-radius: 10px; border: 1px solid #f1f5f9; background: #f8fafc; font-size: 14px; outline: none; }
+    .search-box i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
+
+    .modern-table thead th { text-align: left; padding: 18px 15px; font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.1em; border-bottom: 2px solid #f8fafc; }
+    .modern-table tbody td { padding: 18px 15px; border-bottom: 1px solid #f8fafc; font-size: 14px; vertical-align: middle; }
+
+    .emergency-row { background-color: #fef2f2 !important; }
+    .token-id { color: #10b981; font-weight: 700; }
+    .status-badge { padding: 4px 20px; border-radius: 8px; font-size: 11px; font-weight: 800; text-transform: uppercase; }
+    .status-completed { background: #dcfce7; color: #16a34a; }
+    .status-pending { background: #fefce8; color: #ca8a04; }
+
+    .btn-call-in { background: #eff6ff; color: #3b82f6; border: none; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; }
+    .btn-view { color: #94a3b8; font-size: 18px; padding-left: 5px; background: none; border: none; }
+    
+    .bulk-panel { display: none; margin-bottom: 20px; padding: 12px; background: #f9fafb; border-radius: 12px; gap: 15px; align-items: center; }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-1">
+    <div>
+        <h2 class="page-title">Appointments</h2>
+        <p class="page-sub">Manage and book patient appointments</p>
+    </div>
+    <div class="d-flex gap-3">
+        <button class="btn btn-red" data-bs-toggle="modal" data-bs-target="#emModal"><i class="fa fa-plus"></i> Add New Emergency Appointment</button>
+        <a href="/Staff/BookAppointment" class="btn btn-emerald"><i class="fa fa-plus"></i> Book Regular</a>
+    </div>
+</div>
+
+<div class="main-card">
+    <div class="d-flex justify-content-between mb-4">
+        <div class="search-box position-relative">
+            <i class="fa fa-search"></i>
+            <input type="text" id="pSearch" class="search-input" placeholder="Search patient or doctor..." onkeyup="filterTable()">
+        </div>
+        <button class="btn btn-sm btn-outline-danger px-3 rounded-pill" onclick="confirmDeleteAll()">Clear All History</button>
+    </div>
+
+    <div class="bulk-panel" id="bulkPanel">
+        <span class="fw-bold small text-muted"><span id="selCount">0</span> appointments selected</span>
+        <button class="btn btn-sm btn-danger px-3 rounded-pill" onclick="bulkDelete()">Delete Selected</button>
+    </div>
+
+    <div class="table-responsive">
+        <table class="modern-table w-100" id="apptTable">
+            <thead>
+                <tr>
+                    <th style="width: 40px;"><input type="checkbox" id="selectAll" class="form-check-input shadow-none"></th>
+                    <th>Token</th>
+                    <th>Patient</th>
+                    <th>Doctor</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var app in Model)
+                {
+                    <tr class="@(app.Status == "Emergency" || (app.TokenNumber != null && app.TokenNumber.StartsWith("EMG")) ? "emergency-row" : "")" data-id="@app.Id">
+                        <td><input type="checkbox" class="form-check-input row-check shadow-none"></td>
+                        <td class="token-id">#@app.TokenNumber</td>
+                        <td class="fw-bold text-dark">@app.Patient?.FirstName @app.Patient?.LastName 
+                            @if(app.Status == "Emergency") { <span class="badge bg-danger ms-1" style="font-size: 8px;">EMERGENCY</span> }
+                        </td>
+                        <td class="text-secondary">Dr. @app.Doctor?.FirstName @app.Doctor?.LastName</td>
+                        <td>@app.AppointmentDate.ToString("yyyy-MM-dd")</td>
+                        <td class="fw-semibold">@app.TimeSlot</td>
+                        <td class="text-muted">@(string.IsNullOrEmpty(app.Subject) ? "Consultation" : app.Subject)</td>
+                        <td>
+                            <span class="status-badge status-@(app.Status?.ToLower() == "completed" ? "completed" : "pending")">
+                                @(app.Status?.ToUpper() ?? "PENDING")
+                            </span>
+                        </td>
+                        <td>
+                            <div class="d-flex gap-2 align-items-center">
+                                @if (app.Status == "In Progress" || app.Status == "In-Progress") {
+                                    <button class="btn-emerald py-1 px-3" style="font-size: 12px;" onclick="updateSt(@app.Id, 'Completed')">Complete</button>
+                                } else if (app.Status != "Completed") {
+                                    <button class="btn-call-in" onclick="updateSt(@app.Id, 'In Progress')">Call In</button>
+                                }
+                                <button class="btn-view" onclick="viewDetails(@app.Id)"><i class="fa-regular fa-eye"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-4 text-muted small fw-medium">Showing @Model.Count() of @Model.Count() appointments</div>
+</div>
+
+<!-- Details Modal -->
+<div class="modal fade" id="detModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg p-3" style="border-radius: 20px;">
+            <div class="modal-header border-0"><h5 class="fw-bold">Appointment Details</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-6"><label class="small text-muted fw-bold">PATIENT</label><div id="d_pat" class="fw-bold"></div></div>
+                    <div class="col-6"><label class="small text-muted fw-bold">DOCTOR</label><div id="d_doc" class="fw-bold"></div></div>
+                    <div class="col-6"><label class="small text-muted fw-bold">TOKEN</label><div id="d_tok" class="text-success fw-bold"></div></div>
+                    <div class="col-6"><label class="small text-muted fw-bold">SCHEDULE</label><div id="d_sch"></div></div>
+                </div>
+                <hr class="opacity-25 my-3">
+                <label class="small text-muted fw-bold">SUBJECT</label><div id="d_sub" class="h6 fw-bold"></div>
+                <label class="small text-muted fw-bold mt-2">NOTES</label><div id="d_not" class="p-2 border rounded bg-light small"></div>
+            </div>
+            <div class="modal-footer border-0">
+                <button class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+                <button class="btn btn-danger rounded-pill px-4" onclick="deleteFromModal()">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let currentId = null;
+        function filterTable() {
+            let input = document.getElementById("pSearch").value.toLowerCase();
+            $("#apptTable tbody tr").each(function() {
+                $(this).toggle($(this).text().toLowerCase().indexOf(input) > -1);
+            });
+        }
+        function updateSt(id, status) {
+            $.post('/Staff/UpdateStatus', { id: id, status: status }, function(res) { if(res.success) location.reload(); });
+        }
+        $('#selectAll').on('change', function() {
+            $('.row-check').prop('checked', this.checked); toggleBulk();
+        });
+        $(document).on('change', '.row-check', function() { toggleBulk(); });
+        function toggleBulk() {
+            let count = $('.row-check:checked').length;
+            $('#selCount').text(count);
+            $('#bulkPanel').css('display', count > 0 ? 'flex' : 'none');
+        }
+        function bulkDelete() {
+            if(!confirm("Delete selected items?")) return;
+            let ids = []; $('.row-check:checked').each(function() { ids.push($(this).closest('tr').data('id')); });
+            $.ajax({ url: '/Staff/BulkDeleteAppointments', type:'POST', contentType:'application/json', data:JSON.stringify(ids), success:function(r){ if(r.success) location.reload(); }});
+        }
+        function confirmDeleteAll(){ if(confirm("Clear all?")) $.post('/Staff/DeleteAllAppointments', function(r){ if(r.success) location.reload(); }); }
+        function viewDetails(id) {
+            currentId = id; $('#detModal').modal('show');
+            $.get('/Staff/GetAppointmentDetails/' + id, function(d) {
+                $('#d_pat').text(d.patientName); $('#d_doc').text(d.doctorName); $('#d_tok').text('#'+d.token);
+                $('#d_sch').text(d.date + ' ' + d.time); $('#d_sub').text(d.subject); $('#d_not').text(d.notes || 'No notes');
+            });
+        }
+        function deleteFromModal(){ if(confirm("Delete?")) $.post('/Staff/DeleteAppointment/'+currentId, function(r){ if(r.success) location.reload(); }); }
+    </script>
+}
